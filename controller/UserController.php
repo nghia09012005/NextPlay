@@ -1,66 +1,56 @@
 <?php
-require_once '../config/database.php';
-require_once '../models/User.php';
+require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/../service/UserService.php';
 
 class UserController {
-    private $db;
-    private $user;
+    private $service;
 
     public function __construct() {
-        $database = new Database();
-        $this->db = $database->getConnection();
-        $this->user = new User($this->db);
+        $db = (new Database())->getConnection();
+        $this->service = new UserService($db);
     }
 
-    public function index() {
-        $stmt = $this->user->readAll();
-        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    public function register() {
         header('Content-Type: application/json');
-        echo json_encode($users);
-    }
+        $data = json_decode(file_get_contents("php://input"), true);
 
-    public function show($uid) {
-        $data = $this->user->readOne($uid);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-    }
+        echo "[UserController]: data";
+        print_r($data);
 
-    public function store() {
-        $input = json_decode(file_get_contents('php://input'), true);
-        $this->user->uname = $input['uname'];
-        $this->user->email = $input['email'];
-        $this->user->password = password_hash($input['password'], PASSWORD_DEFAULT);
+        if (!isset($data['uname']) || !isset($data['email']) || !isset($data['password'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required fields']);
+            return;
+        }
 
-        if ($this->user->create()) {
-            http_response_code(201);
-            echo json_encode(['message' => 'User created']);
+        $uid = $this->service->register(
+            $data["uname"], 
+            $data["email"], 
+            $data["password"]
+        );
+
+        if ($uid) {
+            echo json_encode(["status" => "success", "uid" => $uid]);
         } else {
-            http_response_code(500);
-            echo json_encode(['message' => 'Error creating user']);
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Registration failed"]);
         }
     }
 
-    public function update($uid) {
-        $input = json_decode(file_get_contents('php://input'), true);
-        $this->user->uid = $uid;
-        $this->user->uname = $input['uname'];
-        $this->user->email = $input['email'];
-        $this->user->password = password_hash($input['password'], PASSWORD_DEFAULT);
-
-        if ($this->user->update()) {
-            echo json_encode(['message' => 'User updated']);
-        } else {
-            http_response_code(500);
-            echo json_encode(['message' => 'Error updating user']);
-        }
+    public function getAll() {
+        header('Content-Type: application/json');
+        $users = $this->service->getAll();
+        echo json_encode(["status" => "success", "data" => $users]);
     }
 
-    public function delete($uid) {
-        if ($this->user->delete($uid)) {
-            echo json_encode(['message' => 'User deleted']);
+    public function getOne($uid) {
+        header('Content-Type: application/json');
+        $user = $this->service->getOne($uid);
+        if ($user) {
+            echo json_encode(["status" => "success", "data" => $user]);
         } else {
-            http_response_code(500);
-            echo json_encode(['message' => 'Error deleting user']);
+            http_response_code(404);
+            echo json_encode(["status" => "error", "message" => "User not found"]);
         }
     }
 }

@@ -1,6 +1,6 @@
 -- Bảng 1: User
 CREATE TABLE `User` (
-    `uid` INT PRIMARY KEY,
+    `uid` INT AUTO_INCREMENT PRIMARY KEY,
     `uname` VARCHAR(255) NOT NULL,
     `avatar` VARCHAR(255),
     `email` VARCHAR(255) UNIQUE NOT NULL,
@@ -12,21 +12,21 @@ CREATE TABLE `User` (
 
 -- Bảng 2: Customer
 CREATE TABLE `Customer` (
-    `uid` INT PRIMARY KEY,
+    `uid` INT AUTO_INCREMENT PRIMARY KEY,
     `balance` DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (`uid`) REFERENCES `User`(`uid`)
 );
 
 -- Bảng 3: Admin
 CREATE TABLE `Admin` (
-    `uid` INT PRIMARY KEY,
+    `uid` INT AUTO_INCREMENT PRIMARY KEY,
     `startdate` DATE,
     FOREIGN KEY (`uid`) REFERENCES `User`(`uid`)
 );
 
 -- Bảng 4: Publisher
 CREATE TABLE `Publisher` (
-    `uid` INT PRIMARY KEY,
+    `uid` INT AUTO_INCREMENT PRIMARY KEY,
     `description` TEXT,
     `taxcode` VARCHAR(50),
     `location` VARCHAR(255),
@@ -35,7 +35,7 @@ CREATE TABLE `Publisher` (
 
 -- Bảng 5: Game
 CREATE TABLE `Game` (
-    `Gid` INT PRIMARY KEY,
+    `Gid` INT AUTO_INCREMENT PRIMARY KEY,
     `name` VARCHAR(255) NOT NULL,
     `version` VARCHAR(50),
     `description` TEXT,
@@ -48,7 +48,7 @@ CREATE TABLE `Game` (
 
 -- Bảng 6: Category
 CREATE TABLE `Category` (
-    `catId` INT PRIMARY KEY,
+    `catId` INT AUTO_INCREMENT PRIMARY KEY,
     `name` VARCHAR(255) UNIQUE NOT NULL,
     `description` TEXT
 );

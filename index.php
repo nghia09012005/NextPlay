@@ -1,24 +1,31 @@
 <?php
-require_once 'controllers/UserController.php';
+require_once __DIR__ . '/controller/UserController.php';
 
 $controller = new UserController();
 
 // Lấy URL
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = explode('/', trim($uri, '/'));
+$base_path = '/Assignment/NextPlay';
+$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$request_uri = str_replace($base_path, '', $request_uri);
+$uri = explode('/', trim($request_uri, '/'));
 
-// Ví dụ: /users hoặc /users/1
-if ($uri[0] === 'users') {
-    if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($uri[1])) {
-        $controller->index();
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1])) {
-        $controller->show($uri[1]);
+// // Debug
+// echo "Request URI: " . $request_uri . "<br>";
+// echo "URI array: ";
+// print_r($uri);
+// echo "<br>";
+
+// Xử lý route
+if (count($uri) > 0 && $uri[1] === 'users') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($uri[2])) {
+        $controller->getAll();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[2])) {
+        $controller->getOne($uri[1]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $controller->store();
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1])) {
-        $controller->update($uri[1]);
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1])) {
-        $controller->delete($uri[1]);
+        $controller->register();
+    } else {
+        http_response_code(405);
+        echo json_encode(['message' => 'Method Not Allowed']);
     }
 } else {
     http_response_code(404);
