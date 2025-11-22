@@ -1,13 +1,13 @@
 <?php
 require_once __DIR__ . '/../config/Database.php';
-require_once __DIR__ . '/../service/UserService.php';
+require_once __DIR__ . '/../service/PublisherService.php';
 
-class UserController {
+class PublisherController {
     private $service;
 
     public function __construct() {
         $db = (new Database())->getConnection();
-        $this->service = new UserService($db);
+        $this->service = new PublisherService($db);
     }
 
     public function register() {
@@ -26,7 +26,11 @@ class UserController {
             }
 
             // Required fields validation
-            $requiredFields = ['uname', 'email', 'password', 'DOB', 'lname', 'fname'];
+            $requiredFields = [
+                'uname', 'email', 'password', 'DOB', 
+                'lname', 'fname', 'description', 'taxcode', 'location'
+            ];
+            
             $missingFields = [];
             foreach ($requiredFields as $field) {
                 if (empty($data[$field])) {
@@ -54,11 +58,19 @@ class UserController {
                 throw new Exception('Invalid date of birth format. Please use YYYY-MM-DD', 400);
             }
 
+            // Tax code validation (basic check)
+            if (!preg_match('/^[0-9A-Za-z-]+$/', $data['taxcode'])) {
+                throw new Exception('Tax code can only contain letters, numbers and hyphens', 400);
+            }
+
             // Sanitize inputs
             $uname = filter_var($data['uname'], FILTER_SANITIZE_STRING);
             $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
             $lname = filter_var($data['lname'], FILTER_SANITIZE_STRING);
             $fname = filter_var($data['fname'], FILTER_SANITIZE_STRING);
+            $description = filter_var($data['description'], FILTER_SANITIZE_STRING);
+            $taxcode = filter_var($data['taxcode'], FILTER_SANITIZE_STRING);
+            $location = filter_var($data['location'], FILTER_SANITIZE_STRING);
 
             // Attempt registration
             $uid = $this->service->register(
@@ -67,23 +79,26 @@ class UserController {
                 $data['password'], // Don't sanitize password
                 $data['DOB'],
                 $lname,
-                $fname
+                $fname,
+                $description,
+                $taxcode,
+                $location
             );
 
             if ($uid) {
                 http_response_code(201); // 201 Created
                 echo json_encode([
                     'status' => 'success',
-                    'message' => 'User registered successfully',
+                    'message' => 'Publisher registered successfully',
                     'uid' => $uid
                 ]);
             } else {
-                throw new Exception('Failed to register user. The username or email may already be in use.', 400);
+                throw new Exception('Failed to register publisher. The username or email may already be in use.', 400);
             }
 
         } catch (PDOException $e) {
             // Database errors
-            error_log('Database error in UserController: ' . $e->getMessage());
+            error_log('Database error in PublisherController: ' . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'status' => 'error',
@@ -100,57 +115,33 @@ class UserController {
         }
     }
 
-    public function signin() {
+
+
+    public function getAll() {
         header('Content-Type: application/json');
         
         try {
-            // Get and validate JSON input
-            $json = file_get_contents("php://input");
-            if (empty($json)) {
-                throw new Exception('No input data received', 400);
+            $publishers = $this->service->getAll();
+            
+            if (empty($publishers)) {
+                throw new Exception('No publishers found', 404);
             }
             
-            $data = json_decode($json, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception('Invalid JSON format: ' . json_last_error_msg(), 400);
-            }
-
-            // Validate required fields
-            if (empty($data['uname']) || empty($data['password'])) {
-                throw new Exception('Username and password are required', 400);
-            }
-
-            // Sanitize inputs
-            $uname = filter_var($data['uname'], FILTER_SANITIZE_STRING);
-            $password = $data['password']; // Don't sanitize password
-
-            // Authenticate user
-            $user = $this->service->authenticate($uname, $password);
-
-            if ($user) {
-                // Start session (if not already started)
-                if (session_status() === PHP_SESSION_NONE) {
-                    session_start();
-                }
-
-                // Set session variables
-                $_SESSION['user_id'] = $user['uid'];
-                $_SESSION['username'] = $user['uname'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['user_type'] = 'user'; // or determine user type from DB
-
-                // Return success response with user data (without password)
-                echo json_encode([
-                    'status' => 'success',
-                    'message' => 'Login successful',
-                    'user' => $user
-                ]);
-            } else {
-                throw new Exception('Invalid username or password', 401);
-            }
-
+            echo json_encode([
+                'status' => 'success',
+                'data' => $publishers,
+                'count' => count($publishers)
+            ]);
+            
+        } catch (PDOException $e) {
+            error_log('Database error in PublisherController::getAll: ' . $e->getMessage());
+            http_response_code(500);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Failed to retrieve publishers. Please try again later.'
+            ]);
         } catch (Exception $e) {
-            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 400;
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
             http_response_code($statusCode);
             echo json_encode([
                 'status' => 'error',
@@ -159,21 +150,39 @@ class UserController {
         }
     }
 
-
-    public function getAll() {
-        header('Content-Type: application/json');
-        $users = $this->service->getAll();
-        echo json_encode(["status" => "success", "data" => $users]);
-    }
-
     public function getOne($uid) {
         header('Content-Type: application/json');
-        $user = $this->service->getOne($uid);
-        if ($user) {
-            echo json_encode(["status" => "success", "data" => $user]);
-        } else {
-            http_response_code(404);
-            echo json_encode(["status" => "error", "message" => "User not found"]);
+        
+        try {
+            if (!is_numeric($uid) || $uid <= 0) {
+                throw new Exception('Invalid publisher ID', 400);
+            }
+            
+            $publisher = $this->service->getOne($uid);
+            
+            if (!$publisher) {
+                throw new Exception('Publisher not found', 404);
+            }
+            
+            echo json_encode([
+                'status' => 'success',
+                'data' => $publisher
+            ]);
+            
+        } catch (PDOException $e) {
+            error_log('Database error in PublisherController::getOne: ' . $e->getMessage());
+            http_response_code(500);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Failed to retrieve publisher information. Please try again later.'
+            ]);
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
         }
     }
 }

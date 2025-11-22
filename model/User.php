@@ -7,6 +7,9 @@ class User {
     public $uname;
     public $email;
     public $password;
+    public $DOB;
+    public $lname;
+    public $fname;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -29,23 +32,42 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Get user by username
+     * @param string $uname Username to search for
+     * @return array|false User data if found, false otherwise
+     */
+    public function getByUsername($uname) {
+        $query = "SELECT * FROM {$this->table_name} WHERE `uname` = :uname LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":uname", $uname);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     // CREATE user
     public function create() {
-        $query = "INSERT INTO {$this->table_name} (`uname`, `email`, `password`) VALUES (:uname, :email, :password)";
+        $query = "INSERT INTO {$this->table_name} (`uname`, `email`, `password`, `DOB`, `lname`, `fname`) VALUES (:uname, :email, :password, :DOB, :lname, :fname)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":uname", $this->uname);
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":password", $this->password);
+        $stmt->bindParam(":DOB", $this->DOB);
+        $stmt->bindParam(":lname", $this->lname);
+        $stmt->bindParam(":fname", $this->fname);
         return $stmt->execute();
     }
 
     // UPDATE user
     public function update() {
-        $query = "UPDATE {$this->table_name} SET `uname`=:uname, `email`=:email, `password`=:password WHERE `uid`=:uid";
+        $query = "UPDATE {$this->table_name} SET `uname`=:uname, `email`=:email, `password`=:password, `DOB`=:DOB, `lname`=:lname, `fname`=:fname WHERE `uid`=:uid";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":uname", $this->uname);
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":password", $this->password);
+        $stmt->bindParam(":DOB", $this->DOB);
+        $stmt->bindParam(":lname", $this->lname);
+        $stmt->bindParam(":fname", $this->fname);
         $stmt->bindParam(":uid", $this->uid);
         return $stmt->execute();
     }
