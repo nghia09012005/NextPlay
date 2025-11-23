@@ -5,8 +5,7 @@ require_once __DIR__ . '/../service/UserService.php';
 class UserController {
     private $service;
 
-    public function __construct() {
-        $db = (new Database())->getConnection();
+    public function __construct($db) {
         $this->service = new UserService($db);
     }
 
@@ -137,7 +136,7 @@ class UserController {
                 $_SESSION['user_id'] = $user['uid'];
                 $_SESSION['username'] = $user['uname'];
                 $_SESSION['email'] = $user['email'];
-                $_SESSION['user_type'] = 'user'; // or determine user type from DB
+             
 
                 // Return success response with user data (without password)
                 echo json_encode([

@@ -55,7 +55,11 @@ class User {
         $stmt->bindParam(":DOB", $this->DOB);
         $stmt->bindParam(":lname", $this->lname);
         $stmt->bindParam(":fname", $this->fname);
-        return $stmt->execute();
+        $result = $stmt->execute();
+        if ($result) {
+            return $this->conn->lastInsertId();
+        }
+        return false;
     }
 
     // UPDATE user
