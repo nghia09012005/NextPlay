@@ -34,15 +34,43 @@ class Customer {
     }
 
     // CREATE customer (called when creating user)
-    public function create() {
-        $query = "INSERT INTO {$this->table_name} (`uid`, `balance`) 
-                  VALUES (:uid, :balance)";
+    public function create($uid = null, $balance = 100.00) {
+        try {
+            if ($uid !== null) {
+                $this->uid = $uid;
+            }
+            if ($balance !== null) {
+                $this->balance = $balance;
+            }
+            
+            error_log("Creating customer with uid: " . $this->uid . ", balance: " . $this->balance);
+            
+            $query = "INSERT INTO {$this->table_name} (`uid`, `balance`) 
+                      VALUES (:uid, :balance)";
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":uid", $this->uid);
-        $stmt->bindParam(":balance", $this->balance);
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":uid", $this->uid, PDO::PARAM_INT);
+            $stmt->bindParam(":balance", $this->balance);
 
-        return $stmt->execute();
+            $result = $stmt->execute();
+            
+            if (!$result) {
+                $errorInfo = $stmt->errorInfo();
+                error_log("Customer creation failed. Error: " . print_r($errorInfo, true));
+            } else {
+                error_log("Customer created successfully for user ID: " . $this->uid);
+            }
+            
+            return $result;
+            
+        } catch (PDOException $e) {
+            error_log('PDO Exception in Customer::create(): ' . $e->getMessage());
+            error_log('SQL Query: ' . ($query ?? 'Not defined'));
+            return false;
+        } catch (Exception $e) {
+            error_log('General Exception in Customer::create(): ' . $e->getMessage());
+            return false;
+        }
     }
 
     // UPDATE customer balance

@@ -1,16 +1,77 @@
 <?php
 require_once __DIR__ . '/../model/Library.php';
 require_once __DIR__ . '/../model/Lib_game.php';
+require_once __DIR__ . '/../model/Customer.php';
+require_once __DIR__ . '/../model/Game.php';
 
 class LibraryService {
     private $db;
     private $libraryModel;
     private $libGameModel;
+    private $customerModel;
+    private $gameModel;
 
     public function __construct($db) {
         $this->db = $db;
         $this->libraryModel = new Library($db);
         $this->libGameModel = new Lib_game($db);
+        $this->customerModel = new Customer($db);
+        $this->gameModel = new Game($db);
+    }
+    
+    /**
+     * Get all games in a user's library
+     * @param int $userId
+     * @return array Array of games in the user's library
+     */
+    public function getUserLibraryGames($userId) {
+        try {
+            $query = "SELECT g.* 
+                     FROM `Game` g
+                     JOIN `Lib_game` lg ON g.Gid = lg.Gid
+                     WHERE lg.uid = :userId";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $games = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $games[] = $row;
+            }
+            
+            return [
+                'status' => 'success',
+                'data' => $games,
+                'count' => count($games)
+            ];
+            
+        } catch (PDOException $e) {
+            error_log('Error in getUserLibraryGames: ' . $e->getMessage());
+            return [
+                'status' => 'error',
+                'message' => 'Database error: ' . $e->getMessage()
+            ];
+        }
+    }
+    
+    /**
+     * Get total cost of games
+     * @param array $gameIds Array of game IDs
+     * @return float Total cost of all games
+     */
+    private function getTotalCost($gameIds) {
+        if (empty($gameIds)) {
+            return 0;
+        }
+        
+        $placeholders = str_repeat('?,', count($gameIds) - 1) . '?';
+        $query = "SELECT SUM(cost) as total FROM `Game` WHERE Gid IN ($placeholders)";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($gameIds);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return (float) ($result['total'] ?? 0);
     }
 
     /**
@@ -69,6 +130,45 @@ class LibraryService {
      */
     public function moveGamesFromWishlist($userId, $wishlistName, $gameIds) {
         try {
+            // Check if game IDs are provided
+            if (empty($gameIds)) {
+                return [
+                    'status' => 'error',
+                    'message' => 'No game IDs provided',
+                    'code' => 400
+                ];
+            }
+
+            // Get customer balance
+            $customer = $this->customerModel->readOne($userId);
+            if (!$customer) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Customer not found',
+                    'code' => 404
+                ];
+            }
+            
+            // Calculate total cost of games
+            $totalCost = $this->getTotalCost($gameIds);
+            $currentBalance = (float)$customer['balance'];
+            
+            // Check if balance is sufficient
+            if ($currentBalance < $totalCost) {
+                $neededAmount = number_format($totalCost - $currentBalance, 2);
+                return [
+                    'status' => 'error',
+                    'message' => 'Insufficient balance',
+                    'code' => 402, // Payment Required
+                    'data' => [
+                        'current_balance' => $currentBalance,
+                        'total_cost' => $totalCost,
+                        'needed_amount' => $neededAmount,
+                        'required_balance' => $totalCost
+                    ]
+                ];
+            }
+
             // Get or create Payed library
             $libraryResult = $this->getOrCreatePayedLibrary($userId);
             if ($libraryResult['status'] !== 'success') {
@@ -90,6 +190,14 @@ class LibraryService {
                 } else {
                     $errors[] = "Failed to add game $gameId to library";
                 }
+            }
+            
+            // Deduct balance and update customer
+            $newBalance = $currentBalance - $totalCost;
+            $this->customerModel->balance = $newBalance;
+            $this->customerModel->uid = $userId;
+            if (!$this->customerModel->update()) {
+                throw new Exception('Failed to update customer balance');
             }
             
             if (!empty($movedGames)) {

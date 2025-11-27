@@ -48,20 +48,49 @@ class User {
 
     // CREATE user
     public function create() {
-        $query = "INSERT INTO {$this->table_name} (`uname`, `email`, `password`, `DOB`, `lname`, `fname`, `avatar`) VALUES (:uname, :email, :password, :DOB, :lname, :fname, :avatar)";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":uname", $this->uname);
-        $stmt->bindParam(":email", $this->email);
-        $stmt->bindParam(":password", $this->password);
-        $stmt->bindParam(":DOB", $this->DOB);
-        $stmt->bindParam(":lname", $this->lname);
-        $stmt->bindParam(":fname", $this->fname);
-        $stmt->bindValue(":avatar", $this->avatar ?? null, PDO::PARAM_STR | PDO::PARAM_NULL);
-        $result = $stmt->execute();
-        if ($result) {
-            return $this->conn->lastInsertId();
+        try {
+            $query = "INSERT INTO {$this->table_name} (`uname`, `email`, `password`, `DOB`, `lname`, `fname`, `avatar`) 
+                     VALUES (:uname, :email, :password, :DOB, :lname, :fname, :avatar)";
+            
+            $stmt = $this->conn->prepare($query);
+            
+            // Debug: Log the values being inserted
+            error_log("Creating user with data: " . print_r([
+                'uname' => $this->uname,
+                'email' => $this->email,
+                'DOB' => $this->DOB,
+                'lname' => $this->lname,
+                'fname' => $this->fname
+            ], true));
+            
+            $stmt->bindParam(":uname", $this->uname);
+            $stmt->bindParam(":email", $this->email);
+            $stmt->bindParam(":password", $this->password);
+            $stmt->bindParam(":DOB", $this->DOB);
+            $stmt->bindParam(":lname", $this->lname);
+            $stmt->bindParam(":fname", $this->fname);
+            $stmt->bindValue(":avatar", $this->avatar ?? null, PDO::PARAM_STR | PDO::PARAM_NULL);
+            
+            $result = $stmt->execute();
+            
+            if ($result) {
+                $lastId = $this->conn->lastInsertId();
+                error_log("User created successfully with ID: " . $lastId);
+                return $lastId;
+            }
+            
+            $errorInfo = $stmt->errorInfo();
+            error_log("User creation failed. Error: " . print_r($errorInfo, true));
+            return false;
+            
+        } catch (PDOException $e) {
+            error_log("PDO Exception in User::create(): " . $e->getMessage());
+            error_log("SQL Query: " . $query);
+            return false;
+        } catch (Exception $e) {
+            error_log("General Exception in User::create(): " . $e->getMessage());
+            return false;
         }
-        return false;
     }
 
     // UPDATE user

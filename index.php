@@ -6,6 +6,7 @@ require_once __DIR__ . '/controller/PublisherController.php';
 require_once __DIR__ . '/controller/GameController.php';
 require_once __DIR__ . '/controller/WishlistController.php';
 require_once __DIR__ . '/controller/PaymentController.php';
+require_once __DIR__ . '/controller/LibraryController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -15,6 +16,7 @@ $userController = new UserController($db);
 $categoryController = new CategoryController($db);
 $publisherController = new PublisherController($db);
 $gameController = new GameController($db);
+$libraryController = new LibraryController($db);
 
 
 $base_path = '/Assignment/NextPlay';
@@ -34,6 +36,13 @@ echo "<br>";
 
 
 
+
+// Handle library route
+if (isset($uri[0]) && $uri[0] === 'library') {
+    checkAuth(); // Ensure user is authenticated
+    $libraryController->getUserLibrary();
+    exit();
+}
 
 // auth middleware
 function checkAuth() {

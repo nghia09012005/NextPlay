@@ -14,20 +14,47 @@ class UserService {
     }
 
     public function register($uname, $email, $password, $DOB, $lname, $fname) {
-        $this->userModel->uname = $uname;
-        $this->userModel->email = $email;
-        $this->userModel->password = password_hash($password, PASSWORD_BCRYPT);
-        $this->userModel->DOB = $DOB;
-        $this->userModel->lname = $lname;
-        $this->userModel->fname = $fname;
+        try {
+            // Set user data
+            $this->userModel->uname = $uname;
+            $this->userModel->email = $email;
+            $this->userModel->password = password_hash($password, PASSWORD_BCRYPT);
+            $this->userModel->DOB = $DOB;
+            $this->userModel->lname = $lname;
+            $this->userModel->fname = $fname;
 
-        $uid = $this->userModel->create();
+            // Start transaction
+            $this->db->beginTransaction();
 
-        if ($uid) {
-            $this->customerModel->create($uid, 10000000);
+            // Create user
+            $uid = $this->userModel->create();
+            
+            if (!$uid) {
+                throw new Exception('Failed to create user account');
+            }
+
+            // Create customer record
+            $customerCreated = $this->customerModel->create($uid, 100.00);
+            
+            if (!$customerCreated) {
+                $this->db->rollBack();
+                error_log("Failed to create customer record for user ID: " . $uid);
+                return false;
+            }
+
+            // Commit transaction
+            $this->db->commit();
+            
+            error_log("User and customer created successfully. User ID: " . $uid);
             return $uid;
+            
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            error_log("Error in UserService::register(): " . $e->getMessage());
+            return false;
         }
-        return false;
     }
 
     public function getAll() {
