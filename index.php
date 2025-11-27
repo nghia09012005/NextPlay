@@ -4,6 +4,8 @@ require_once __DIR__ . '/controller/UserController.php';
 require_once __DIR__ . '/controller/CategoryController.php';
 require_once __DIR__ . '/controller/PublisherController.php';
 require_once __DIR__ . '/controller/GameController.php';
+require_once __DIR__ . '/controller/WishlistController.php';
+require_once __DIR__ . '/controller/PaymentController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -62,6 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[0])) {
 // Handle publisher registration
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[0]) && $uri[0] === 'publishers' && (!isset($uri[1]) || $uri[1] === 'register')) {
     $publisherController->register();
+    exit();
+}
+
+// Handle user update (no ID in URL, gets from session)
+if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[0]) && $uri[0] === 'users' && (!isset($uri[1]) || $uri[1] === 'me')) {
+    $userController->update();
     exit();
 }
 
@@ -147,13 +155,45 @@ if (isset($uri[0]) && $uri[0] === 'categories') {
     exit();
 }
 
+// Handle payment endpoint
+if (isset($uri[0]) && $uri[0] === 'payments' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $paymentController = new PaymentController($db);
+    $paymentController->processPayment();
+    exit();
+}
+
+// Handle wishlist endpoints
+if (isset($uri[0]) && $uri[0] === 'wishlists') {
+    $wishlistController = new WishlistController($db);
+    
+    // Create a new wishlist
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($uri[1])) {
+        $wishlistController->createWishlist();
+    } 
+    // Get games from wishlist: GET /wishlists/{wishlist_name}/games
+    else if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && $uri[2] === 'games') {
+        $wishlistName = urldecode($uri[1]);
+        $wishlistController->getWishlistGames($wishlistName);
+    }
+    // Add game to wishlist: POST /wishlists/{wishlist_name}/games
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && $uri[2] === 'games') {
+        $wishlistName = urldecode($uri[1]);
+        $wishlistController->addGameToWishlist($wishlistName);
+    }
+    else {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'Not Found']);
+    }
+    exit();
+}
+
 // Handle user endpoints
 if (isset($uri[0]) && $uri[0] === 'users') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($uri[1]) && is_numeric($uri[1])) {
             $userController->getUserById($uri[1]);
         } else {
-            $userController->getAllUsers();
+            $userController->getAll();
         }
     } else {
         http_response_code(405);

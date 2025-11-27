@@ -6,6 +6,7 @@
 |--------|----------|-------------|---------------|
 | POST   | /users/signin | User login | No |
 | POST   | /users/register | Register new user | No |
+| PUT    | /users | Update current user | Yes |
 | POST   | /publishers/register | Register new publisher | No |
 | GET    | /users | Get all users | Yes |
 | GET    | /users/{id} | Get user by ID | Yes |
@@ -20,9 +21,125 @@
 | GET    | /games/me | Get current publisher's games | Publisher |
 | GET    | /games/{id} | Get game by ID | No |
 | GET    | /publishers/{id}/games | Get games by publisher | No |
+| POST   | /wishlists | Create a new wishlist | Yes |
+| GET    | /wishlists/{wishlist_name}/games | Get games in a wishlist | Yes |
+| POST   | /wishlists/{wishlist_name}/games | Add game to wishlist | Yes |
+| POST   | /payments | Process payment and move games to library | Yes |
 | POST   | /games | Create new game | Publisher |
 | PUT    | /games/{id} | Update game | Publisher/Admin |
 | DELETE | /games/{id} | Delete game | Publisher/Admin |
+
+## Wishlist Endpoints
+
+### Create a New Wishlist
+- **URL**: `/wishlists`
+- **Method**: `POST`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "wishlist_name": "My Wishlist"
+  }
+  ```
+- **Success Response (201 Created)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Wishlist created successfully",
+    "data": {
+      "wishname": "My Wishlist"
+    }
+  }
+  ```
+- **Error Responses**:
+  - 400 Bad Request: Missing wishlist name
+  - 401 Unauthorized: User not logged in
+  - 409 Conflict: Wishlist with this name already exists
+  - 500 Internal Server Error: Server error
+
+### Get Games in Wishlist
+- **URL**: `/wishlists/{wishlist_name}/games`
+- **Method**: `GET`
+- **Authentication**: Required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "wishlist_name": "My Wishlist",
+      "games": [
+        {
+          "Gid": 123,
+          "name": "Game Name",
+          "version": "1.0",
+          "description": "Game description",
+          "cost": "29.99"
+        }
+      ]
+    }
+  }
+  ```
+- **Error Responses**:
+  - 401 Unauthorized: User not logged in
+  - 404 Not Found: Wishlist not found
+  - 500 Internal Server Error: Server error
+
+### Add Game to Wishlist
+- **URL**: `/wishlists/{wishlist_name}/games`
+- **Method**: `POST`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "game_id": 123
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Game added to wishlist successfully"
+  }
+  ```
+- **Error Responses**:
+  - 400 Bad Request: Missing game ID
+  - 401 Unauthorized: User not logged in
+  - 404 Not Found: Wishlist not found
+  - 409 Conflict: Game already in wishlist
+  - 500 Internal Server Error: Server error
+
+## Payment Endpoint
+
+### Process Payment and Move Games to Library
+- **URL**: `/payments`
+- **Method**: `POST`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "wishlist_name": "My Wishlist",
+    "game_ids": [123, 456, 789]
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "2 games moved to library",
+    "data": {
+      "moved_to_library": [123, 789],
+      "failed_to_remove_from_wishlist": [456],
+      "library": "Payed"
+    },
+    "warnings": [
+      "Failed to remove game 456 from wishlist"
+    ]
+  }
+  ```
+- **Error Responses**:
+  - 400 Bad Request: Missing required fields or invalid input
+  - 401 Unauthorized: User not logged in
+  - 500 Internal Server Error: Server error during payment processing
 
 ## Default Admin Account
 - **Username**: admin
@@ -31,6 +148,8 @@
 - **UID**: 3
 
 **Note**: This is a default admin account. Please change the password after first login.
+
+
 
 This document provides detailed information about the NextPlay API endpoints, request/response formats, and examples.
 
@@ -43,6 +162,43 @@ http://localhost/Assignment/NextPlay/index.php/...
 Most endpoints require authentication. Include the session token in subsequent requests after login.
 
 ## API Endpoints
+
+### Users
+
+#### Update Current User
+- **URL**: `/users` or `/users/me`
+- **Method**: `PUT`
+- **Authentication**: Required
+- **Request Body** (all fields optional):
+  ```json
+  {
+    "uname": "new_username",
+    "email": "new.email@example.com",
+    "DOB": "1990-01-01",
+    "fname": "New First",
+    "lname": "New Last",
+    "avatar": "path/to/avatar.jpg"
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "message": "User updated successfully",
+    "user": {
+      "uid": 1,
+      "uname": "new_username",
+      "email": "new.email@example.com",
+      "DOB": "1990-01-01",
+      "fname": "New First",
+      "lname": "New Last",
+      "avatar": "path/to/avatar.jpg"
+    }
+  }
+  ```
+- **Error Responses**:
+  - 400 Bad Request: Invalid input data
+  - 401 Unauthorized: User not logged in
+  - 500 Internal Server Error: Server error
 
 ### Authentication
 

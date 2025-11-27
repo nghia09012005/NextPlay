@@ -39,6 +39,32 @@ class UserService {
     }
 
     /**
+     * Update user information
+     * @param int $uid User ID
+     * @param array $data User data to update (uname, email, DOB, lname, fname)
+     * @return bool True on success, false on failure
+     */
+    public function updateUser($uid, $data) {
+        // Get existing user data
+        $user = $this->userModel->readOne($uid);
+        if (!$user) {
+            return false;
+        }
+
+        // Update model properties
+        $this->userModel->uid = $uid;
+        $this->userModel->uname = $data['uname'] ?? $user['uname'];
+        $this->userModel->email = $data['email'] ?? $user['email'];
+        $this->userModel->DOB = $data['DOB'] ?? $user['DOB'];
+        $this->userModel->lname = $data['lname'] ?? $user['lname'];
+        $this->userModel->fname = $data['fname'] ?? $user['fname'];
+        $this->userModel->avatar = $data['avatar'] ?? $user['avatar'];
+
+        // Update the user
+        return $this->userModel->update();
+    }
+
+    /**
      * Authenticate user with username and password
      * @param string $uname Username
      * @param string $password Plain text password
