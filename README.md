@@ -26,11 +26,40 @@
 | GET    | /wishlists/{wishlist_name}/games | Get games in a wishlist | Yes |
 | POST   | /wishlists/{wishlist_name}/games | Add game to wishlist | Yes |
 | POST   | /payments | Process payment and move games to library | Yes |
+| GET    | /library | Get all games in user's library | Yes |
 | POST   | /games | Create new game | Publisher |
 | PUT    | /games/{id} | Update game | Publisher/Admin |
 | DELETE | /games/{id} | Delete game | Publisher/Admin |
 
-## Wishlist Endpoints
+## Library Endpoints
+
+### Get All Games in User's Library
+- **URL**: `/library`
+- **Method**: `GET`
+- **Authentication**: Required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": [
+      {
+        "Gid": 1,
+        "name": "Game 1",
+        "version": "1.0",
+        "description": "Game description",
+        "cost": "29.99",
+        "adminid": 1,
+        "publisherid": 1
+      }
+    ],
+    "count": 1
+  }
+  ```
+- **Error Responses**:
+  - 401 Unauthorized: User not logged in
+  - 500 Internal Server Error: Server error
+
+## Payment & Wishlist Endpoints
 
 ### Create a New Wishlist
 - **URL**: `/wishlists`
@@ -118,8 +147,8 @@
 - **Request Body**:
   ```json
   {
-    "wishlist_name": "My Wishlist",
-    "game_ids": [123, 456, 789]
+    "wishlist_name": "wishlist1",
+    "game_ids": [1, 2, 3]
   }
   ```
 - **Success Response (200 OK)**:
@@ -128,19 +157,33 @@
     "status": "success",
     "message": "2 games moved to library",
     "data": {
-      "moved_to_library": [123, 789],
-      "failed_to_remove_from_wishlist": [456],
+      "moved_to_library": [1, 2],
+      "failed_to_remove_from_wishlist": [3],
       "library": "Payed"
-    },
-    "warnings": [
-      "Failed to remove game 456 from wishlist"
-    ]
+    }
   }
   ```
 - **Error Responses**:
-  - 400 Bad Request: Missing required fields or invalid input
+  - 400 Bad Request: Invalid input data
   - 401 Unauthorized: User not logged in
-  - 500 Internal Server Error: Server error during payment processing
+  - 402 Payment Required: Insufficient balance
+  - 404 Not Found: Customer not found
+  - 500 Internal Server Error: Server error
+
+  **Insufficient Balance Response (402 Payment Required)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Insufficient balance",
+    "code": 402,
+    "data": {
+      "current_balance": 50.00,
+      "total_cost": 99.99,
+      "needed_amount": "49.99",
+      "required_balance": 99.99
+    }
+  }
+  ```
 
 ## Default Admin Account
 - **Username**: admin
