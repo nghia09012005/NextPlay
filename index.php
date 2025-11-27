@@ -68,8 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[0]) && $uri[0] === 'publ
 }
 
 // Handle user update (no ID in URL, gets from session)
-if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[0]) && $uri[0] === 'users' && (!isset($uri[1]) || $uri[1] === 'me')) {
-    $userController->update();
+if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[0]) && $uri[0] === 'users') {
+    if (isset($uri[1]) && $uri[1] === 'password') {
+        // Handle password update
+        $userController->updatePassword();
+    } else if (!isset($uri[1]) || $uri[1] === 'me') {
+        // Handle regular user info update
+        $userController->update();
+    }
     exit();
 }
 
@@ -166,17 +172,21 @@ if (isset($uri[0]) && $uri[0] === 'payments' && $_SERVER['REQUEST_METHOD'] === '
 if (isset($uri[0]) && $uri[0] === 'wishlists') {
     $wishlistController = new WishlistController($db);
     
-    // Create a new wishlist
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($uri[1])) {
+    // Get all wishlist names for current user: GET /wishlists
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($uri[1])) {
+        $wishlistController->getUserWishlistNames();
+    }
+    // Create a new wishlist: POST /wishlists
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($uri[1])) {
         $wishlistController->createWishlist();
     } 
     // Get games from wishlist: GET /wishlists/{wishlist_name}/games
-    else if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && $uri[2] === 'games') {
+    else if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && isset($uri[2]) && $uri[2] === 'games') {
         $wishlistName = urldecode($uri[1]);
         $wishlistController->getWishlistGames($wishlistName);
     }
     // Add game to wishlist: POST /wishlists/{wishlist_name}/games
-    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && $uri[2] === 'games') {
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && isset($uri[2]) && $uri[2] === 'games') {
         $wishlistName = urldecode($uri[1]);
         $wishlistController->addGameToWishlist($wishlistName);
     }

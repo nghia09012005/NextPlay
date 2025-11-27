@@ -187,6 +187,72 @@ class UserController {
      * Update current user's information
      * Gets user ID from session
      */
+    /**
+     * Update user's password
+     * Requires current password for verification
+     */
+    public function updatePassword() {
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['status' => 'error', 'message' => 'Unauthorized. Please login first.']);
+            return;
+        }
+        
+        $uid = $_SESSION['user_id'];
+        header('Content-Type: application/json');
+        
+        try {
+            // Get and validate JSON input
+            $json = file_get_contents("php://input");
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON format: ' . json_last_error_msg(), 400);
+            }
+
+            // Validate required fields
+            if (empty($data['currentPassword']) || empty($data['newPassword'])) {
+                throw new Exception('Both currentPassword and newPassword are required', 400);
+            }
+
+            // Update password
+            $result = $this->service->updatePassword(
+                $uid,
+                $data['currentPassword'],
+                $data['newPassword']
+            );
+            
+            if ($result === true) {
+                http_response_code(200);
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Password updated successfully'
+                ]);
+            } else {
+                throw new Exception($result ?: 'Failed to update password', 400);
+            }
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() ?: 500;
+            http_response_code($statusCode);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Update current user's information
+     */
     public function update() {
         // Start session if not already started
         if (session_status() === PHP_SESSION_NONE) {

@@ -12,6 +12,32 @@ class WishlistService {
         $this->wishlistModel = new Wishlist($db);
         $this->wishGameModel = new Wish_game($db);
     }
+    
+    /**
+     * Get all wishlist names for a user
+     * @param int $userId
+     * @return array Result with status and wishlist names
+     */
+    public function getUserWishlistNames($userId) {
+        try {
+            $stmt = $this->wishlistModel->getUserWishlists($userId);
+            $wishlists = $stmt->fetchAll(PDO::FETCH_COLUMN, 1); // Get only the wishname column
+            
+            return [
+                'status' => 'success',
+                'data' => [
+                    'wishlists' => $wishlists
+                ],
+                'code' => 200
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Failed to fetch wishlists: ' . $e->getMessage(),
+                'code' => 500
+            ];
+        }
+    }
 
     /**
      * Create a new wishlist for a user

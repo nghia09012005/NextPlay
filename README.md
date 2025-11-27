@@ -7,6 +7,7 @@
 | POST   | /users/signin | User login | No |
 | POST   | /users/register | Register new user | No |
 | PUT    | /users | Update current user | Yes |
+| PUT    | /users/password | Update user password | Yes |
 | POST   | /publishers/register | Register new publisher | No |
 | GET    | /users | Get all users | Yes |
 | GET    | /users/{id} | Get user by ID | Yes |
@@ -164,6 +165,29 @@ Most endpoints require authentication. Include the session token in subsequent r
 ## API Endpoints
 
 ### Users
+
+#### Update Password
+- **URL**: `/users/password`
+- **Method**: `PUT`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "currentPassword": "current_password_123",
+    "newPassword": "new_secure_password_123"
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Password updated successfully"
+  }
+  ```
+- **Error Responses**:
+  - 400 Bad Request: Missing or invalid input, incorrect current password, or new password too short
+  - 401 Unauthorized: User not logged in
+  - 500 Internal Server Error: Server error
 
 #### Update Current User
 - **URL**: `/users` or `/users/me`

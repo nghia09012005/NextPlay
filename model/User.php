@@ -106,5 +106,19 @@ class User {
         $stmt->bindParam(":uid", $uid);
         return $stmt->execute();
     }
+
+    /**
+     * Update user password
+     * @param int $uid User ID
+     * @param string $hashedPassword Hashed password
+     * @return bool True on success, false on failure
+     */
+    public function updatePassword($uid, $hashedPassword) {
+        $query = "UPDATE {$this->table_name} SET `password` = :password WHERE `uid` = :uid";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":password", $hashedPassword);
+        $stmt->bindParam(":uid", $uid);
+        return $stmt->execute();
+    }
 }
 ?>

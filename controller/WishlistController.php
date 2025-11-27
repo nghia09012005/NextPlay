@@ -7,6 +7,37 @@ class WishlistController {
     public function __construct($db) {
         $this->wishlistService = new WishlistService($db);
     }
+    
+    /**
+     * Get all wishlist names for the current user
+     */
+    public function getUserWishlistNames() {
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'You must be logged in to view wishlists'
+            ]);
+            return;
+        }
+
+        // Get wishlist names
+        $result = $this->wishlistService->getUserWishlistNames($_SESSION['user_id']);
+        
+        // Send response
+        http_response_code($result['code']);
+        echo json_encode([
+            'status' => $result['status'],
+            'message' => $result['message'] ?? '',
+            'data' => $result['data'] ?? null
+        ]);
+    }
 
     /**
      * Create a new wishlist for the current user
