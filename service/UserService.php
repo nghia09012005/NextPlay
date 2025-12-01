@@ -35,7 +35,16 @@ class UserService {
     }
 
     public function getOne($uid) {
-        return $this->userModel->readOne($uid);
+        $user = $this->userModel->readOne($uid);
+        if ($user) {
+            // Get balance if customer
+            $customer = $this->customerModel->readOne($uid);
+            if ($customer) {
+                $user['balance'] = $customer['balance'];
+            }
+            unset($user['password']);
+        }
+        return $user;
     }
 
     /**
@@ -57,6 +66,13 @@ class UserService {
             if (password_verify($password, $user['password'])) {
                 // Remove password from returned user data
                 unset($user['password']);
+                
+                // Get balance if customer
+                $customer = $this->customerModel->readOne($user['uid']);
+                if ($customer) {
+                    $user['balance'] = $customer['balance'];
+                }
+                
                 return $user;
             }
             
@@ -66,6 +82,34 @@ class UserService {
             error_log('Authentication error: ' . $e->getMessage());
             return false;
         }
+    }
+
+    public function uploadAvatar($uid, $filename) {
+        $this->userModel->uid = $uid;
+        // We need to fetch existing user data to update only avatar, 
+        // OR update User model to allow updating single field.
+        // For now, let's fetch, update avatar, and save back.
+        // BUT User::update updates ALL fields.
+        // So we must populate all fields.
+        
+        $user = $this->userModel->readOne($uid);
+        if (!$user) return false;
+
+        $this->userModel->uname = $user['uname'];
+        $this->userModel->email = $user['email'];
+        $this->userModel->password = $user['password'];
+        $this->userModel->DOB = $user['DOB'];
+        $this->userModel->lname = $user['lname'];
+        $this->userModel->fname = $user['fname'];
+        $this->userModel->avatar = $filename;
+        
+        return $this->userModel->update();
+    }
+
+    public function getUserGames($uid) {
+        require_once __DIR__ . '/../model/Library.php';
+        $libraryModel = new Library($this->db);
+        return $libraryModel->getAllUserGames($uid)->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 ?>

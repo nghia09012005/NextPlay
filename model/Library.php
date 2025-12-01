@@ -80,5 +80,17 @@ class Library {
         $stmt->execute();
         return $stmt;
     }
+
+    // Get ALL games for a user (across all libraries)
+    public function getAllUserGames($uid) {
+        $query = "SELECT DISTINCT G.* 
+                 FROM `Game` G
+                 JOIN {$this->lib_game_table} LG ON G.Gid = LG.Gid
+                 WHERE LG.uid = :uid";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":uid", $uid);
+        $stmt->execute();
+        return $stmt;
+    }
 }
 ?>

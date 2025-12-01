@@ -176,5 +176,78 @@ class UserController {
             echo json_encode(["status" => "error", "message" => "User not found"]);
         }
     }
+
+    public function uploadAvatar($uid) {
+        header('Content-Type: application/json');
+        
+        try {
+            if (!isset($_FILES['avatar'])) {
+                throw new Exception('No file uploaded', 400);
+            }
+
+            $file = $_FILES['avatar'];
+            $fileName = $file['name'];
+            $fileTmpName = $file['tmp_name'];
+            $fileSize = $file['size'];
+            $fileError = $file['error'];
+            $fileType = $file['type'];
+
+            $fileExt = explode('.', $fileName);
+            $fileActualExt = strtolower(end($fileExt));
+            $allowed = array('jpg', 'jpeg', 'png', 'gif');
+
+            if (in_array($fileActualExt, $allowed)) {
+                if ($fileError === 0) {
+                    if ($fileSize < 5000000) { // 5MB
+                        $fileNameNew = "profile_" . $uid . "_" . uniqid('', true) . "." . $fileActualExt;
+                        // Save to FE assets folder
+                        $fileDestination = 'd:/webroot/BTL_LTW/BTL_LTW_FE/assets/uploads/' . $fileNameNew;
+                        
+                        // Create dir if not exists
+                        if (!file_exists(dirname($fileDestination))) {
+                            mkdir(dirname($fileDestination), 0777, true);
+                        }
+
+                        if (move_uploaded_file($fileTmpName, $fileDestination)) {
+                            // Update DB
+                            if ($this->service->uploadAvatar($uid, $fileNameNew)) {
+                                echo json_encode([
+                                    'status' => 'success', 
+                                    'message' => 'Avatar uploaded successfully',
+                                    'avatar' => $fileNameNew
+                                ]);
+                            } else {
+                                throw new Exception('Failed to update database', 500);
+                            }
+                        } else {
+                            throw new Exception('Failed to move uploaded file', 500);
+                        }
+                    } else {
+                        throw new Exception('File is too big', 400);
+                    }
+                } else {
+                    throw new Exception('There was an error uploading your file', 400);
+                }
+            } else {
+                throw new Exception('You cannot upload files of this type', 400);
+            }
+
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 400;
+            http_response_code($statusCode);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function getGames($uid) {
+        header('Content-Type: application/json');
+        try {
+            $games = $this->service->getUserGames($uid);
+            echo json_encode(['status' => 'success', 'data' => $games]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
 }
 ?>

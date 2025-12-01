@@ -5,6 +5,7 @@ class User {
 
     public $uid;
     public $uname;
+    public $avatar;
     public $email;
     public $password;
     public $DOB;
@@ -47,9 +48,10 @@ class User {
 
     // CREATE user
     public function create() {
-        $query = "INSERT INTO {$this->table_name} (`uname`, `email`, `password`, `DOB`, `lname`, `fname`) VALUES (:uname, :email, :password, :DOB, :lname, :fname)";
+        $query = "INSERT INTO {$this->table_name} (`uname`, `avatar`, `email`, `password`, `DOB`, `lname`, `fname`) VALUES (:uname, :avatar, :email, :password, :DOB, :lname, :fname)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":uname", $this->uname);
+        $stmt->bindParam(":avatar", $this->avatar);
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":password", $this->password);
         $stmt->bindParam(":DOB", $this->DOB);
@@ -60,9 +62,10 @@ class User {
 
     // UPDATE user
     public function update() {
-        $query = "UPDATE {$this->table_name} SET `uname`=:uname, `email`=:email, `password`=:password, `DOB`=:DOB, `lname`=:lname, `fname`=:fname WHERE `uid`=:uid";
+        $query = "UPDATE {$this->table_name} SET `uname`=:uname, `avatar`=:avatar, `email`=:email, `password`=:password, `DOB`=:DOB, `lname`=:lname, `fname`=:fname WHERE `uid`=:uid";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":uname", $this->uname);
+        $stmt->bindParam(":avatar", $this->avatar);
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":password", $this->password);
         $stmt->bindParam(":DOB", $this->DOB);
