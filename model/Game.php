@@ -20,24 +20,40 @@ class Game {
         $this->conn = $db;
     }
 
-    // GET all
+    // GET all games
     public function readAll() {
-        $query = "SELECT * FROM {$this->table_name}";
+        $query = "SELECT g.*, u.uname as publisher_name, a.uname as admin_name 
+                 FROM {$this->table_name} g
+                 LEFT JOIN `User` u ON g.publisherid = u.uid
+                 LEFT JOIN `User` a ON g.adminid = a.uid";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
     }
 
-    // GET one
-    public function readOne($gid) {
-        $query = "SELECT * FROM {$this->table_name} WHERE `gid` = :gid";
+    // GET one game by ID
+    public function readOne($Gid) {
+        $query = "SELECT g.*, u.uname as publisher_name, a.uname as admin_name 
+                 FROM {$this->table_name} g
+                 LEFT JOIN `User` u ON g.publisherid = u.uid
+                 LEFT JOIN `User` a ON g.adminid = a.uid
+                 WHERE g.Gid = :Gid";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":gid", $gid);
+        $stmt->bindParam(":Gid", $Gid);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // CREATE
+    // GET games by publisher
+    public function readByPublisher($publisherId) {
+        $query = "SELECT * FROM {$this->table_name} WHERE publisherid = :publisherid";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":publisherid", $publisherId);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    // CREATE new game
     public function create() {
         $query = "INSERT INTO {$this->table_name} 
             (`name`, `description`, `price`, `thumbnail`, `category`, `tags`, `developer`, `publisher`, `release_date`, `rating`, `reviews`) 
@@ -63,7 +79,7 @@ class Game {
         return false;
     }
 
-    // UPDATE
+    // UPDATE game
     public function update() {
         $query = "UPDATE {$this->table_name} 
                 SET `name`=:name, `description`=:description, 
@@ -92,11 +108,12 @@ class Game {
         return $stmt->execute();
     }
 
-    // DELETE
-    public function delete($gid) {
-        $query = "DELETE FROM {$this->table_name} WHERE `gid`=:gid";
+    // DELETE game
+    public function delete() {
+        $query = "DELETE FROM {$this->table_name} WHERE Gid = :Gid";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":gid", $gid);
+        $this->Gid = htmlspecialchars(strip_tags($this->Gid));
+        $stmt->bindParam(":Gid", $this->Gid);
         return $stmt->execute();
     }
 }

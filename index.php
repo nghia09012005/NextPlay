@@ -1,97 +1,229 @@
 <?php
+require_once __DIR__ . '/config/Database.php';
 require_once __DIR__ . '/controller/UserController.php';
+require_once __DIR__ . '/controller/CategoryController.php';
+require_once __DIR__ . '/controller/PublisherController.php';
+require_once __DIR__ . '/controller/GameController.php';
+require_once __DIR__ . '/controller/WishlistController.php';
+require_once __DIR__ . '/controller/PaymentController.php';
+require_once __DIR__ . '/controller/LibraryController.php';
 
-$controller = new UserController();
+$database = new Database();
+$db = $database->getConnection();
 
-// Allow CORS
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
+$userController = new UserController($db);
+$categoryController = new CategoryController($db);
+$publisherController = new PublisherController($db);
+$gameController = new GameController($db);
+$libraryController = new LibraryController($db);
+
+
+$base_path = '/Assignment/NextPlay';
+$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$request_uri = str_replace($base_path, '', $request_uri);
+
+// Remove 'index.php' from the request URI if present
+$request_uri = preg_replace('|^/index\.php|', '', $request_uri);
+
+$uri = array_values(array_filter(explode('/', trim($request_uri, '/'))));
+
+// // Debug
+echo "Request URI: " . $request_uri . "<br>";
+echo "URI array: ";
+print_r($uri);
+echo "<br>";
+
+
+
+
+// Handle library route
+if (isset($uri[0]) && $uri[0] === 'library') {
+    checkAuth(); // Ensure user is authenticated
+    $libraryController->getUserLibrary();
     exit();
 }
 
-// Handle static files for PHP built-in server
-if (preg_match('/\.(?:png|jpg|jpeg|gif|css|js)$/', $_SERVER["REQUEST_URI"])) {
-    return false;    // serve the requested resource as-is.
+// auth middleware
+function checkAuth() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    if (!isset($_SESSION['user_id'])) {
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Unauthorized. Please login first.']);
+        exit();
+    }
+    return true;
 }
 
-// Lấy URL
-$base_path = '';
-$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$request_uri = str_replace($base_path, '', $request_uri);
-$uri = explode('/', trim($request_uri, '/'));
 
-//---------------------API-----------------------------
+// Public endpoints (no auth required)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[0])) {
+    if ($uri[0] === 'users' && isset($uri[1]) && $uri[1] === 'signin') {
+        $userController->signin();
+        exit();
+    } elseif ($uri[0] === 'users' && (!isset($uri[1]) || $uri[1] === 'register')) {
+        $userController->register();
+        exit();
+    }
+}
 
-// Xử lý route
-if (count($uri) > 0 && $uri[0] === 'users') {
-    if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($uri[1])) {
-        $controller->getAll();
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && is_numeric($uri[1])) {
-        $controller->getOne($uri[1]);
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && $uri[1] === 'signin') {
-        $controller->signin();
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && (!isset($uri[1]) || $uri[1] === 'register')) {
-        $controller->register();
-    } elseif (isset($uri[1]) && is_numeric($uri[1])) {
-        // Handle /users/{uid}/...
-        $uid = $uri[1];
-        if (isset($uri[2])) {
-            if ($uri[2] === 'avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                $controller->uploadAvatar($uid);
-            } elseif ($uri[2] === 'games' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-                $controller->getGames($uid);
-            } else {
-                http_response_code(404);
-                echo json_encode(['message' => 'Not Found']);
-            }
-        } else {
-             // /users/{uid} handled above
-             http_response_code(404);
-             echo json_encode(['message' => 'Not Found']);
-        }
+// Handle publisher registration
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[0]) && $uri[0] === 'publishers' && (!isset($uri[1]) || $uri[1] === 'register')) {
+    $publisherController->register();
+    exit();
+}
+
+// Handle user update (no ID in URL, gets from session)
+if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[0]) && $uri[0] === 'users') {
+    if (isset($uri[1]) && $uri[1] === 'password') {
+        // Handle password update
+        $userController->updatePassword();
+    } else if (!isset($uri[1]) || $uri[1] === 'me') {
+        // Handle regular user info update
+        $userController->update();
+    }
+    exit();
+}
+
+// Check authentication for protected routes
+if (isset($uri[0]) && in_array($uri[0], ['users', 'publishers', 'categories', 'games'])) {
+    checkAuth();
+}
+
+// Handle game endpoints
+if (isset($uri[0]) && $uri[0] === 'games') {
+    // Handle /games/me to get current publisher's games
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && $uri[1] === 'me') {
+        $gameController->getMyGames();
+    }
+    // Handle /games/{id} to get a specific game
+    elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && is_numeric($uri[1])) {
+        $gameController->getOne($uri[1]);
+    }
+    // Handle /games to get all games
+    elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $gameController->getAll();
+    }
+    // Handle other methods
+    elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $gameController->create();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1]) && is_numeric($uri[1])) {
+        $gameController->update($uri[1]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
+        $gameController->delete($uri[1]);
     } else {
         http_response_code(405);
-        echo json_encode(['message' => 'Method Not Allowed']);
+        echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
     }
-} elseif (count($uri) > 0 && $uri[0] === 'publishers') {
-    if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($uri[1])) {
-        $controller->getAll();
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1])) {
-        $controller->getOne($uri[1]);
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $controller->register();
+    exit();
+}
+
+// Handle publisher games endpoint
+if (isset($uri[0]) && $uri[0] === 'publishers' && isset($uri[1]) && is_numeric($uri[1]) && isset($uri[2]) && $uri[2] === 'games') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $gameController->getPublisherGames($uri[1]);
     } else {
         http_response_code(405);
-        echo json_encode(['message' => 'Method Not Allowed']);
+        echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
     }
-} elseif (count($uri) > 0 && $uri[0] === 'games') {
-    require_once __DIR__ . '/controller/GameController.php';
-    $gameController = new GameController();
+    exit();
+}
 
+// Handle other publisher endpoints
+if (isset($uri[0]) && $uri[0] === 'publishers') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($uri[1]) && is_numeric($uri[1])) {
-            $gameController->getOne($uri[1]);
+            $publisherController->getOne($uri[1]);
         } else {
-            $gameController->getAll();
+            $publisherController->getAllPublishers();
+        }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $publisherController->create();
+    } else {
+        http_response_code(405);
+        echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+    }
+    exit();
+}
+
+// Handle category endpoints
+if (isset($uri[0]) && $uri[0] === 'categories') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if (isset($uri[1]) && is_numeric($uri[1])) {
+            $categoryController->getOne($uri[1]);
+        } else {
+            $categoryController->getAll();
+        }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $categoryController->create();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1]) && is_numeric($uri[1])) {
+        $categoryController->update($uri[1]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
+        $categoryController->delete($uri[1]);
+    } else {
+        http_response_code(405);
+        echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+    }
+    exit();
+}
+
+// Handle payment endpoint
+if (isset($uri[0]) && $uri[0] === 'payments' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $paymentController = new PaymentController($db);
+    $paymentController->processPayment();
+    exit();
+}
+
+// Handle wishlist endpoints
+if (isset($uri[0]) && $uri[0] === 'wishlists') {
+    $wishlistController = new WishlistController($db);
+    
+    // Get all wishlist names for current user: GET /wishlists
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($uri[1])) {
+        $wishlistController->getUserWishlistNames();
+    }
+    // Create a new wishlist: POST /wishlists
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($uri[1])) {
+        $wishlistController->createWishlist();
+    } 
+    // Get games from wishlist: GET /wishlists/{wishlist_name}/games
+    else if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && isset($uri[2]) && $uri[2] === 'games') {
+        $wishlistName = urldecode($uri[1]);
+        $wishlistController->getWishlistGames($wishlistName);
+    }
+    // Add game to wishlist: POST /wishlists/{wishlist_name}/games
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && isset($uri[2]) && $uri[2] === 'games') {
+        $wishlistName = urldecode($uri[1]);
+        $wishlistController->addGameToWishlist($wishlistName);
+    }
+    else {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'Not Found']);
+    }
+    exit();
+}
+
+// Handle user endpoints
+if (isset($uri[0]) && $uri[0] === 'users') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if (isset($uri[1]) && is_numeric($uri[1])) {
+            $userController->getUserById($uri[1]);
+        } else {
+            $userController->getAll();
         }
     } else {
         http_response_code(405);
-        echo json_encode(['message' => 'Method Not Allowed']);
+        echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
     }
-} else {
-    http_response_code(404);
-    echo json_encode(['message' => 'Not Found']);
+    exit();
 }
 
-
-
-
+// If no route matches
+http_response_code(404);
+echo json_encode(['status' => 'error', 'message' => 'Not Found']);
 
 
 

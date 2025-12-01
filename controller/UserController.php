@@ -5,8 +5,7 @@ require_once __DIR__ . '/../service/UserService.php';
 class UserController {
     private $service;
 
-    public function __construct() {
-        $db = (new Database())->getConnection();
+    public function __construct($db) {
         $this->service = new UserService($db);
     }
 
@@ -137,7 +136,7 @@ class UserController {
                 $_SESSION['user_id'] = $user['uid'];
                 $_SESSION['username'] = $user['uname'];
                 $_SESSION['email'] = $user['email'];
-                $_SESSION['user_type'] = 'user'; // or determine user type from DB
+             
 
                 // Return success response with user data (without password)
                 echo json_encode([
@@ -168,12 +167,156 @@ class UserController {
 
     public function getOne($uid) {
         header('Content-Type: application/json');
-        $user = $this->service->getOne($uid);
-        if ($user) {
-            echo json_encode(["status" => "success", "data" => $user]);
-        } else {
-            http_response_code(404);
-            echo json_encode(["status" => "error", "message" => "User not found"]);
+        try {
+            $user = $this->service->getOne($uid);
+            if ($user) {
+                // Remove sensitive data before sending response
+                unset($user['password']);
+                echo json_encode($user);
+            } else {
+                http_response_code(404);
+                echo json_encode(['message' => 'User not found']);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Update current user's information
+     * Gets user ID from session
+     */
+    /**
+     * Update user's password
+     * Requires current password for verification
+     */
+    public function updatePassword() {
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['status' => 'error', 'message' => 'Unauthorized. Please login first.']);
+            return;
+        }
+        
+        $uid = $_SESSION['user_id'];
+        header('Content-Type: application/json');
+        
+        try {
+            // Get and validate JSON input
+            $json = file_get_contents("php://input");
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON format: ' . json_last_error_msg(), 400);
+            }
+
+            // Validate required fields
+            if (empty($data['currentPassword']) || empty($data['newPassword'])) {
+                throw new Exception('Both currentPassword and newPassword are required', 400);
+            }
+
+            // Update password
+            $result = $this->service->updatePassword(
+                $uid,
+                $data['currentPassword'],
+                $data['newPassword']
+            );
+            
+            if ($result === true) {
+                http_response_code(200);
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Password updated successfully'
+                ]);
+            } else {
+                throw new Exception($result ?: 'Failed to update password', 400);
+            }
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() ?: 500;
+            http_response_code($statusCode);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Update current user's information
+     */
+    public function update() {
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['status' => 'error', 'message' => 'Unauthorized. Please login first.']);
+            return;
+        }
+        
+        $uid = $_SESSION['user_id'];
+        header('Content-Type: application/json');
+        
+        try {
+            // Get and validate JSON input
+            $json = file_get_contents("php://input");
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON format: ' . json_last_error_msg(), 400);
+            }
+
+            // Check if user exists
+            $existingUser = $this->service->getOne($uid);
+            if (!$existingUser) {
+                http_response_code(404);
+                echo json_encode(['message' => 'User not found']);
+                return;
+            }
+
+            // Validate email if provided
+            if (isset($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                throw new Exception('Invalid email format', 400);
+            }
+
+            // Update user
+            $result = $this->service->updateUser($uid, $data);
+            
+            if ($result) {
+                // Get updated user data
+                $updatedUser = $this->service->getOne($uid);
+                unset($updatedUser['password']); // Remove sensitive data
+                
+                http_response_code(200);
+                echo json_encode([
+                    'message' => 'User updated successfully',
+                    'user' => $updatedUser
+                ]);
+            } else {
+                throw new Exception('Failed to update user', 500);
+            }
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() ?: 500;
+            http_response_code($statusCode);
+            echo json_encode([
+                'message' => $e->getMessage(),
+                'status' => 'error'
+            ]);
         }
     }
 
