@@ -4,10 +4,17 @@ class Game {
     private $table_name = "`Game`";
 
     public $gid;
-    public $title;
+    public $name;
     public $description;
     public $price;
     public $thumbnail;
+    public $category;
+    public $tags;
+    public $developer;
+    public $publisher;
+    public $release_date;
+    public $rating;
+    public $reviews;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -33,31 +40,53 @@ class Game {
     // CREATE
     public function create() {
         $query = "INSERT INTO {$this->table_name} 
-            (`title`, `description`, `price`, `thumbnail`) 
-            VALUES (:title, :description, :price, :thumbnail)";
+            (`name`, `description`, `price`, `thumbnail`, `category`, `tags`, `developer`, `publisher`, `release_date`, `rating`, `reviews`) 
+            VALUES (:name, :description, :price, :thumbnail, :category, :tags, :developer, :publisher, :release_date, :rating, :reviews)";
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(":title", $this->title);
+        $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":description", $this->description);
         $stmt->bindParam(":price", $this->price);
         $stmt->bindParam(":thumbnail", $this->thumbnail);
+        $stmt->bindParam(":category", $this->category);
+        $stmt->bindParam(":tags", $this->tags);
+        $stmt->bindParam(":developer", $this->developer);
+        $stmt->bindParam(":publisher", $this->publisher);
+        $stmt->bindParam(":release_date", $this->release_date);
+        $stmt->bindParam(":rating", $this->rating);
+        $stmt->bindParam(":reviews", $this->reviews);
 
-        return $stmt->execute();
+        if($stmt->execute()){
+            return true;
+        }
+        printf("Error: %s.\n", $stmt->errorInfo()[2]);
+        return false;
     }
 
     // UPDATE
     public function update() {
         $query = "UPDATE {$this->table_name} 
-                SET `title`=:title, `description`=:description, 
-                    `price`=:price, `thumbnail`=:thumbnail
+                SET `name`=:name, `description`=:description, 
+                    `price`=:price, `thumbnail`=:thumbnail,
+                    `category`=:category, `tags`=:tags,
+                    `developer`=:developer, `publisher`=:publisher,
+                    `release_date`=:release_date, `rating`=:rating,
+                    `reviews`=:reviews
                 WHERE `gid`=:gid";
 
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(":title", $this->title);
+        $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":description", $this->description);
         $stmt->bindParam(":price", $this->price);
         $stmt->bindParam(":thumbnail", $this->thumbnail);
+        $stmt->bindParam(":category", $this->category);
+        $stmt->bindParam(":tags", $this->tags);
+        $stmt->bindParam(":developer", $this->developer);
+        $stmt->bindParam(":publisher", $this->publisher);
+        $stmt->bindParam(":release_date", $this->release_date);
+        $stmt->bindParam(":rating", $this->rating);
+        $stmt->bindParam(":reviews", $this->reviews);
         $stmt->bindParam(":gid", $this->gid);
 
         return $stmt->execute();
