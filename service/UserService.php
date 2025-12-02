@@ -14,6 +14,9 @@ class UserService {
     }
 
     public function register($uname, $email, $password, $DOB, $lname, $fname) {
+        // Start transaction
+        $this->db->beginTransaction();
+        
         try {
             // Set user data
             $this->userModel->uname = $uname;
@@ -23,23 +26,19 @@ class UserService {
             $this->userModel->lname = $lname;
             $this->userModel->fname = $fname;
 
-            // Start transaction
-            $this->db->beginTransaction();
-
-            // Create user
+            // Create user - this will throw an exception if username/email exists
             $uid = $this->userModel->create();
             
             if (!$uid) {
                 throw new Exception('Failed to create user account');
             }
 
-            // Create customer record
-            $customerCreated = $this->customerModel->create($uid, 100.00);
+            // Create customer record with initial balance
+            $initialBalance = 0.00; // Set initial balance to 0
+            $customerCreated = $this->customerModel->create($uid, $initialBalance);
             
             if (!$customerCreated) {
-                $this->db->rollBack();
-                error_log("Failed to create customer record for user ID: " . $uid);
-                return false;
+                throw new Exception('Failed to create customer account');
             }
 
             // Commit transaction
@@ -48,12 +47,14 @@ class UserService {
             error_log("User and customer created successfully. User ID: " . $uid);
             return $uid;
             
+        } catch (PDOException $e) {
+            $this->db->rollBack();
+            error_log("Database error in UserService::register(): " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception('A database error occurred. Please try again.');
         } catch (Exception $e) {
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack();
-            }
-            error_log("Error in UserService::register(): " . $e->getMessage());
-            return false;
+            $this->db->rollBack();
+            error_log("Error in UserService::register(): " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw $e; // Re-throw with original message
         }
     }
 

@@ -7,6 +7,8 @@ require_once __DIR__ . '/controller/GameController.php';
 require_once __DIR__ . '/controller/WishlistController.php';
 require_once __DIR__ . '/controller/PaymentController.php';
 require_once __DIR__ . '/controller/LibraryController.php';
+require_once __DIR__ . '/controller/NewsController.php';
+require_once __DIR__ . '/controller/ReviewController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -17,7 +19,8 @@ $categoryController = new CategoryController($db);
 $publisherController = new PublisherController($db);
 $gameController = new GameController($db);
 $libraryController = new LibraryController($db);
-
+$newsController = new NewsController($db);
+$reviewController = new ReviewController($db);
 
 $base_path = '/BE/NextPlay';
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -36,6 +39,62 @@ echo "<br>";
 
 
 
+
+// Handle review routes
+if (isset($uri[0]) && $uri[0] === 'reviews') {
+    // GET /reviews/news/{news_id} - Get all reviews for a news article
+    if (isset($uri[1]) && $uri[1] === 'news' && isset($uri[2]) && is_numeric($uri[2])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $reviewController->getNewsReviews($uri[2]);
+            exit();
+        }
+    }
+    
+    // GET /reviews/customer/{customer_id} - Get all reviews by a customer
+    if (isset($uri[1]) && $uri[1] === 'customer' && isset($uri[2]) && is_numeric($uri[2])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $reviewController->getCustomerReviews($uri[2]);
+            exit();
+        }
+    }
+    
+    // POST /reviews - Add or update a review
+    if (count($uri) === 1 && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        checkAuth(); // Require authentication
+        $reviewController->saveReview();
+        exit();
+    }
+    
+    // GET /reviews/average/{news_id} - Get average rating for a news article
+    if (isset($uri[1]) && $uri[1] === 'average' && isset($uri[2]) && is_numeric($uri[2])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $reviewController->getNewsAverageRating($uri[2]);
+            exit();
+        }
+    }
+    
+    // Check if a customer has reviewed a news article
+    // GET /reviews/check/{customer_id}/{news_id}
+    if (isset($uri[1]) && $uri[1] === 'check' && isset($uri[2]) && is_numeric($uri[2]) && isset($uri[3]) && is_numeric($uri[3])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $reviewController->checkCustomerReview($uri[2], $uri[3]);
+            exit();
+        }
+    }
+    
+    http_response_code(404);
+    echo json_encode(['status' => 'error', 'message' => 'Endpoint not found']);
+    exit();
+}
+
+// Handle DELETE review
+if (isset($uri[0]) && $uri[0] === 'review' && isset($uri[1]) && is_numeric($uri[1]) && isset($uri[2]) && is_numeric($uri[2])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        checkAuth(); // Require authentication
+        $reviewController->deleteReview($uri[1], $uri[2]);
+        exit();
+    }
+}
 
 // Handle library route
 if (isset($uri[0]) && $uri[0] === 'library') {
@@ -91,6 +150,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[0]) && $uri[0] === 'users
 // Check authentication for protected routes
 if (isset($uri[0]) && in_array($uri[0], ['users', 'publishers', 'categories', 'games'])) {
     checkAuth();
+}
+
+// Handle news endpoints
+if (isset($uri[0]) && $uri[0] === 'news') {
+    // GET /news - List all news
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if (isset($uri[1]) && is_numeric($uri[1])) {
+            // GET /news/{id} - Get single news
+            $newsController->getNews($uri[1]);
+        } else {
+            // GET /news - Get all news
+            $newsController->getAllNews();
+        }
+        exit();
+    }
+    // POST /news - Create new news
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $newsController->createNews();
+        exit();
+    }
+    // PUT /news/{id} - Update news
+    if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1]) && is_numeric($uri[1])) {
+        $newsController->updateNews($uri[1]);
+        exit();
+    }
+    // DELETE /news/{id} - Delete news
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
+        $newsController->deleteNews($uri[1]);
+        exit();
+    }
+    
+    // If no method matched, return 404
+    http_response_code(404);
+    echo json_encode(['status' => 'error', 'message' => 'Endpoint not found']);
+    exit();
 }
 
 // Handle game endpoints
