@@ -30,6 +30,13 @@
 | POST   | /games | Create new game | Publisher |
 | PUT    | /games/{id} | Update game | Publisher/Admin |
 | DELETE | /games/{id} | Delete game | Publisher/Admin |
+| GET    | /news | Get all news articles | No |
+| GET    | /news/{id} | Get news article by ID | No |
+| POST   | /news | Create new article | Admin/Publisher |
+| PUT    | /news/{id} | Update article | Author/Admin |
+| DELETE | /news/{id} | Delete article | Author/Admin |
+| POST   | /news/comment | Add comment to article | Authenticated User |
+| DELETE | /news/comment/{id} | Delete comment | Comment Author/Admin |
 
 ## Library Endpoints
 
@@ -194,6 +201,152 @@
 **Note**: This is a default admin account. Please change the password after first login.
 
 
+
+## News Endpoints
+
+### Get All News Articles
+- **URL**: `/news`
+- **Method**: `GET`
+- **Authentication**: Not required
+- **Success Response (200 OK)**:
+  ```json
+  [
+    {
+      "id": 1,
+      "title": "New Game Release",
+      "content": "Content of the news article...",
+      "thumbnail": "https://example.com/image.jpg",
+      "author_id": 1,
+      "author_name": "admin",
+      "author_avatar": "path/to/avatar.jpg",
+      "created_at": "2025-12-02 14:30:00",
+      "views": 42
+    }
+  ]
+  ```
+
+### Get Single News Article
+- **URL**: `/news/{id}`
+- **Method**: `GET`
+- **Authentication**: Not required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "id": 1,
+    "title": "New Game Release",
+    "content": "Content of the news article...",
+    "thumbnail": "https://example.com/image.jpg",
+    "author_id": 1,
+    "author_name": "admin",
+    "author_avatar": "path/to/avatar.jpg",
+    "created_at": "2025-12-02 14:30:00",
+    "views": 43,
+    "comments": [
+      {
+        "id": 1,
+        "news_id": 1,
+        "user_id": 2,
+        "content": "Great article!",
+        "created_at": "2025-12-02 15:30:00",
+        "uname": "user123",
+        "avatar": "path/to/user/avatar.jpg"
+      }
+    ]
+  }
+  ```
+
+### Create News Article
+- **URL**: `/news`
+- **Method**: `POST`
+- **Authentication**: Required (Admin/Publisher)
+- **Request Body**:
+  ```json
+  {
+    "title": "New Article",
+    "content": "Article content here...",
+    "thumbnail": "https://example.com/image.jpg",
+    "author_id": 1
+  }
+  ```
+- **Success Response (201 Created)**:
+  ```json
+  {
+    "message": "News created successfully"
+  }
+  ```
+
+### Update News Article
+- **URL**: `/news/{id}`
+- **Method**: `PUT`
+- **Authentication**: Required (Author/Admin)
+- **Request Body**:
+  ```json
+  {
+    "title": "Updated Article Title",
+    "content": "Updated content...",
+    "thumbnail": "https://example.com/new-image.jpg",
+    "author_id": 1
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "message": "News updated successfully"
+  }
+  ```
+
+### Delete News Article
+- **URL**: `/news/{id}`
+- **Method**: `DELETE`
+- **Authentication**: Required (Author/Admin)
+- **Request Body**:
+  ```json
+  {
+    "author_id": 1
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "message": "News deleted successfully"
+  }
+  ```
+
+### Add Comment to News Article
+- **URL**: `/news/comment`
+- **Method**: `POST`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "news_id": 1,
+    "user_id": 2,
+    "content": "This is a great article!"
+  }
+  ```
+- **Success Response (201 Created)**:
+  ```json
+  {
+    "message": "Comment added successfully"
+  }
+  ```
+
+### Delete Comment
+- **URL**: `/news/comment/{id}`
+- **Method**: `DELETE`
+- **Authentication**: Required (Comment Author/Admin)
+- **Request Body**:
+  ```json
+  {
+    "user_id": 2
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "message": "Comment deleted successfully"
+  }
+  ```
 
 This document provides detailed information about the NextPlay API endpoints, request/response formats, and examples.
 

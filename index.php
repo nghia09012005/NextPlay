@@ -7,6 +7,7 @@ require_once __DIR__ . '/controller/GameController.php';
 require_once __DIR__ . '/controller/WishlistController.php';
 require_once __DIR__ . '/controller/PaymentController.php';
 require_once __DIR__ . '/controller/LibraryController.php';
+require_once __DIR__ . '/controller/NewsController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -17,7 +18,7 @@ $categoryController = new CategoryController($db);
 $publisherController = new PublisherController($db);
 $gameController = new GameController($db);
 $libraryController = new LibraryController($db);
-
+$newsController = new NewsController($db);
 
 $base_path = '/Assignment/NextPlay';
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -91,6 +92,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[0]) && $uri[0] === 'users
 // Check authentication for protected routes
 if (isset($uri[0]) && in_array($uri[0], ['users', 'publishers', 'categories', 'games'])) {
     checkAuth();
+}
+
+// Handle news endpoints
+if (isset($uri[0]) && $uri[0] === 'news') {
+    // GET /news - List all news
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if (isset($uri[1]) && is_numeric($uri[1])) {
+            // GET /news/{id} - Get single news
+            $newsController->getNews($uri[1]);
+        } else {
+            // GET /news - Get all news
+            $newsController->getAllNews();
+        }
+        exit();
+    }
+    // POST /news - Create new news
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $newsController->createNews();
+        exit();
+    }
+    // PUT /news/{id} - Update news
+    if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1]) && is_numeric($uri[1])) {
+        $newsController->updateNews($uri[1]);
+        exit();
+    }
+    // DELETE /news/{id} - Delete news
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
+        $newsController->deleteNews($uri[1]);
+        exit();
+    }
+    
+    // If no method matched, return 404
+    http_response_code(404);
+    echo json_encode(['status' => 'error', 'message' => 'Endpoint not found']);
+    exit();
 }
 
 // Handle game endpoints

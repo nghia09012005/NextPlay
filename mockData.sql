@@ -23,7 +23,7 @@ VALUES
 (4, 'Top game publisher', 'TX12345', 'New York');
 
 -- Bảng 5: Game
-INSERT INTO `Game` (`Gid`, `name`, `version`, `description`, `cost`, `adminid`, `publisherid`)
+INSERT INTO `Game` (`Gid`, `name`, `version`, `description`, `price`, `adminid`, `publisherid`)
 VALUES
 (101, 'Game A', '1.0', 'First game', 29.99, 3, 4),
 (102, 'Game B', '1.2', 'Second game', 39.99, 3, 4);
@@ -34,11 +34,19 @@ VALUES
 (1, 'Action', 'Action games'),
 (2, 'Adventure', 'Adventure games');
 
--- Bảng 7: Review
-INSERT INTO `Review` (`customerid`, `Gid`, `review_time`, `content`, `rating`)
+-- Bảng 10: News
+INSERT INTO `News` (`id`, `title`, `content`, `thumbnail`, `author_id`, `created_at`, `views`)
 VALUES
-(1, 101, CURRENT_TIMESTAMP, 'Great game!', 5),
-(2, 102, CURRENT_TIMESTAMP, 'Pretty good', 4);
+(1, 'NextPlay Launches New Gaming Platform', 'We are excited to announce the launch of our new gaming platform with enhanced features and better performance. Join us in this new era of gaming!', 'https://example.com/news/launch.jpg', 3, '2025-11-25 10:00:00', 1245),
+(2, 'Upcoming Game Release: Cyber Adventure 2077', 'Get ready for the most anticipated game of the year! Cyber Adventure 2077 will be available on our platform next month.', 'https://example.com/news/cyber-adventure.jpg', 4, '2025-11-28 14:30:00', 876),
+(3, 'Winter Sale 2025 - Up to 70% Off', 'Huge discounts on your favorite games this winter! Sale starts December 15th. Don\'t miss out!', 'https://example.com/news/winter-sale.jpg', 3, '2025-11-30 09:15:00', 1532);
+
+
+-- Bảng 7: Review
+INSERT INTO `Review` (`customerid`, `news_id`, `review_time`, `content`, `rating`)
+VALUES
+(1, 1, CURRENT_TIMESTAMP, 'Great game!', 5),
+(2, 2, CURRENT_TIMESTAMP, 'Pretty good', 4);
 
 -- Bảng 8: Library
 INSERT INTO `Library` (`uid`, `libname`)
@@ -84,3 +92,4 @@ INSERT INTO `Receives_feedback` (`feedback_time`, `customerid`, `Gid`, `publishe
 VALUES
 (CURRENT_DATE, 1, 101, 4),
 (CURRENT_DATE, 2, 102, 4);
+
