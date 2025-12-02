@@ -8,62 +8,75 @@ class NewsController {
         $this->newsService = new NewsService($db);
     }
 
+    // Send JSON response
+    private function jsonResponse($statusCode, $data) {
+        http_response_code($statusCode);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+
+    // Get all news articles
     public function getAllNews() {
         try {
             $news = $this->newsService->getAllNews();
-            $this->jsonResponse(200, $news);
+            $this->jsonResponse(200, [
+                'status' => 'success',
+                'data' => $news
+            ]);
         } catch (Exception $e) {
-            $this->jsonResponse(500, ['error' => $e->getMessage()]);
+            $this->jsonResponse(500, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
-    public function getNews($id) {
+    // Get news article by ID
+    public function getNewsById($id) {
         try {
             $news = $this->newsService->getNewsById($id);
             if ($news) {
-                $this->jsonResponse(200, $news);
+                $this->jsonResponse(200, [
+                    'status' => 'success',
+                    'data' => $news
+                ]);
             } else {
-                $this->jsonResponse(404, ['error' => 'News not found']);
+                $this->jsonResponse(404, [
+                    'status' => 'error',
+                    'message' => 'News article not found'
+                ]);
             }
         } catch (Exception $e) {
-            $this->jsonResponse(500, ['error' => $e->getMessage()]);
+            $this->jsonResponse(500, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
+    // Create new news article
     public function createNews() {
         try {
-            // Get and validate input data
             $data = json_decode(file_get_contents('php://input'), true);
             
-            // Check if required fields are present
-            $requiredFields = ['title', 'content', 'author_id'];
-            $missingFields = [];
-            
-            foreach ($requiredFields as $field) {
-                if (empty($data[$field])) {
-                    $missingFields[] = $field;
-                }
+            if (empty($data)) {
+                throw new Exception('No data provided');
             }
-            
-            if (!empty($missingFields)) {
-                throw new Exception('Missing required fields: ' . implode(', ', $missingFields));
-            }
-            
-            // Set default values for optional fields
-            $data['thumbnail'] = $data['thumbnail'] ?? null;
-            
+
+            // Set default values
+            $data['publish_date'] = date('Y-m-d H:i:s');
+            $data['adminid'] = $_SESSION['user_id'] ?? null; // Get admin ID from session
+
             $result = $this->newsService->createNews($data);
+            
             if ($result) {
                 $this->jsonResponse(201, [
                     'status' => 'success',
-                    'message' => 'News created successfully',
+                    'message' => 'News article created successfully',
                     'data' => $data
                 ]);
             } else {
-                $this->jsonResponse(400, [
-                    'status' => 'error',
-                    'message' => 'Failed to create news'
-                ]);
+                throw new Exception('Failed to create news article');
             }
         } catch (Exception $e) {
             $this->jsonResponse(400, [
@@ -73,73 +86,133 @@ class NewsController {
         }
     }
 
+    // Update news article
     public function updateNews($id) {
         try {
             $data = json_decode(file_get_contents('php://input'), true);
+            
+            if (empty($data)) {
+                throw new Exception('No data provided');
+            }
+
             $result = $this->newsService->updateNews($id, $data);
+            
             if ($result) {
-                $this->jsonResponse(200, ['message' => 'News updated successfully']);
+                $this->jsonResponse(200, [
+                    'status' => 'success',
+                    'message' => 'News article updated successfully'
+                ]);
             } else {
-                $this->jsonResponse(400, ['error' => 'Failed to update news']);
+                throw new Exception('Failed to update news article or article not found');
             }
         } catch (Exception $e) {
-            $this->jsonResponse(400, ['error' => $e->getMessage()]);
+            $this->jsonResponse(400, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
+    // Delete news article
     public function deleteNews($id) {
         try {
-            $data = json_decode(file_get_contents('php://input'), true);
-            if (!isset($data['author_id'])) {
-                throw new Exception('Author ID is required');
-            }
-            $result = $this->newsService->deleteNews($id, $data['author_id']);
+            $result = $this->newsService->deleteNews($id);
+            
             if ($result) {
-                $this->jsonResponse(200, ['message' => 'News deleted successfully']);
+                $this->jsonResponse(200, [
+                    'status' => 'success',
+                    'message' => 'News article deleted successfully'
+                ]);
             } else {
-                $this->jsonResponse(400, ['error' => 'Failed to delete news']);
+                throw new Exception('Failed to delete news article or article not found');
             }
         } catch (Exception $e) {
-            $this->jsonResponse(400, ['error' => $e->getMessage()]);
+            $this->jsonResponse(400, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
-    public function addComment() {
+    // Get news comments
+    public function getNewsComments($news_id) {
+        try {
+            $comments = $this->newsService->getNewsComments($news_id);
+            $this->jsonResponse(200, [
+                'status' => 'success',
+                'data' => $comments
+            ]);
+        } catch (Exception $e) {
+            $this->jsonResponse(500, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // Add comment to news
+    public function addComment($news_id) {
         try {
             $data = json_decode(file_get_contents('php://input'), true);
-            $result = $this->newsService->addComment($data);
+            
+            if (empty($data) || !isset($data['content'])) {
+                throw new Exception('Comment content is required');
+            }
+
+            // Get user ID from session
+            if (!isset($_SESSION['user_id'])) {
+                throw new Exception('User not authenticated');
+            }
+
+            $commentData = [
+                'news_id' => $news_id,
+                'customerid' => $_SESSION['user_id'],
+                'content' => $data['content']
+            ];
+
+            $result = $this->newsService->addComment($commentData);
+            
             if ($result) {
-                $this->jsonResponse(201, ['message' => 'Comment added successfully']);
+                $this->jsonResponse(201, [
+                    'status' => 'success',
+                    'message' => 'Comment added successfully',
+                    'data' => $commentData
+                ]);
             } else {
-                $this->jsonResponse(400, ['error' => 'Failed to add comment']);
+                throw new Exception('Failed to add comment');
             }
         } catch (Exception $e) {
-            $this->jsonResponse(400, ['error' => $e->getMessage()]);
+            $this->jsonResponse(400, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
-    public function deleteComment($id) {
+    // Delete comment
+    public function deleteComment($comment_id) {
         try {
-            $data = json_decode(file_get_contents('php://input'), true);
-            if (!isset($data['user_id'])) {
-                throw new Exception('User ID is required');
+            // Get user ID from session
+            if (!isset($_SESSION['user_id'])) {
+                throw new Exception('User not authenticated');
             }
-            $result = $this->newsService->deleteComment($id, $data['user_id']);
+
+            $result = $this->newsService->deleteComment($comment_id, $_SESSION['user_id']);
+            
             if ($result) {
-                $this->jsonResponse(200, ['message' => 'Comment deleted successfully']);
+                $this->jsonResponse(200, [
+                    'status' => 'success',
+                    'message' => 'Comment deleted successfully'
+                ]);
             } else {
-                $this->jsonResponse(400, ['error' => 'Failed to delete comment']);
+                throw new Exception('Failed to delete comment or comment not found');
             }
         } catch (Exception $e) {
-            $this->jsonResponse(400, ['error' => $e->getMessage()]);
+            $this->jsonResponse(400, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
         }
-    }
-
-    private function jsonResponse($statusCode, $data) {
-        header('Content-Type: application/json');
-        http_response_code($statusCode);
-        echo json_encode($data);
-        exit();
     }
 }
 ?>
