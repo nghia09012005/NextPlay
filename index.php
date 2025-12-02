@@ -19,7 +19,7 @@ $gameController = new GameController($db);
 $libraryController = new LibraryController($db);
 
 
-$base_path = '/Assignment/NextPlay';
+$base_path = '/BE/NextPlay';
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $request_uri = str_replace($base_path, '', $request_uri);
 
