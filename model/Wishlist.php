@@ -68,6 +68,16 @@ class Wishlist {
         return $stmt->execute();
     }
 
+    // Clear all games from wishlist
+    public function clearGames() {
+        $query = "DELETE FROM {$this->wish_game_table} 
+                 WHERE uid = :uid AND wishname = :wishname";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":uid", $this->uid);
+        $stmt->bindParam(":wishname", $this->wishname);
+        return $stmt->execute();
+    }
+
     // Get all games in a wishlist
     public function getGames() {
         $query = "SELECT G.* 

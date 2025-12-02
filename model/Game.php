@@ -53,6 +53,17 @@ class Game {
         return $stmt;
     }
 
+    // GET games by user (Library)
+    public function readByUser($uid) {
+        $query = "SELECT g.* FROM {$this->table_name} g
+                  JOIN `Lib_game` lg ON g.Gid = lg.Gid
+                  WHERE lg.uid = :uid";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":uid", $uid);
+        $stmt->execute();
+        return $stmt;
+    }
+
     // CREATE new game
     public function create() {
         $query = "INSERT INTO {$this->table_name} 

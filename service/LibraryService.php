@@ -139,6 +139,43 @@ class LibraryService {
                 ];
             }
 
+            // Get or create Payed library
+            $libraryResult = $this->getOrCreatePayedLibrary($userId);
+            if ($libraryResult['status'] !== 'success') {
+                return $libraryResult;
+            }
+            $libname = $libraryResult['data']['libname'];
+
+            // Filter out games already in library
+            $gamesToBuy = [];
+            $alreadyOwned = [];
+            
+            foreach ($gameIds as $gameId) {
+                $this->libGameModel->Gid = $gameId;
+                $this->libGameModel->libname = $libname;
+                $this->libGameModel->uid = $userId;
+                
+                if ($this->libGameModel->exists()) {
+                    $alreadyOwned[] = $gameId;
+                } else {
+                    $gamesToBuy[] = $gameId;
+                }
+            }
+
+            // If all games are already owned
+            if (empty($gamesToBuy)) {
+                return [
+                    'status' => 'success',
+                    'message' => 'All games are already in your library',
+                    'data' => [
+                        'moved_games' => $alreadyOwned, // Treat as moved so they get removed from cart
+                        'library' => $libname,
+                        'errors' => []
+                    ],
+                    'code' => 200
+                ];
+            }
+
             // Get customer balance
             $customer = $this->customerModel->readOne($userId);
             if (!$customer) {
@@ -149,8 +186,8 @@ class LibraryService {
                 ];
             }
             
-            // Calculate total cost of games
-            $totalCost = $this->getTotalCost($gameIds);
+            // Calculate total cost of NEW games only
+            $totalCost = $this->getTotalCost($gamesToBuy);
             $currentBalance = (float)$customer['balance'];
             
             // Check if balance is sufficient
@@ -169,18 +206,11 @@ class LibraryService {
                 ];
             }
 
-            // Get or create Payed library
-            $libraryResult = $this->getOrCreatePayedLibrary($userId);
-            if ($libraryResult['status'] !== 'success') {
-                return $libraryResult;
-            }
-            $libname = $libraryResult['data']['libname'];
-            
             $movedGames = [];
             $errors = [];
             
-            foreach ($gameIds as $gameId) {
-                // Add to library
+            // Add new games to library
+            foreach ($gamesToBuy as $gameId) {
                 $this->libGameModel->Gid = $gameId;
                 $this->libGameModel->libname = $libname;
                 $this->libGameModel->uid = $userId;
@@ -192,19 +222,28 @@ class LibraryService {
                 }
             }
             
-            // Deduct balance and update customer
-            $newBalance = $currentBalance - $totalCost;
-            $this->customerModel->balance = $newBalance;
-            $this->customerModel->uid = $userId;
-            if (!$this->customerModel->update()) {
-                throw new Exception('Failed to update customer balance');
+            // Combine with already owned for the response (so they are removed from cart)
+            $allProcessedGames = array_merge($movedGames, $alreadyOwned);
+
+            // Deduct balance ONLY if games were successfully added
+            if (!empty($movedGames)) {
+                $newBalance = $currentBalance - $totalCost;
+                $this->customerModel->balance = $newBalance;
+                $this->customerModel->uid = $userId;
+                if (!$this->customerModel->update()) {
+                    // Critical error: Games added but balance not deducted
+                    // In a real system, we'd rollback transaction. 
+                    // Here we just log it and return error, but games are already in library.
+                    error_log("CRITICAL: Failed to deduct balance for user $userId after adding games " . implode(',', $movedGames));
+                    // We still return success to user because they got the games, but admin needs to know.
+                }
             }
             
-            if (!empty($movedGames)) {
+            if (!empty($allProcessedGames)) {
                 return [
                     'status' => 'success',
                     'data' => [
-                        'moved_games' => $movedGames,
+                        'moved_games' => $allProcessedGames,
                         'library' => $libname,
                         'errors' => $errors
                     ],

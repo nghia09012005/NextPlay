@@ -127,11 +127,6 @@ class UserController {
             $user = $this->service->authenticate($uname, $password);
 
             if ($user) {
-                // Start session (if not already started)
-                if (session_status() === PHP_SESSION_NONE) {
-                    session_start();
-                }
-
                 // Set session variables
                 $_SESSION['user_id'] = $user['uid'];
                 $_SESSION['username'] = $user['uname'];
@@ -172,10 +167,16 @@ class UserController {
             if ($user) {
                 // Remove sensitive data before sending response
                 unset($user['password']);
-                echo json_encode($user);
+                echo json_encode([
+                    'status' => 'success',
+                    'data' => $user
+                ]);
             } else {
                 http_response_code(404);
-                echo json_encode(['message' => 'User not found']);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'User not found'
+                ]);
             }
         } catch (Exception $e) {
             http_response_code(500);
@@ -183,10 +184,6 @@ class UserController {
         }
     }
 
-    /**
-     * Update current user's information
-     * Gets user ID from session
-     */
     /**
      * Update user's password
      * Requires current password for verification

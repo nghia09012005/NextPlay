@@ -1,3 +1,4 @@
+
 -- Bảng 1: User
 CREATE TABLE `User` (
     `uid` INT AUTO_INCREMENT PRIMARY KEY,

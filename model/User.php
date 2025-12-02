@@ -58,7 +58,11 @@ class User {
         $stmt->bindParam(":DOB", $this->DOB);
         $stmt->bindParam(":lname", $this->lname);
         $stmt->bindParam(":fname", $this->fname);
-        return $stmt->execute();
+        
+        if ($stmt->execute()) {
+            return $this->conn->lastInsertId();
+        }
+        return false;
     }
 
     // UPDATE user
@@ -79,10 +83,10 @@ class User {
         $stmt->bindParam(":uname", $this->uname);
         $stmt->bindParam(":avatar", $this->avatar);
         $stmt->bindParam(":email", $this->email);
+        $stmt->bindParam(":password", $this->password);
         $stmt->bindParam(":DOB", $this->DOB);
         $stmt->bindParam(":lname", $this->lname);
         $stmt->bindParam(":fname", $this->fname);
-        $stmt->bindParam(":avatar", $this->avatar, PDO::PARAM_STR | PDO::PARAM_NULL);
         $stmt->bindParam(":uid", $this->uid);
 
         // Execute query
@@ -106,8 +110,8 @@ class User {
     public function updatePassword($uid, $hashedPassword) {
         $query = "UPDATE {$this->table_name} SET `password` = :password WHERE `uid` = :uid";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":password", $hashedPassword);
-        $stmt->bindParam(":uid", $uid);
+        $stmt->bindValue(":password", $hashedPassword);
+        $stmt->bindValue(":uid", $uid);
         return $stmt->execute();
     }
 }

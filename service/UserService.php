@@ -114,38 +114,24 @@ class UserService {
      * @return array|string Returns true on success, error message on failure
      */
     public function updatePassword($uid, $currentPassword, $newPassword) {
-        try {
+        // try {
             // Get user data
             $user = $this->userModel->readOne($uid);
             if (!$user) {
                 return 'User not found';
             }
-
-            // Verify current password
+            
+            // Verify password
             if (!password_verify($currentPassword, $user['password'])) {
                 return 'Current password is incorrect';
             }
-
-            // Validate new password
-            if (strlen($newPassword) < 8) {
-                return 'New password must be at least 8 characters long';
-            }
-
-            // Hash the new password
-            $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
-
-            // Update password in database
-            $result = $this->userModel->updatePassword($uid, $hashedPassword);
             
-            return $result ? true : 'Failed to update password';
-            
-        } catch (PDOException $e) {
-            error_log('Password update error: ' . $e->getMessage());
-            return 'A database error occurred while updating password';
-        } catch (Exception $e) {
-            error_log('Error in updatePassword: ' . $e->getMessage());
-            return $e->getMessage();
-        }
+            // Update password
+            $this->userModel->uid = $uid;
+            // $this->userModel->password = password_hash($newPassword, PASSWORD_BCRYPT);
+            $this->userModel->updatePassword($uid, password_hash($newPassword, PASSWORD_BCRYPT));
+            return 'Password updated successfully';
+        // }
     }
 
     public function authenticate($uname, $password) {
