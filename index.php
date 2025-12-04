@@ -12,6 +12,8 @@ require_once __DIR__ . '/controller/NewsController.php';
 require_once __DIR__ . '/controller/ReviewController.php';
 require_once __DIR__ . '/controller/FeedbackController.php';
 require_once __DIR__ . '/controller/PageController.php';
+require_once __DIR__ . '/controller/PageContentController.php';
+require_once __DIR__ . '/controller/ContactController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -53,6 +55,8 @@ $newsController = new NewsController($db);
 $reviewController = new ReviewController($db);
 $feedbackController = new FeedbackController($db);
 $pageController = new PageController();
+$contactController = new ContactController($db);
+$pageContentController = new PageContentController($db);
 
 $base_path = '/BTL_LTW/BTL_LTW_BE';
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -378,6 +382,33 @@ if (isset($uri[0]) && $uri[0] === 'users') {
         echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
     }
     exit();
+}
+
+// Handle contact endpoints
+if (isset($uri[0]) && $uri[0] === 'contact') {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $contactController->createMessage();
+        exit();
+    }
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+    exit();
+}
+
+// Handle content endpoints
+if (isset($uri[0]) && $uri[0] === 'content') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $pageContentController->getAllContent();
+        exit();
+    }
+}
+
+if (isset($uri[0]) && $uri[0] === 'admin' && isset($uri[1]) && $uri[1] === 'content') {
+    if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+        // checkAuth(); // Uncomment to enforce auth
+        $pageContentController->updateContent();
+        exit();
+    }
 }
 
 // If no route matches
