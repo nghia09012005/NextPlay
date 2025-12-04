@@ -340,28 +340,17 @@ class UserController {
             if (in_array($fileActualExt, $allowed)) {
                 if ($fileError === 0) {
                     if ($fileSize < 5000000) { // 5MB
-                        $fileNameNew = "profile_" . $uid . "_" . uniqid('', true) . "." . $fileActualExt;
-                        // Save to FE assets folder
-                        $fileDestination = 'd:/webroot/BTL_LTW/BTL_LTW_FE/assets/uploads/' . $fileNameNew;
-                        
-                        // Create dir if not exists
-                        if (!file_exists(dirname($fileDestination))) {
-                            mkdir(dirname($fileDestination), 0777, true);
-                        }
-
-                        if (move_uploaded_file($fileTmpName, $fileDestination)) {
-                            // Update DB
-                            if ($this->service->uploadAvatar($uid, $fileNameNew)) {
-                                echo json_encode([
-                                    'status' => 'success', 
-                                    'message' => 'Avatar uploaded successfully',
-                                    'avatar' => $fileNameNew
-                                ]);
-                            } else {
-                                throw new Exception('Failed to update database', 500);
-                            }
+                        // Upload to Cloudinary via Service
+                        if ($this->service->uploadAvatar($uid, $fileTmpName)) {
+                            // Fetch updated user to get the new avatar URL
+                            $updatedUser = $this->service->getOne($uid);
+                            echo json_encode([
+                                'status' => 'success', 
+                                'message' => 'Avatar uploaded successfully',
+                                'avatar' => $updatedUser['avatar']
+                            ]);
                         } else {
-                            throw new Exception('Failed to move uploaded file', 500);
+                            throw new Exception('Failed to upload avatar to Cloudinary', 500);
                         }
                     } else {
                         throw new Exception('File is too big', 400);

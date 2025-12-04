@@ -78,12 +78,6 @@ class UserService {
         return $user;
     }
 
-    /**
-     * Update user information
-     * @param int $uid User ID
-     * @param array $data User data to update (uname, email, DOB, lname, fname)
-     * @return bool True on success, false on failure
-     */
     public function updateUser($uid, $data) {
         // Get existing user data
         $user = $this->userModel->readOne($uid);
@@ -104,38 +98,22 @@ class UserService {
         return $this->userModel->update();
     }
 
-    /**
-     * Authenticate user with username and password
-     * @param string $uname Username
-     * @param string $password Plain text password
-     * @return array|false User data if authentication successful, false otherwise
-     */
-    /**
-     * Update user password
-     * @param int $uid User ID
-     * @param string $currentPassword Current password
-     * @param string $newPassword New password
-     * @return array|string Returns true on success, error message on failure
-     */
     public function updatePassword($uid, $currentPassword, $newPassword) {
-        // try {
-            // Get user data
-            $user = $this->userModel->readOne($uid);
-            if (!$user) {
-                return 'User not found';
-            }
-            
-            // Verify password
-            if (!password_verify($currentPassword, $user['password'])) {
-                return 'Current password is incorrect';
-            }
-            
-            // Update password
-            $this->userModel->uid = $uid;
-            // $this->userModel->password = password_hash($newPassword, PASSWORD_BCRYPT);
-            $this->userModel->updatePassword($uid, password_hash($newPassword, PASSWORD_BCRYPT));
-            return 'Password updated successfully';
-        // }
+        // Get user data
+        $user = $this->userModel->readOne($uid);
+        if (!$user) {
+            return 'User not found';
+        }
+        
+        // Verify password
+        if (!password_verify($currentPassword, $user['password'])) {
+            return 'Current password is incorrect';
+        }
+        
+        // Update password
+        $this->userModel->uid = $uid;
+        $this->userModel->updatePassword($uid, password_hash($newPassword, PASSWORD_BCRYPT));
+        return 'Password updated successfully';
     }
 
     public function authenticate($uname, $password) {
@@ -169,14 +147,17 @@ class UserService {
         }
     }
 
-    public function uploadAvatar($uid, $filename) {
-        $this->userModel->uid = $uid;
-        // We need to fetch existing user data to update only avatar, 
-        // OR update User model to allow updating single field.
-        // For now, let's fetch, update avatar, and save back.
-        // BUT User::update updates ALL fields.
-        // So we must populate all fields.
+    public function uploadAvatar($uid, $fileTmpPath) {
+        require_once __DIR__ . '/CloudinaryService.php';
+        $cloudinary = new CloudinaryService();
         
+        $secureUrl = $cloudinary->uploadImage($fileTmpPath);
+        
+        if (!$secureUrl) {
+            return false;
+        }
+
+        $this->userModel->uid = $uid;
         $user = $this->userModel->readOne($uid);
         if (!$user) return false;
 
@@ -186,7 +167,7 @@ class UserService {
         $this->userModel->DOB = $user['DOB'];
         $this->userModel->lname = $user['lname'];
         $this->userModel->fname = $user['fname'];
-        $this->userModel->avatar = $filename;
+        $this->userModel->avatar = $secureUrl;
         
         return $this->userModel->update();
     }
@@ -196,6 +177,7 @@ class UserService {
         $libraryModel = new Library($this->db);
         return $libraryModel->getAllUserGames($uid)->fetchAll(PDO::FETCH_ASSOC);
     }
+
     public function isAdmin($uid) {
         return $this->adminModel->readOne($uid) ? true : false;
     }
