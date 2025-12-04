@@ -66,7 +66,7 @@ class LibraryService {
         }
         
         $placeholders = str_repeat('?,', count($gameIds) - 1) . '?';
-        $query = "SELECT SUM(cost) as total FROM `Game` WHERE Gid IN ($placeholders)";
+        $query = "SELECT SUM(price) as total FROM `Game` WHERE Gid IN ($placeholders)";
         $stmt = $this->db->prepare($query);
         $stmt->execute($gameIds);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -227,15 +227,16 @@ class LibraryService {
 
             // Deduct balance ONLY if games were successfully added
             if (!empty($movedGames)) {
-                $newBalance = $currentBalance - $totalCost;
+                // Recalculate cost for only the games that were successfully added
+                $actualCost = $this->getTotalCost($movedGames);
+                $newBalance = $currentBalance - $actualCost;
+                
                 $this->customerModel->balance = $newBalance;
                 $this->customerModel->uid = $userId;
+                
                 if (!$this->customerModel->update()) {
                     // Critical error: Games added but balance not deducted
-                    // In a real system, we'd rollback transaction. 
-                    // Here we just log it and return error, but games are already in library.
                     error_log("CRITICAL: Failed to deduct balance for user $userId after adding games " . implode(',', $movedGames));
-                    // We still return success to user because they got the games, but admin needs to know.
                 }
             }
             

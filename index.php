@@ -359,6 +359,10 @@ if (isset($uri[0]) && $uri[0] === 'pages') {
 
 // Handle user endpoints
 if (isset($uri[0]) && $uri[0] === 'users') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && $uri[1] === 'check_admin') {
+        $userController->checkAdmin();
+        exit();
+    }
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($uri[1]) && is_numeric($uri[1])) {
             $userController->getOne($uri[1]);
@@ -367,6 +371,8 @@ if (isset($uri[0]) && $uri[0] === 'users') {
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && is_numeric($uri[1]) && isset($uri[2]) && $uri[2] === 'avatar') {
         $userController->uploadAvatar($uri[1]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && is_numeric($uri[1]) && isset($uri[2]) && $uri[2] === 'deposit') {
+        $userController->deposit($uri[1]);
     } else {
         http_response_code(405);
         echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);

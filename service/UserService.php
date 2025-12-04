@@ -1,16 +1,19 @@
 <?php
 require_once __DIR__ . '/../model/User.php';
 require_once __DIR__ . '/../model/Customer.php';
+require_once __DIR__ . '/../model/Admin.php';
 
 class UserService {
     private $db;
     private $userModel;
     private $customerModel;
+    private $adminModel;
 
     public function __construct($db) {
         $this->db = $db;
         $this->userModel = new User($db);
         $this->customerModel = new Customer($db);
+        $this->adminModel = new Admin($db);
     }
 
     public function register($uname, $email, $password, $DOB, $lname, $fname) {
@@ -192,6 +195,40 @@ class UserService {
         require_once __DIR__ . '/../model/Library.php';
         $libraryModel = new Library($this->db);
         return $libraryModel->getAllUserGames($uid)->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function isAdmin($uid) {
+        return $this->adminModel->readOne($uid) ? true : false;
+    }
+
+    public function deposit($uid, $amount) {
+        if ($amount <= 0) {
+            return false;
+        }
+
+        try {
+            // Get current customer data
+            $customer = $this->customerModel->readOne($uid);
+            if (!$customer) {
+                return false;
+            }
+
+            // Calculate new balance
+            $currentBalance = (float)$customer['balance'];
+            $newBalance = $currentBalance + $amount;
+
+            // Update balance
+            $this->customerModel->uid = $uid;
+            $this->customerModel->balance = $newBalance;
+            
+            if ($this->customerModel->update()) {
+                return $newBalance;
+            }
+            
+            return false;
+        } catch (Exception $e) {
+            error_log('Error in UserService::deposit: ' . $e->getMessage());
+            return false;
+        }
     }
 }
 ?>

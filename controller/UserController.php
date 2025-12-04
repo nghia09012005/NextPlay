@@ -390,5 +390,59 @@ class UserController {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
+    public function checkAdmin() {
+        header('Content-Type: application/json');
+        try {
+            if (!isset($_GET['uid'])) {
+                throw new Exception('User ID is required', 400);
+            }
+            $uid = $_GET['uid'];
+            $isAdmin = $this->service->isAdmin($uid);
+            echo json_encode(['status' => 'success', 'isAdmin' => $isAdmin]);
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function deposit($uid) {
+        header('Content-Type: application/json');
+        
+        try {
+            // Get and validate JSON input
+            $json = file_get_contents("php://input");
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON format', 400);
+            }
+
+            if (!isset($data['amount']) || !is_numeric($data['amount']) || $data['amount'] <= 0) {
+                throw new Exception('Invalid amount', 400);
+            }
+
+            $amount = (float)$data['amount'];
+            $newBalance = $this->service->deposit($uid, $amount);
+
+            if ($newBalance !== false) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Deposit successful',
+                    'new_balance' => $newBalance
+                ]);
+            } else {
+                throw new Exception('Deposit failed', 500);
+            }
+
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
 }
 ?>
