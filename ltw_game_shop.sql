@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Dec 04, 2025 at 06:54 PM
+-- Generation Time: Dec 04, 2025 at 08:33 PM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.4
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `ltw_game_shop`
 --
+CREATE DATABASE IF NOT EXISTS `ltw_game_shop` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `ltw_game_shop`;
 
 -- --------------------------------------------------------
 
@@ -99,6 +101,29 @@ INSERT INTO `category` (`catId`, `name`, `description`) VALUES
 (10, 'FPS', 'First-person shooter games.'),
 (11, 'Horror', 'Games designed to scare the player.'),
 (12, 'Sports', 'Games that simulate the practice of sports.');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contactmessages`
+--
+
+CREATE TABLE `contactmessages` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('new','read','replied') COLLATE utf8mb4_unicode_ci DEFAULT 'new',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `contactmessages`
+--
+
+INSERT INTO `contactmessages` (`id`, `name`, `email`, `subject`, `message`, `status`, `created_at`) VALUES
+(1, 'Huỳnh Minh Tiến', 'randy2032005@gmail.com', 'Web Lỏ', 'Admin ơi hãy sửa lại giúp em với, ban đầu em định nạp 50000 nhưng mà lỡ bấm lộn thành 500000 giờ má em chửi em quá trời, có cách nào để trả lại tiền cho em được không. Em cảm ơn!!!', 'new', '2025-12-04 19:03:10');
 
 -- --------------------------------------------------------
 
@@ -298,9 +323,36 @@ INSERT INTO `news` (`id`, `title`, `content`, `thumbnail`, `author_id`, `created
 (3, 'Bản cập nhật mới của Cyber Future có gì hot?', 'Nhà phát triển vừa tung ra bản vá lỗi lớn cùng DLC mở rộng bản đồ. Người chơi sẽ được trải nghiệm khu vực mới...', 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-25 14:15:00', 2103, 'Tin Game', 'GenK'),
 (4, 'Hướng dẫn build PC chơi game giá rẻ năm 2025', 'Tối ưu hiệu năng trên giá thành với cấu hình PC gaming tầm trung. Chỉ với 15 triệu đồng, bạn có thể chiến tốt...', 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-20 10:00:00', 3501, 'Công nghệ', 'TinhTe'),
 (5, 'Review: Lost Kingdom - Siêu phẩm hay bom xịt?', 'Đánh giá chi tiết tựa game được mong chờ nhất năm. Cốt truyện sâu sắc nhưng gameplay còn nhiều sạn...', 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=2165&auto=format&fit=crop', 25, '2025-11-15 16:45:00', 1508, 'Review', 'Game4V'),
-(6, 'Cộng đồng game thủ Việt nói gì về sự kiện sắp tới?', 'Những ý kiến trái chiều xoay quanh việc thay đổi thể thức thi đấu. Nhiều người ủng hộ nhưng cũng không ít...', 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-10 11:20:00', 500, 'Cộng đồng', 'ThanhNien'),
+(6, 'Cộng đồng game thủ Việt nói gì về sự kiện sắp tới?', 'Những ý kiến trái chiều xoay quanh việc thay đổi thể thức thi đấu. Nhiều người ủng hộ nhưng cũng không ít...', 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-10 11:20:00', 501, 'Cộng đồng', 'ThanhNien'),
 (7, 'Sony công bố PlayStation 6: Cấu hình khủng khiếp', 'Những thông tin rò rỉ đầu tiên về thế hệ console tiếp theo. Sức mạnh xử lý đồ họa được nâng cấp gấp đôi...', 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?q=80&w=2000&auto=format&fit=crop', 25, '2025-11-05 08:30:00', 5000, 'Công nghệ', 'Sony'),
 (8, 'GTA VI lộ diện trailer mới: Đồ họa siêu thực', 'Rockstar Games tiếp tục khiến cộng đồng đứng ngồi không yên. Trailer mới hé lộ bối cảnh Vice City hiện đại...', 'https://images.unsplash.com/photo-1628260412297-a3377e45006f?q=80&w=2000&auto=format&fit=crop', 25, '2025-11-01 20:00:00', 8009, 'Tin Game', 'Rockstar');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pagecontent`
+--
+
+CREATE TABLE `pagecontent` (
+  `id` int(11) NOT NULL,
+  `page_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `section_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content_value` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `pagecontent`
+--
+
+INSERT INTO `pagecontent` (`id`, `page_key`, `section_key`, `content_value`, `updated_at`) VALUES
+(1, 'contact', 'address', '14/17 Khu phố Tây B, Dĩ An, TP.HCM', '2025-12-04 19:12:08'),
+(2, 'contact', 'email', 'support@nextplay.com', '2025-12-04 19:06:28'),
+(3, 'contact', 'hotline', '0948 467 394', '2025-12-04 19:12:22'),
+(4, 'contact', 'facebook', 'https://www.facebook.com/mintieeen/', '2025-12-04 19:13:31'),
+(5, 'contact', 'instagram', '#', '2025-12-04 19:06:28'),
+(6, 'contact', 'twitter', '#', '2025-12-04 19:06:28'),
+(7, 'contact', 'youtube', '#', '2025-12-04 19:06:28');
 
 -- --------------------------------------------------------
 
@@ -438,7 +490,7 @@ INSERT INTO `user` (`uid`, `uname`, `avatar`, `email`, `password`, `DOB`, `lname
 (31, 'tien', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1764863096/p2amdbvwoazomtgidzfi.jpg', 'tien2005@gmail.com', '$2y$10$WMtFyXVGMod/qu6YLgk12uW8hcLZHEBmhKW3bEC.9xS3B4nAt3Tk.', '2005-03-20', 'Minh', 'Tien', 0, NULL, '2025-12-05 00:26:33'),
 (36, 'tien2032005', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1764863876/fkcvzvfkjhfnunx0uhcr.jpg', 'tien2032005@gmail.com', '$2y$10$WMtFyXVGMod/qu6YLgk12uW8hcLZHEBmhKW3bEC.9xS3B4nAt3Tk.', '2005-03-20', 'Minh', 'Tien', 0, NULL, '2025-12-05 00:26:33'),
 (37, 'MinhTien2032005', NULL, 'tien.huynhminhcse@hcmut.edu.vn', '$2y$10$td4ESCCLhfgViQLOmHfQQOypaQSidfhO75c3oEoS2S/.15ZiHNPvK', '2005-03-20', 'Huỳnh', 'Minh Tiến', 0, NULL, '2025-12-05 00:26:33'),
-(38, 'minhtien2003', NULL, 'rrr@gmail.com', '$2y$10$kiydZLU2f7f2afISytYZnujdB7O0Xm2ob./biT57EYgKoAumjnj7m', '2005-03-20', 'Minh', 'Tien', 5, '2025-12-04 18:53:03', '2025-12-05 00:37:48');
+(38, 'minhtien2003', NULL, 'rrr@gmail.com', '$2y$10$kiydZLU2f7f2afISytYZnujdB7O0Xm2ob./biT57EYgKoAumjnj7m', '2005-03-20', 'Minh', 'Tien', 6, '2025-12-04 19:29:24', '2025-12-05 00:37:48');
 
 -- --------------------------------------------------------
 
@@ -507,6 +559,12 @@ ALTER TABLE `category`
   ADD UNIQUE KEY `name` (`name`);
 
 --
+-- Indexes for table `contactmessages`
+--
+ALTER TABLE `contactmessages`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `customer`
 --
 ALTER TABLE `customer`
@@ -546,6 +604,13 @@ ALTER TABLE `lib_game`
 ALTER TABLE `news`
   ADD PRIMARY KEY (`id`),
   ADD KEY `author_id` (`author_id`);
+
+--
+-- Indexes for table `pagecontent`
+--
+ALTER TABLE `pagecontent`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_content` (`page_key`,`section_key`);
 
 --
 -- Indexes for table `pages`
@@ -613,6 +678,12 @@ ALTER TABLE `category`
   MODIFY `catId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
+-- AUTO_INCREMENT for table `contactmessages`
+--
+ALTER TABLE `contactmessages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
@@ -629,6 +700,12 @@ ALTER TABLE `game`
 --
 ALTER TABLE `news`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `pagecontent`
+--
+ALTER TABLE `pagecontent`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `pages`
