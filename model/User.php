@@ -15,6 +15,34 @@ class User {
     public function __construct($db) {
         $this->conn = $db;
     }
+    
+    /**
+     * Check if a user with the given username or email already exists
+     * @return array|false Returns array with 'uname' and 'email' keys if either exists, false otherwise
+     */
+    public function checkExistingUser() {
+        $query = "SELECT 
+                    SUM(CASE WHEN uname = :uname THEN 1 ELSE 0 END) as uname_exists,
+                    SUM(CASE WHEN email = :email THEN 1 ELSE 0 END) as email_exists
+                  FROM {$this->table_name}
+                  WHERE uname = :uname OR email = :email";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":uname", $this->uname);
+        $stmt->bindParam(":email", $this->email);
+        $stmt->execute();
+        
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result['uname_exists'] > 0 || $result['email_exists'] > 0) {
+            return [
+                'uname' => $result['uname_exists'] > 0,
+                'email' => $result['email_exists'] > 0
+            ];
+        }
+        
+        return false;
+    }
 
     // GET all users
     public function readAll() {
@@ -46,11 +74,27 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-
     // CREATE user
     public function create() {
-        $query = "INSERT INTO {$this->table_name} (`uname`, `avatar`, `email`, `password`, `DOB`, `lname`, `fname`) VALUES (:uname, :avatar, :email, :password, :DOB, :lname, :fname)";
+        // First check if username or email already exists
+        $existing = $this->checkExistingUser();
+        if ($existing !== false) {
+            if ($existing['uname']) {
+                throw new Exception('Username already exists');
+            }
+            if ($existing['email']) {
+                throw new Exception('Email already registered');
+            }
+        }
+
+        $query = "INSERT INTO {$this->table_name} (`uname`, `avatar`, `email`, `password`, `DOB`, `lname`, `fname`) 
+                 VALUES (:uname, :avatar, :email, :password, :DOB, :lname, :fname)";
+        
         $stmt = $this->conn->prepare($query);
+        
+        // Set default avatar if not provided
+        $this->avatar = $this->avatar ?? null;
+        
         $stmt->bindParam(":uname", $this->uname);
         $stmt->bindParam(":avatar", $this->avatar);
         $stmt->bindParam(":email", $this->email);
@@ -59,10 +103,21 @@ class User {
         $stmt->bindParam(":lname", $this->lname);
         $stmt->bindParam(":fname", $this->fname);
         
-        if ($stmt->execute()) {
-            return $this->conn->lastInsertId();
+        try {
+            if ($stmt->execute()) {
+                $lastId = $this->conn->lastInsertId();
+                if ($lastId === '0' || $lastId === false) {
+                    // If lastInsertId() fails, try to get the ID another way
+                    $stmt = $this->conn->query("SELECT LAST_INSERT_ID()");
+                    $lastId = $stmt->fetchColumn();
+                }
+                return $lastId;
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log("Error in User->create(): " . $e->getMessage());
+            throw new Exception('Failed to create user: ' . $e->getMessage());
         }
-        return false;
     }
 
     // UPDATE user

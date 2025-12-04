@@ -15,6 +15,7 @@ class Game {
     public $release_date;
     public $rating;
     public $reviews;
+    public $trailer;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -67,8 +68,8 @@ class Game {
     // CREATE new game
     public function create() {
         $query = "INSERT INTO {$this->table_name} 
-            (`name`, `description`, `price`, `thumbnail`, `category`, `tags`, `developer`, `publisher`, `release_date`, `rating`, `reviews`) 
-            VALUES (:name, :description, :price, :thumbnail, :category, :tags, :developer, :publisher, :release_date, :rating, :reviews)";
+            (`name`, `description`, `price`, `thumbnail`, `category`, `tags`, `developer`, `publisher`, `release_date`, `rating`, `reviews`, `trailer`) 
+            VALUES (:name, :description, :price, :thumbnail, :category, :tags, :developer, :publisher, :release_date, :rating, :reviews, :trailer)";
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":name", $this->name);
@@ -98,7 +99,7 @@ class Game {
                     `category`=:category, `tags`=:tags,
                     `developer`=:developer, `publisher`=:publisher,
                     `release_date`=:release_date, `rating`=:rating,
-                    `reviews`=:reviews
+                    `reviews`=:reviews, `trailer`=:trailer
                 WHERE `gid`=:gid";
 
         $stmt = $this->conn->prepare($query);
@@ -114,6 +115,7 @@ class Game {
         $stmt->bindParam(":release_date", $this->release_date);
         $stmt->bindParam(":rating", $this->rating);
         $stmt->bindParam(":reviews", $this->reviews);
+        $stmt->bindParam(":trailer", $this->trailer);
         $stmt->bindParam(":gid", $this->gid);
 
         return $stmt->execute();

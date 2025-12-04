@@ -13,21 +13,21 @@ CREATE TABLE `User` (
 
 -- Bảng 2: Customer
 CREATE TABLE `Customer` (
-    `uid` INT AUTO_INCREMENT PRIMARY KEY,
+    `uid` INT  PRIMARY KEY,
     `balance` DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (`uid`) REFERENCES `User`(`uid`)
 );
 
 -- Bảng 3: Admin
 CREATE TABLE `Admin` (
-    `uid` INT AUTO_INCREMENT PRIMARY KEY,
+    `uid` INT  PRIMARY KEY,
     `startdate` DATE,
     FOREIGN KEY (`uid`) REFERENCES `User`(`uid`)
 );
 
 -- Bảng 4: Publisher
 CREATE TABLE `Publisher` (
-    `uid` INT AUTO_INCREMENT PRIMARY KEY,
+    `uid` INT  PRIMARY KEY,
     `description` TEXT,
     `taxcode` VARCHAR(50),
     `location` VARCHAR(255),
@@ -62,16 +62,43 @@ CREATE TABLE `Category` (
     `description` TEXT
 );
 
+-- Bảng 10: News
+CREATE TABLE `News` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(255) NOT NULL,
+    `content` TEXT NOT NULL,
+    `thumbnail` VARCHAR(255),
+    `author_id` INT NOT NULL,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `views` INT DEFAULT 0,
+    `category` VARCHAR(100),
+    `source` VARCHAR(100),
+    FOREIGN KEY (`author_id`) REFERENCES `User`(`uid`)
+);
+
+-- Bảng 11: NewsComments
+-- CREATE TABLE `NewsComments` (
+--     `id` INT AUTO_INCREMENT PRIMARY KEY,
+--     `news_id` INT NOT NULL,
+--     `user_id` INT NOT NULL,
+--     `content` TEXT NOT NULL,
+--     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     FOREIGN KEY (`news_id`) REFERENCES `News`(`id`) ON DELETE CASCADE,
+--     FOREIGN KEY (`user_id`) REFERENCES `User`(`uid`) ON DELETE CASCADE
+-- );
+
+
+
 -- Bảng 7: Review (Customer đánh giá Game)
 CREATE TABLE `Review` (
     `customerid` INT,
-    `Gid` INT,
+    `news_id` INT,
     `review_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `content` TEXT,
-    `rating` INT CHECK (`rating` BETWEEN 1 AND 5),
-    PRIMARY KEY (`customerid`, `Gid`),
+    `rating` INT ,
+    PRIMARY KEY (`customerid`, `news_id`),
     FOREIGN KEY (`customerid`) REFERENCES `Customer`(`uid`),
-    FOREIGN KEY (`Gid`) REFERENCES `Game`(`Gid`)
+    FOREIGN KEY (`news_id`) REFERENCES `News`(`id`)
 );
 
 -- Bảng 8: Library
@@ -142,6 +169,8 @@ CREATE TABLE `Receives_feedback` (
     `customerid` INT,
     `Gid` INT,
     `publisherid` INT,
+    `content` TEXT,
+    `rating` INT,
     PRIMARY KEY (`feedback_time`, `customerid`),
     FOREIGN KEY (`customerid`) REFERENCES `Customer`(`uid`),
     FOREIGN KEY (`Gid`) REFERENCES `Game`(`Gid`),

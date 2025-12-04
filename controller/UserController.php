@@ -59,25 +59,26 @@ class UserController {
             $lname = filter_var($data['lname'], FILTER_SANITIZE_STRING);
             $fname = filter_var($data['fname'], FILTER_SANITIZE_STRING);
 
-            // Attempt registration
-            $uid = $this->service->register(
-                $uname,
-                $email,
-                $data['password'], // Don't sanitize password
-                $data['DOB'],
-                $lname,
-                $fname
-            );
+            try {
+                // Attempt registration
+                $uid = $this->service->register(
+                    $uname,
+                    $email,
+                    $data['password'], // Don't sanitize password
+                    $data['DOB'],
+                    $lname,
+                    $fname
+                );
 
-            if ($uid) {
                 http_response_code(201); // 201 Created
                 echo json_encode([
                     'status' => 'success',
                     'message' => 'User registered successfully',
                     'uid' => $uid
                 ]);
-            } else {
-                throw new Exception('Failed to register user. The username or email may already be in use.', 400);
+            } catch (Exception $e) {
+                // Rethrow with the original error message
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }
 
         } catch (PDOException $e) {
