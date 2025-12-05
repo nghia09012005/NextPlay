@@ -4,7 +4,7 @@ class Database {
     private $db_name = "ltw_game_shop";
     private $username = "root";
     private $password = ""; 
-    private $port = "3306"; // Default MySQL port
+    private $port = "3307"; // Default MySQL port
     public $conn;
 
     public function getConnection() {

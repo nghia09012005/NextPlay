@@ -100,27 +100,10 @@ class NewsService {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function deleteComment($review_id, $user_id) {
-        // Get the review to check ownership
-        $stmt = $this->reviewModel->readByCustomer($user_id);
-        $userReviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $userHasReview = false;
-        
-        // Check if the review exists and belongs to the user
-        foreach ($userReviews as $review) {
-            if ($review['review_id'] == $review_id) {
-                $userHasReview = true;
-                break;
-            }
-        }
-        
-        if (!$userHasReview && !$this->isAdmin($user_id)) {
-            throw new Exception('Unauthorized to delete this comment');
-        }
-        
-        // Delete the review
+    public function deleteComment($news_id, $user_id) {
+        // Delete the review directly using composite key
         $this->reviewModel->customerid = $user_id;
-        $this->reviewModel->news_id = $review['news_id'];
+        $this->reviewModel->news_id = $news_id;
         return $this->reviewModel->delete();
     }
 

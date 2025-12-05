@@ -1,19 +1,36 @@
 <?php
 require_once __DIR__ . '/../model/User.php';
 require_once __DIR__ . '/../model/Customer.php';
+require_once __DIR__ . '/../model/Admin.php';
+require_once __DIR__ . '/../service/WishlistService.php';
 
 class UserService {
     private $db;
     private $userModel;
     private $customerModel;
+    private $adminModel;
+    private $wishlistService;
 
     public function __construct($db) {
         $this->db = $db;
         $this->userModel = new User($db);
         $this->customerModel = new Customer($db);
+        $this->adminModel = new Admin($db);
+        $this->wishlistService = new WishlistService($db);
+    }
+
+    private function validatePasswordStrength($password) {
+        // Min 8 chars, at least 1 uppercase, 1 lowercase, 1 number, 1 special char
+        $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
+        if (!preg_match($regex, $password)) {
+            throw new Exception('Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.');
+        }
     }
 
     public function register($uname, $email, $password, $DOB, $lname, $fname) {
+        // Validate password strength
+        $this->validatePasswordStrength($password);
+
         // Start transaction
         $this->db->beginTransaction();
         
@@ -40,6 +57,8 @@ class UserService {
             if (!$customerCreated) {
                 throw new Exception('Failed to create customer account');
             }
+
+            $this->wishlistService->createWishlist($uid, 'Cart');
 
             // Commit transaction
             $this->db->commit();
@@ -75,12 +94,6 @@ class UserService {
         return $user;
     }
 
-    /**
-     * Update user information
-     * @param int $uid User ID
-     * @param array $data User data to update (uname, email, DOB, lname, fname)
-     * @return bool True on success, false on failure
-     */
     public function updateUser($uid, $data) {
         // Get existing user data
         $user = $this->userModel->readOne($uid);
@@ -96,57 +109,43 @@ class UserService {
         $this->userModel->lname = $data['lname'] ?? $user['lname'];
         $this->userModel->fname = $data['fname'] ?? $user['fname'];
         $this->userModel->avatar = $data['avatar'] ?? $user['avatar'];
+        $this->userModel->password = $user['password'];
 
         // Update the user
         return $this->userModel->update();
     }
 
-    /**
-     * Authenticate user with username and password
-     * @param string $uname Username
-     * @param string $password Plain text password
-     * @return array|false User data if authentication successful, false otherwise
-     */
-    /**
-     * Update user password
-     * @param int $uid User ID
-     * @param string $currentPassword Current password
-     * @param string $newPassword New password
-     * @return array|string Returns true on success, error message on failure
-     */
     public function updatePassword($uid, $currentPassword, $newPassword) {
+        // Get user data
+        $user = $this->userModel->readOne($uid);
+        if (!$user) {
+            return 'User not found';
+        }
+        
+        // Verify password
+        if (!password_verify($currentPassword, $user['password'])) {
+            return 'Current password is incorrect';
+        }
+
         try {
-            // Get user data
-            $user = $this->userModel->readOne($uid);
-            if (!$user) {
-                return 'User not found';
-            }
-
-            // Verify current password
-            if (!password_verify($currentPassword, $user['password'])) {
-                return 'Current password is incorrect';
-            }
-
-            // Validate new password
-            if (strlen($newPassword) < 8) {
-                return 'New password must be at least 8 characters long';
-            }
-
-            // Hash the new password
-            $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
-
-            // Update password in database
-            $result = $this->userModel->updatePassword($uid, $hashedPassword);
-            
-            return $result ? true : 'Failed to update password';
-            
-        } catch (PDOException $e) {
-            error_log('Password update error: ' . $e->getMessage());
-            return 'A database error occurred while updating password';
+            $this->validatePasswordStrength($newPassword);
         } catch (Exception $e) {
-            error_log('Error in updatePassword: ' . $e->getMessage());
             return $e->getMessage();
         }
+        
+        // Update password
+        $this->userModel->uid = $uid;
+        // Update password and timestamp
+        $query = "UPDATE `User` SET password = :password, password_changed_at = NOW() WHERE uid = :uid";
+        $stmt = $this->db->prepare($query);
+        $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+        $stmt->bindParam(':password', $hashedPassword);
+        $stmt->bindParam(':uid', $uid);
+        
+        if($stmt->execute()) {
+             return 'Password updated successfully';
+        }
+        return 'Failed to update password';
     }
 
     public function authenticate($uname, $password) {
@@ -155,11 +154,30 @@ class UserService {
             $user = $this->userModel->getByUsername($uname);
             
             if (!$user) {
-                return false;
+                // To prevent user enumeration, we could delay here, but for now just return false
+                // Or throw specific error if we want to be helpful but less secure against enumeration
+                throw new Exception('Invalid username or password');
+            }
+
+            // Check for lockout
+            if (isset($user['lockout_time']) && $user['lockout_time']) {
+                $lockoutTime = new DateTime($user['lockout_time']);
+                $now = new DateTime();
+                if ($now < $lockoutTime) {
+                    $diff = $now->diff($lockoutTime);
+                    $minutes = $diff->i + ($diff->h * 60) + 1; // Round up
+                    throw new Exception("Account is locked. Please try again in $minutes minutes.");
+                } else {
+                    // Lockout expired, reset
+                    $this->resetLockout($user['uid']);
+                }
             }
             
             // Verify password
             if (password_verify($password, $user['password'])) {
+                // Reset failed attempts on success
+                $this->resetLockout($user['uid']);
+
                 // Remove password from returned user data
                 unset($user['password']);
                 
@@ -170,24 +188,62 @@ class UserService {
                 }
                 
                 return $user;
+            } else {
+                // Increment failed attempts
+                $currentAttempts = $user['failed_attempts'] ?? 0;
+                $this->handleFailedLogin($user['uid'], $currentAttempts);
+                
+                $newAttempts = $currentAttempts + 1;
+                $remaining = 5 - $newAttempts;
+                
+                if ($remaining > 0) {
+                     throw new Exception("Invalid username or password. Remaining attempts: $remaining");
+                } else {
+                     throw new Exception("Invalid username or password. Account is now locked.");
+                }
             }
-            
-            return false;
             
         } catch (PDOException $e) {
             error_log('Authentication error: ' . $e->getMessage());
-            return false;
+            throw new Exception('System error during authentication');
         }
     }
 
-    public function uploadAvatar($uid, $filename) {
-        $this->userModel->uid = $uid;
-        // We need to fetch existing user data to update only avatar, 
-        // OR update User model to allow updating single field.
-        // For now, let's fetch, update avatar, and save back.
-        // BUT User::update updates ALL fields.
-        // So we must populate all fields.
+    private function resetLockout($uid) {
+        $query = "UPDATE `User` SET failed_attempts = 0, lockout_time = NULL WHERE uid = :uid";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':uid', $uid);
+        $stmt->execute();
+    }
+
+    private function handleFailedLogin($uid, $currentAttempts) {
+        $newAttempts = $currentAttempts + 1;
+        $lockoutTime = null;
         
+        // Lockout policy: 5 failed attempts = 15 minutes lockout
+        if ($newAttempts >= 5) {
+            $lockoutTime = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+        }
+
+        $query = "UPDATE `User` SET failed_attempts = :attempts, lockout_time = :lockout WHERE uid = :uid";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':attempts', $newAttempts);
+        $stmt->bindParam(':lockout', $lockoutTime);
+        $stmt->bindParam(':uid', $uid);
+        $stmt->execute();
+    }
+
+    public function uploadAvatar($uid, $fileTmpPath) {
+        require_once __DIR__ . '/CloudinaryService.php';
+        $cloudinary = new CloudinaryService();
+        
+        $secureUrl = $cloudinary->uploadImage($fileTmpPath);
+        
+        if (!$secureUrl) {
+            return false;
+        }
+
+        $this->userModel->uid = $uid;
         $user = $this->userModel->readOne($uid);
         if (!$user) return false;
 
@@ -197,7 +253,7 @@ class UserService {
         $this->userModel->DOB = $user['DOB'];
         $this->userModel->lname = $user['lname'];
         $this->userModel->fname = $user['fname'];
-        $this->userModel->avatar = $filename;
+        $this->userModel->avatar = $secureUrl;
         
         return $this->userModel->update();
     }
@@ -206,6 +262,41 @@ class UserService {
         require_once __DIR__ . '/../model/Library.php';
         $libraryModel = new Library($this->db);
         return $libraryModel->getAllUserGames($uid)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function isAdmin($uid) {
+        return $this->adminModel->readOne($uid) ? true : false;
+    }
+
+    public function deposit($uid, $amount) {
+        if ($amount <= 0) {
+            return false;
+        }
+
+        try {
+            // Get current customer data
+            $customer = $this->customerModel->readOne($uid);
+            if (!$customer) {
+                return false;
+            }
+
+            // Calculate new balance
+            $currentBalance = (float)$customer['balance'];
+            $newBalance = $currentBalance + $amount;
+
+            // Update balance
+            $this->customerModel->uid = $uid;
+            $this->customerModel->balance = $newBalance;
+            
+            if ($this->customerModel->update()) {
+                return $newBalance;
+            }
+            
+            return false;
+        } catch (Exception $e) {
+            error_log('Error in UserService::deposit: ' . $e->getMessage());
+            return false;
+        }
     }
 }
 ?>

@@ -230,5 +230,72 @@ class WishlistService {
             ];
         }
     }
+    /**
+     * Remove a game from a user's wishlist
+     * @param int $userId
+     * @param string $wishlistName
+     * @param int $gameId
+     * @return array Result with status and message
+     */
+    public function removeGameFromWishlist($userId, $wishlistName, $gameId) {
+        try {
+            // Validate inputs
+            if (empty($wishlistName) || empty($gameId)) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Wishlist name and game ID are required',
+                    'code' => 400
+                ];
+            }
+
+            // Check if wishlist exists
+            $this->wishlistModel->uid = $userId;
+            $this->wishlistModel->wishname = $wishlistName;
+            
+            $stmt = $this->wishlistModel->getUserWishlists($userId);
+            $wishlistExists = false;
+            $wishlists = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            foreach ($wishlists as $wishlist) {
+                if (strcasecmp($wishlist['wishname'], $wishlistName) === 0) {
+                    $wishlistExists = true;
+                    break;
+                }
+            }
+
+            if (!$wishlistExists) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Wishlist not found',
+                    'code' => 404
+                ];
+            }
+
+            // Remove game from wishlist
+            $this->wishGameModel->Gid = $gameId;
+            $this->wishGameModel->wishname = $wishlistName;
+            $this->wishGameModel->uid = $userId;
+            
+            if ($this->wishGameModel->remove()) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Game removed from wishlist successfully',
+                    'code' => 200
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Game not found in wishlist or failed to remove',
+                    'code' => 404
+                ];
+            }
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Failed to remove game from wishlist: ' . $e->getMessage(),
+                'code' => 500
+            ];
+        }
+    }
 }
 ?>

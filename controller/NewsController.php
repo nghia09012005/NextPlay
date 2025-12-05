@@ -167,7 +167,8 @@ class NewsController {
             $commentData = [
                 'news_id' => $news_id,
                 'customerid' => $_SESSION['user_id'],
-                'content' => $data['content']
+                'content' => $data['content'],
+                'rating' => isset($data['rating']) ? (int)$data['rating'] : 5 // Default to 5 if not provided
             ];
 
             $result = $this->newsService->addComment($commentData);
@@ -190,14 +191,15 @@ class NewsController {
     }
 
     // Delete comment
-    public function deleteComment($comment_id) {
+    public function deleteComment($news_id) {
         try {
             // Get user ID from session
             if (!isset($_SESSION['user_id'])) {
                 throw new Exception('User not authenticated');
             }
 
-            $result = $this->newsService->deleteComment($comment_id, $_SESSION['user_id']);
+            // Delete by news_id and user_id (composite key)
+            $result = $this->newsService->deleteComment($news_id, $_SESSION['user_id']);
             
             if ($result) {
                 $this->jsonResponse(200, [

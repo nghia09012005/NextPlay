@@ -1,3 +1,4 @@
+
 -- Bảng 1: User
 CREATE TABLE `User` (
     `uid` INT AUTO_INCREMENT PRIMARY KEY,
@@ -70,6 +71,8 @@ CREATE TABLE `News` (
     `author_id` INT NOT NULL,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `views` INT DEFAULT 0,
+    `category` VARCHAR(100),
+    `source` VARCHAR(100),
     FOREIGN KEY (`author_id`) REFERENCES `User`(`uid`)
 );
 
@@ -166,6 +169,8 @@ CREATE TABLE `Receives_feedback` (
     `customerid` INT,
     `Gid` INT,
     `publisherid` INT,
+    `content` TEXT,
+    `rating` INT,
     PRIMARY KEY (`feedback_time`, `customerid`),
     FOREIGN KEY (`customerid`) REFERENCES `Customer`(`uid`),
     FOREIGN KEY (`Gid`) REFERENCES `Game`(`Gid`),

@@ -128,11 +128,6 @@ class UserController {
             $user = $this->service->authenticate($uname, $password);
 
             if ($user) {
-                // Start session (if not already started)
-                if (session_status() === PHP_SESSION_NONE) {
-                    session_start();
-                }
-
                 // Set session variables
                 $_SESSION['user_id'] = $user['uid'];
                 $_SESSION['username'] = $user['uname'];
@@ -173,10 +168,16 @@ class UserController {
             if ($user) {
                 // Remove sensitive data before sending response
                 unset($user['password']);
-                echo json_encode($user);
+                echo json_encode([
+                    'status' => 'success',
+                    'data' => $user
+                ]);
             } else {
                 http_response_code(404);
-                echo json_encode(['message' => 'User not found']);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'User not found'
+                ]);
             }
         } catch (Exception $e) {
             http_response_code(500);
@@ -184,10 +185,6 @@ class UserController {
         }
     }
 
-    /**
-     * Update current user's information
-     * Gets user ID from session
-     */
     /**
      * Update user's password
      * Requires current password for verification
@@ -343,28 +340,17 @@ class UserController {
             if (in_array($fileActualExt, $allowed)) {
                 if ($fileError === 0) {
                     if ($fileSize < 5000000) { // 5MB
-                        $fileNameNew = "profile_" . $uid . "_" . uniqid('', true) . "." . $fileActualExt;
-                        // Save to FE assets folder
-                        $fileDestination = 'd:/webroot/BTL_LTW/BTL_LTW_FE/assets/uploads/' . $fileNameNew;
-                        
-                        // Create dir if not exists
-                        if (!file_exists(dirname($fileDestination))) {
-                            mkdir(dirname($fileDestination), 0777, true);
-                        }
-
-                        if (move_uploaded_file($fileTmpName, $fileDestination)) {
-                            // Update DB
-                            if ($this->service->uploadAvatar($uid, $fileNameNew)) {
-                                echo json_encode([
-                                    'status' => 'success', 
-                                    'message' => 'Avatar uploaded successfully',
-                                    'avatar' => $fileNameNew
-                                ]);
-                            } else {
-                                throw new Exception('Failed to update database', 500);
-                            }
+                        // Upload to Cloudinary via Service
+                        if ($this->service->uploadAvatar($uid, $fileTmpName)) {
+                            // Fetch updated user to get the new avatar URL
+                            $updatedUser = $this->service->getOne($uid);
+                            echo json_encode([
+                                'status' => 'success', 
+                                'message' => 'Avatar uploaded successfully',
+                                'avatar' => $updatedUser['avatar']
+                            ]);
                         } else {
-                            throw new Exception('Failed to move uploaded file', 500);
+                            throw new Exception('Failed to upload avatar to Cloudinary', 500);
                         }
                     } else {
                         throw new Exception('File is too big', 400);
@@ -390,6 +376,60 @@ class UserController {
             echo json_encode(['status' => 'success', 'data' => $games]);
         } catch (Exception $e) {
             http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function checkAdmin() {
+        header('Content-Type: application/json');
+        try {
+            if (!isset($_GET['uid'])) {
+                throw new Exception('User ID is required', 400);
+            }
+            $uid = $_GET['uid'];
+            $isAdmin = $this->service->isAdmin($uid);
+            echo json_encode(['status' => 'success', 'isAdmin' => $isAdmin]);
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function deposit($uid) {
+        header('Content-Type: application/json');
+        
+        try {
+            // Get and validate JSON input
+            $json = file_get_contents("php://input");
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON format', 400);
+            }
+
+            if (!isset($data['amount']) || !is_numeric($data['amount']) || $data['amount'] <= 0) {
+                throw new Exception('Invalid amount', 400);
+            }
+
+            $amount = (float)$data['amount'];
+            $newBalance = $this->service->deposit($uid, $amount);
+
+            if ($newBalance !== false) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Deposit successful',
+                    'new_balance' => $newBalance
+                ]);
+            } else {
+                throw new Exception('Deposit failed', 500);
+            }
+
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }

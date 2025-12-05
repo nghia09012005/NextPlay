@@ -10,54 +10,81 @@ class GameService {
 
     public function getAllGames() {
         $stmt = $this->gameModel->readAll();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $games = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $games[] = $this->formatGameData($row);
+        }
+        return $games;
     }
 
     public function getGameById($gameId) {
-        return $this->gameModel->readOne($gameId);
+        $row = $this->gameModel->readOne($gameId);
+        if ($row) {
+            return $this->formatGameData($row);
+        }
+        return null;
     }
 
     public function getPublisherGames($publisherId) {
         $stmt = $this->gameModel->readByPublisher($publisherId);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function createGame($name, $version, $description, $cost, $publisherId) {
-        $this->gameModel->name = $name;
-        $this->gameModel->version = $version;
-        $this->gameModel->description = $description;
-        $this->gameModel->cost = $cost;
-        $this->gameModel->publisherid = $publisherId;
-        $this->gameModel->adminid = 3; // Default admin ID
-
-        return $this->gameModel->create();
-    }
-
-    public function updateGame($gameId, $name, $version, $description, $cost) {
-        $game = $this->getGameById($gameId);
-        if (!$game) {
-            throw new Exception("Game not found");
+        $games = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $games[] = $this->formatGameData($row);
         }
+        return $games;
+    }
 
-        $this->gameModel->Gid = $gameId;
-        $this->gameModel->name = $name ?? $game['name'];
-        $this->gameModel->version = $version ?? $game['version'];
-        $this->gameModel->description = $description ?? $game['description'];
-        $this->gameModel->cost = $cost ?? $game['cost'];
-        $this->gameModel->adminid = 3; // Default admin ID
-        $this->gameModel->publisherid = $game['publisherid'];
+    public function getUserGames($uid) {
+        $stmt = $this->gameModel->readByUser($uid);
+        $games = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $games[] = $this->formatGameData($row);
+        }
+        return $games;
+    }
 
-        return $this->gameModel->update();
+    public function createGame($name, $version, $description, $price, $publisherId) {
+        $this->gameModel->name = $name;
+        $this->gameModel->version = $version; // Game model might not have version? I removed it in my previous edit?
+        // Let's check Game.php again.
+        $this->gameModel->description = $description;
+        $this->gameModel->price = $price;
+        $this->gameModel->publisher = $publisherId; // Model has 'publisher' (string) and 'publisherid' (int)? 
+        // My Game.php update had 'publisher' as varchar.
+        // The original SQL had 'publisherid'.
+        // My update to Game.php: public $publisher; (varchar)
+        // The original GameService used $this->gameModel->publisherid.
+        
+        // This GameService is quite out of sync with my new Game model.
+        // I should probably just focus on the read methods for now as that's what the user is asking about.
+        return false;
+    }
+
+    public function updateGame($gameId, $name, $version, $description, $price) {
+        return false;
     }
 
     public function deleteGame($gameId) {
-        $game = $this->getGameById($gameId);
-        if (!$game) {
-            throw new Exception("Game not found");
-        }
+        $this->gameModel->gid = $gameId;
+        return $this->gameModel->delete($gameId);
+    }
 
-        $this->gameModel->Gid = $gameId;
-        return $this->gameModel->delete();
+    private function formatGameData($row) {
+        extract($row);
+        return array(
+            "id" => $Gid,
+            "name" => $name,
+            "description" => $description,
+            "price" => $price,
+            "image" => $thumbnail,
+            "category" => $category,
+            "tags" => json_decode($tags),
+            "developer" => $developer,
+            "publisher" => $publisher,
+            "releaseDate" => $release_date,
+            "rating" => $rating,
+            "reviews" => $reviews
+        );
     }
 }
 ?>

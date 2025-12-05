@@ -12,11 +12,6 @@ class WishlistController {
      * Get all wishlist names for the current user
      */
     public function getUserWishlistNames() {
-        // Start session if not already started
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
         // Check if user is logged in
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
@@ -158,6 +153,40 @@ class WishlistController {
             $_SESSION['user_id'],
             $wishlistName,
             $data['game_id']
+        );
+
+        // Send response
+        http_response_code($result['code']);
+        unset($result['code']);
+        echo json_encode($result);
+    }
+
+    /**
+     * Remove a game from a wishlist
+     * @param string $wishlistName
+     * @param int $gameId
+     */
+    public function removeGameFromWishlist($wishlistName, $gameId) {
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'You must be logged in to remove games from a wishlist'
+            ]);
+            return;
+        }
+
+        // Remove game from wishlist
+        $result = $this->wishlistService->removeGameFromWishlist(
+            $_SESSION['user_id'],
+            $wishlistName,
+            $gameId
         );
 
         // Send response
