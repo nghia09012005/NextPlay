@@ -14,7 +14,7 @@ class Admin {
     public function readAll() {
         $query = "SELECT A.*, U.uname, U.email 
                  FROM {$this->table_name} A
-                 JOIN `User` U ON U.uid = A.uid";
+                 JOIN `user` U ON U.uid = A.uid";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
@@ -24,7 +24,7 @@ class Admin {
     public function readOne($uid) {
         $query = "SELECT A.*, U.uname, U.email 
                  FROM {$this->table_name} A
-                 JOIN `User` U ON U.uid = A.uid
+                 JOIN `user` U ON U.uid = A.uid
                  WHERE A.`uid` = :uid";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":uid", $uid);

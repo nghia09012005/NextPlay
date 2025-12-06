@@ -32,7 +32,7 @@ class CategoryService {
 
     public function deleteCategory($catId) {
         $this->categoryModel->catId = $catId;
-        return $this->categoryModel->delete();
+        return $this->categoryModel->delete($catId);
     }
 }
 ?>

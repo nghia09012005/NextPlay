@@ -9,7 +9,7 @@ public url: https://nghiadz.alwaysdata.net/...
 ```
 ### Database url
 ```
-mysql://root:zqrZpHByLbLH YozKGRrFCDYhQbINYpTe8@tramway.proxy.rlwy.net:42537/railway
+mysql://root:zqrZpHByLbLHYozKGRrFCDYhQbINYpTe8@tramway.proxy.rlwy.net:42537/railway
 ```
 
 ## Quick Reference

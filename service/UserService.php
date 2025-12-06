@@ -184,25 +184,32 @@ class UserService {
                 }
             }
             
-           
-
     
 
             // Verify password
             if (password_verify($password, $user['password'])) {
                 // Reset failed attempts on success
+
+          
                 // $this->resetLockout($user['uid']);
+                
 
              
 
                 // Remove password from returned user data
                 unset($user['password']);
                 
+                
+
                 // Get balance if customer
                 $customer = $this->customerModel->readOne($user['uid']);
+
+               
+
                 if ($customer) {
                     $user['balance'] = $customer['balance'];
                 }
+                
                 
                 
                 return $user;

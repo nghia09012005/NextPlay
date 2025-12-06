@@ -17,7 +17,7 @@ class Review {
     public function readByNews($news_id) {
         $query = "SELECT R.*, U.uname, U.avatar 
                  FROM {$this->table_name} R
-                 JOIN `User` U ON U.uid = R.customerid
+                 JOIN `user` U ON U.uid = R.customerid
                  WHERE R.news_id = :news_id
                  ORDER BY R.review_time DESC";
         $stmt = $this->conn->prepare($query);
@@ -30,7 +30,7 @@ class Review {
     public function readByCustomer($customerid) {
         $query = "SELECT R.*, N.title as news_title 
                  FROM {$this->table_name} R
-                 JOIN `News` N ON N.id = R.news_id
+                 JOIN `news` N ON N.id = R.news_id
                  WHERE R.customerid = :customerid";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":customerid", $customerid);

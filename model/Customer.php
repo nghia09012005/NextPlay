@@ -24,12 +24,20 @@ class Customer {
     public function readOne($uid) {
         $query = "SELECT C.*, U.uname, U.email 
                   FROM {$this->table_name} C
-                  JOIN `User` U ON U.uid = C.uid
+                  JOIN `user` U ON U.uid = C.uid
                   WHERE C.`uid` = :uid";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":uid", $uid);
-        $stmt->execute();
+
+        print("lỗi đây");
+
+        print($stmt->execute());
+
+        print("excute xong");
+
+       
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 

@@ -1,21 +1,21 @@
 <?php
 class Database {
     // XAMPP LOCAL
-    // private $host = "localhost";
-    // private $db_name = "ltw_game_shop";
-    // private $username = "root";
-    // private $password = ""; 
-    // private $port = "3306"; // Default MySQL port
-    // public $conn;
+    private $host = "localhost";
+    private $db_name = "ltw_game_shop";
+    private $username = "root";
+    private $password = ""; 
+    private $port = "3306"; // Default MySQL port
+    public $conn;
 
 
     // RAILWAY
-    private $host = "tramway.proxy.rlwy.net";
-    private $db_name = "railway";
-    private $username = "root";
-    private $password = "zqRZpHByLbLhYOzKgWRfCDYhqbNYpTeB";
-    private $port = "42537"; 
-
+    // private $host = "tramway.proxy.rlwy.net";
+    // private $db_name = "railway";
+    // private $username = "root";
+    // private $password = "zqRZpHByLbLhYOzKgWRfCDYhqbNYpTeB";
+    // private $port = "42537";
+    //public $conn;
 
     public function getConnection() {
         $this->conn = null;

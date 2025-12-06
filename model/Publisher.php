@@ -16,7 +16,7 @@ class Publisher {
     public function readAll() {
         $query = "SELECT P.*, U.uname, U.email 
                  FROM {$this->table_name} P
-                 JOIN `User` U ON U.uid = P.uid";
+                 JOIN `user` U ON U.uid = P.uid";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
@@ -26,7 +26,7 @@ class Publisher {
     public function readOne($uid) {
         $query = "SELECT P.*, U.uname, U.email 
                  FROM {$this->table_name} P
-                 JOIN `User` U ON U.uid = P.uid
+                 JOIN `user` U ON U.uid = P.uid
                  WHERE P.`uid` = :uid";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":uid", $uid);

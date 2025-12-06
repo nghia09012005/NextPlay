@@ -25,8 +25,8 @@ class Game {
     public function readAll() {
         $query = "SELECT g.*, u.uname as publisher_name, a.uname as admin_name 
                  FROM {$this->table_name} g
-                 LEFT JOIN `User` u ON g.publisherid = u.uid
-                 LEFT JOIN `User` a ON g.adminid = a.uid";
+                 LEFT JOIN `user` u ON g.publisherid = u.uid
+                 LEFT JOIN `user` a ON g.adminid = a.uid";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
@@ -36,8 +36,8 @@ class Game {
     public function readOne($Gid) {
         $query = "SELECT g.*, u.uname as publisher_name, a.uname as admin_name 
                  FROM {$this->table_name} g
-                 LEFT JOIN `User` u ON g.publisherid = u.uid
-                 LEFT JOIN `User` a ON g.adminid = a.uid
+                 LEFT JOIN `user` u ON g.publisherid = u.uid
+                 LEFT JOIN `user` a ON g.adminid = a.uid
                  WHERE g.Gid = :Gid";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":Gid", $Gid);
@@ -57,7 +57,7 @@ class Game {
     // GET games by user (Library)
     public function readByUser($uid) {
         $query = "SELECT g.* FROM {$this->table_name} g
-                  JOIN `Lib_game` lg ON g.Gid = lg.Gid
+                  JOIN `lib_game` lg ON g.Gid = lg.Gid
                   WHERE lg.uid = :uid";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":uid", $uid);
