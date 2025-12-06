@@ -1,8 +1,8 @@
 <?php
 class Cart {
     private $conn;
-    private $table_name = "`Cart`";
-    private $cart_game_table = "`Cart_game`";
+    private $table_name = "`cart`";
+    private $cart_game_table = "`cart_game`";
 
     public $uid;
     public $status;

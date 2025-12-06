@@ -1,7 +1,7 @@
 <?php
 class Customer {
     private $conn;
-    private $table_name = "`Customer`";
+    private $table_name = "`customer`";
 
     public $uid;
     public $balance;

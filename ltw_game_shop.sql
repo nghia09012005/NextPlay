@@ -50,7 +50,7 @@ INSERT INTO `admin` (`uid`, `startdate`) VALUES
 CREATE TABLE `cart` (
   `uid` int(11) NOT NULL,
   `status` varchar(30) NOT NULL,
-  `created_date` date DEFAULT curdate()
+  `created_date` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --

@@ -1,7 +1,7 @@
 <?php
 class Game {
     private $conn;
-    private $table_name = "`Game`";
+    private $table_name = "`game`";
 
     public $gid;
     public $name;

@@ -1,7 +1,7 @@
 <?php
 class Publisher {
     private $conn;
-    private $table_name = "`Publisher`";
+    private $table_name = "`publisher`";
 
     public $uid;
     public $description;

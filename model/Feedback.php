@@ -1,7 +1,7 @@
 <?php
 class Feedback {
     private $conn;
-    private $table_name = "Receives_feedback";
+    private $table_name = "`receives_feedback`";
 
     public $feedback_time;
     public $customerid;

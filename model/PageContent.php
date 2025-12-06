@@ -1,7 +1,7 @@
 <?php
 class PageContent {
     private $conn;
-    private $table_name = "PageContent";
+    private $table_name = "`pagecontent`";
 
     public $id;
     public $page_key;

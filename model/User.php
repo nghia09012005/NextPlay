@@ -1,7 +1,7 @@
 <?php
 class User {
     private $conn;
-    private $table_name = "`User`";
+    private $table_name = "`user`";
 
     public $uid;
     public $uname;
@@ -87,6 +87,7 @@ class User {
             }
         }
 
+        
         $query = "INSERT INTO {$this->table_name} (`uname`, `avatar`, `email`, `password`, `DOB`, `lname`, `fname`) 
                  VALUES (:uname, :avatar, :email, :password, :DOB, :lname, :fname)";
         

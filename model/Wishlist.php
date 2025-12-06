@@ -1,8 +1,8 @@
 <?php
 class Wishlist {
     private $conn;
-    private $table_name = "`Wishlist`";
-    private $wish_game_table = "`Wish_game`";
+    private $table_name = "`wishlist`";
+    private $wish_game_table = "`wish_game`";
 
     public $uid;
     public $wishname;

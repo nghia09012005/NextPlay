@@ -1,7 +1,7 @@
 <?php
 class Lib_game {
     private $conn;
-    private $table_name = "`Lib_game`";
+    private $table_name = "`lib_game`";
 
     public $Gid;
     public $libname;

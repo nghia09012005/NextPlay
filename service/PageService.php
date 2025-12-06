@@ -6,9 +6,12 @@ class PageService {
     private $db;
     private $page;
 
-    public function __construct() {
-        $database = new Database();
-        $this->db = $database->getConnection();
+    public function __construct($db = null) {
+        if (!$db) {
+            $database = new Database();
+            $db = $database->getConnection();
+        }
+        $this->db = $db;
         $this->page = new Page($this->db);
     }
 

@@ -40,26 +40,34 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
+// Initialize controllers with the database connection
+$userController = new UserController($db);
+// $gameController = new GameController($db);
+// $publisherController = new PublisherController($db);
+// $categoryController = new CategoryController($db);
+// $libraryController = new LibraryController($db);
+// $wishlistController = new WishlistController($db);
+// $paymentController = new PaymentController($db);
+// $pageContentController = new PageContentController($db);
+// $contactController = new ContactController($db);
+// $pageController = new PageController();
+// $newsController = new NewsController($db);
+// $reviewController = new ReviewController($db);
+// $feedbackController = new FeedbackController($db);
+
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-$userController = new UserController($db);
-$categoryController = new CategoryController($db);
-$publisherController = new PublisherController($db);
-$gameController = new GameController($db);
-$libraryController = new LibraryController($db);
-$newsController = new NewsController($db);
-$newsController = new NewsController($db);
-$reviewController = new ReviewController($db);
-$feedbackController = new FeedbackController($db);
-$pageController = new PageController();
-$contactController = new ContactController($db);
-$pageContentController = new PageContentController($db);
+    $base_path = '/Assignment/NextPlay';
+    $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-$base_path = '/BTL_LTW/BTL_LTW_BE';
+    error_log("Original URI: " . $request_uri);
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+
+
 error_log("Original URI: " . $request_uri);
 
 // Remove base path
@@ -74,6 +82,9 @@ error_log("After index.php strip: " . $request_uri);
 
 $uri = array_values(array_filter(explode('/', trim($request_uri, '/'))));
 error_log("Parsed URI Array: " . print_r($uri, true));
+
+print_r($uri);
+
 
 // Handle review routes
 if (isset($uri[0]) && $uri[0] === 'reviews') {
@@ -180,7 +191,9 @@ function checkAuth() {
 // Public endpoints (no auth required)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[0])) {
     if ($uri[0] === 'users' && isset($uri[1]) && $uri[1] === 'signin') {
+        // print("sigin here");
         $userController->signin();
+        // print("sigin out");
         exit();
     } elseif ($uri[0] === 'users' && (!isset($uri[1]) || $uri[1] === 'register')) {
         $userController->register();

@@ -5,8 +5,8 @@ require_once __DIR__ . '/../service/PublisherService.php';
 class PublisherController {
     private $service;
 
-    public function __construct() {
-        $db = (new Database())->getConnection();
+    public function __construct($db) {
+        $this->db = $db;
         $this->service = new PublisherService($db);
     }
 

@@ -35,6 +35,8 @@ class UserService {
         $this->db->beginTransaction();
         
         try {
+
+            print("register user service");
             // Set user data
             $this->userModel->uname = $uname;
             $this->userModel->email = $email;
@@ -45,14 +47,20 @@ class UserService {
 
             // Create user - this will throw an exception if username/email exists
             $uid = $this->userModel->create();
+
+            
             
             if (!$uid) {
                 throw new Exception('Failed to create user account');
             }
 
+            
             // Create customer record with initial balance
             $initialBalance = 0.00; // Set initial balance to 0
             $customerCreated = $this->customerModel->create($uid, $initialBalance);
+            
+
+            print("xong");
             
             if (!$customerCreated) {
                 throw new Exception('Failed to create customer account');
@@ -62,7 +70,9 @@ class UserService {
 
             // Commit transaction
             $this->db->commit();
+
             
+
             error_log("User and customer created successfully. User ID: " . $uid);
             return $uid;
             
@@ -150,6 +160,7 @@ class UserService {
 
     public function authenticate($uname, $password) {
         try {
+          
             // Get user by username
             $user = $this->userModel->getByUsername($uname);
             
@@ -173,10 +184,16 @@ class UserService {
                 }
             }
             
+           
+
+    
+
             // Verify password
             if (password_verify($password, $user['password'])) {
                 // Reset failed attempts on success
-                $this->resetLockout($user['uid']);
+                // $this->resetLockout($user['uid']);
+
+             
 
                 // Remove password from returned user data
                 unset($user['password']);
@@ -186,6 +203,7 @@ class UserService {
                 if ($customer) {
                     $user['balance'] = $customer['balance'];
                 }
+                
                 
                 return $user;
             } else {
@@ -202,6 +220,7 @@ class UserService {
                      throw new Exception("Invalid username or password. Account is now locked.");
                 }
             }
+            // print("fail");
             
         } catch (PDOException $e) {
             error_log('Authentication error: ' . $e->getMessage());

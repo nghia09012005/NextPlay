@@ -1,7 +1,7 @@
 <?php
 class Wish_game {
     private $conn;
-    private $table_name = "`Wish_game`";
+    private $table_name = "`wish_game`";
 
     public $Gid;
     public $wishname;

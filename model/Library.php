@@ -1,8 +1,8 @@
 <?php
 class Library {
     private $conn;
-    private $table_name = "`Library`";
-    private $lib_game_table = "`Lib_game`";
+    private $table_name = "`library`";
+    private $lib_game_table = "`lib_game`";
 
     public $uid;
     public $libname;

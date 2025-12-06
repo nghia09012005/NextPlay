@@ -1,7 +1,7 @@
 <?php
 class Review {
     private $conn;
-    private $table_name = "`Review`";
+    private $table_name = "`review`";
 
     public $customerid;
     public $news_id;
