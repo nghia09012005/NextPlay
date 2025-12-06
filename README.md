@@ -1,5 +1,17 @@
 # NextPlay API Documentation
 
+## Base URL
+
+### WebServer url
+```
+localhost: http://localhost/Assignment/NextPlay/index.php/...
+public url: https://nghiadz.alwaysdata.net/...
+```
+### Database url
+```
+mysql://root:zqrZpHByLbLH YozKGRrFCDYhQbINYpTe8@tramway.proxy.rlwy.net:42537/railway
+```
+
 ## Quick Reference
 
 | Method | Endpoint | Description | Auth Required |
@@ -477,10 +489,7 @@
 
 This document provides detailed information about the NextPlay API endpoints, request/response formats, and examples.
 
-## Base URL
-```
-http://localhost/Assignment/NextPlay/index.php/...
-```
+
 
 ## Authentication
 Most endpoints require authentication. Include the session token in subsequent requests after login.
