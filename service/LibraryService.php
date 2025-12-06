@@ -37,7 +37,21 @@ class LibraryService {
             
             $games = [];
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $games[] = $row;
+                // Format game data to match GameService output
+                $games[] = [
+                    "id" => $row['Gid'],
+                    "name" => $row['name'],
+                    "description" => $row['description'],
+                    "price" => $row['price'],
+                    "image" => $row['thumbnail'],
+                    "category" => $row['category'],
+                    "tags" => json_decode($row['tags']),
+                    "developer" => $row['developer'],
+                    "publisher" => $row['publisher'],
+                    "releaseDate" => $row['release_date'],
+                    "rating" => $row['rating'],
+                    "reviews" => $row['reviews']
+                ];
             }
             
             return [

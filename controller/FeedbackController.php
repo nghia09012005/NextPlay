@@ -31,7 +31,8 @@ class FeedbackController {
 
     public function addReview() {
         try {
-            $data = json_decode(file_get_contents('php://input'), true);
+            $input = file_get_contents('php://input');
+            $data = json_decode($input, true);
             
             if (empty($data)) {
                 throw new Exception('No data provided');
@@ -45,15 +46,17 @@ class FeedbackController {
 
             $result = $this->feedbackService->addReview($data);
             
-            if ($result) {
+            if ($result === true) {
                 $this->jsonResponse(201, [
                     'status' => 'success',
                     'message' => 'Review added successfully'
                 ]);
             } else {
-                throw new Exception('Failed to add review');
+                // $result contains the error message
+                throw new Exception('Failed to add review: ' . $result);
             }
         } catch (Exception $e) {
+            error_log("Error in addReview: " . $e->getMessage());
             $this->jsonResponse(400, [
                 'status' => 'error',
                 'message' => $e->getMessage()

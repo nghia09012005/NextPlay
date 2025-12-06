@@ -43,8 +43,16 @@
 | DELETE | /review/{customer_id}/{news_id} | Delete a review | Review Author/Admin |
 | GET    | /reviews/average/{news_id} | Get average rating for news | No |
 | GET    | /reviews/check/{customer_id}/{news_id} | Check if customer reviewed news | No |
+| POST   | /feedback | Add a game review | Yes |
+| GET    | /feedback/game/{id} | Get reviews for a game | No |
+| PUT    | /feedback/game/{id} | Update a game review | Yes |
+| DELETE | /feedback/game/{id} | Delete a game review | Yes |
+| GET    | /faqs | Get all FAQs | No |
+| POST   | /contact | Submit contact message | No |
+| GET    | /content | Get page content | No |
+| PUT    | /admin/content | Update page content | Admin |
 
-## Review Endpoints
+## Review Endpoints (News)
 
 ### Get Reviews for a News Article
 - **URL**: `/reviews/news/{news_id}`
@@ -796,6 +804,147 @@ Most endpoints require authentication. Include the session token in subsequent r
   - 500 Internal Server Error: Server error
 
 ## API Endpoints (Legacy)
+
+
+## Game Feedback Endpoints
+
+### Get Reviews for a Game
+- **URL**: `/feedback/game/{id}`
+- **Method**: `GET`
+- **Authentication**: Not required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": [
+      {
+        "customerid": 1,
+        "Gid": 12,
+        "feedback_time": "2025-12-05",
+        "publisherid": 2,
+        "content": "Great game!",
+        "rating": 5,
+        "uname": "player1",
+        "avatar": "avatar.jpg"
+      }
+    ]
+  }
+  ```
+
+### Add Game Review
+- **URL**: `/feedback`
+- **Method**: `POST`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "Gid": 12,
+    "content": "Awesome gameplay!",
+    "rating": 5
+  }
+  ```
+- **Success Response (201 Created)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Review added successfully"
+  }
+  ```
+
+### Update Game Review
+- **URL**: `/feedback/game/{id}`
+- **Method**: `PUT`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "content": "Updated review content",
+    "rating": 4
+  }
+  ```
+
+### Delete Game Review
+- **URL**: `/feedback/game/{id}`
+- **Method**: `DELETE`
+- **Authentication**: Required
+
+## FAQ Endpoints
+
+### Get All FAQs
+- **URL**: `/faqs`
+- **Method**: `GET`
+- **Authentication**: Not required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": [
+      {
+        "id": "general",
+        "name": "Chung",
+        "icon": "bi-info-circle",
+        "questions": [
+           { "id": 1, "title": "Question?", "answer": "Answer..." }
+        ]
+      }
+    ]
+  }
+  ```
+
+## Contact Endpoints
+
+### Submit Contact Message
+- **URL**: `/contact`
+- **Method**: `POST`
+- **Authentication**: Not required
+- **Request Body**:
+  ```json
+  {
+    "name": "User Name",
+    "email": "user@example.com",
+    "subject": "Inquiry",
+    "message": "Message content..."
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Message sent successfully"
+  }
+  ```
+
+## Content Management Endpoints
+
+### Get Page Content
+- **URL**: `/content`
+- **Method**: `GET`
+- **Authentication**: Not required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "home_hero_title": "Welcome",
+      "contact_address": "123 Street"
+    }
+  }
+  ```
+
+### Update Page Content (Admin)
+- **URL**: `/admin/content`
+- **Method**: `PUT`
+- **Authentication**: Required (Admin)
+- **Request Body**:
+  ```json
+  {
+    "section": "contact",
+    "key": "address",
+    "value": "New Address"
+  }
+  ```
+
+
 
 ### User Management
 

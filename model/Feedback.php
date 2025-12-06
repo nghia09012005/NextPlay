@@ -35,6 +35,7 @@ class Feedback {
                   SET feedback_time = :feedback_time,
                       customerid = :customerid,
                       Gid = :Gid,
+                      publisherid = :publisherid,
                       content = :content,
                       rating = :rating";
 
@@ -48,13 +49,16 @@ class Feedback {
         $stmt->bindParam(":feedback_time", $this->feedback_time);
         $stmt->bindParam(":customerid", $this->customerid);
         $stmt->bindParam(":Gid", $this->Gid);
+        $stmt->bindParam(":publisherid", $this->publisherid);
         $stmt->bindParam(":content", $this->content);
         $stmt->bindParam(":rating", $this->rating);
 
         if ($stmt->execute()) {
             return true;
         }
-        return false;
+        $error = implode(" ", $stmt->errorInfo());
+        error_log("Feedback create error: " . $error);
+        return $error;
     }
 }
 ?>
