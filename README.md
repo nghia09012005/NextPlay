@@ -1,5 +1,33 @@
 # NextPlay API Documentation
 
+## Testing
+
+### Running Tests
+
+To run the test suite, use the following command:
+
+```bash
+php tests/run_all_service_tests.php
+```
+
+### Test Coverage
+
+The test suite includes the following test cases:
+
+- **GameService Tests**
+  - `getAllGames()`: Tests retrieving all games
+  - `getGameById()`: Tests retrieving a single game by ID
+
+- **UserService Tests**
+  - User registration and authentication tests
+  - Password validation tests
+
+- **CategoryService Tests**
+  - `getAllCategories()`: Tests retrieving all categories
+  - `getCategoryById()`: Tests retrieving a single category by ID
+  - `createCategory()`: Tests creating a new category
+  - `updateCategory()`: Tests updating an existing category
+
 ## Base URL
 
 ### WebServer url
