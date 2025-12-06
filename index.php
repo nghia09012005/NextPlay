@@ -75,6 +75,15 @@ $request_uri = preg_replace('|^/index\.php|', '', $request_uri);
 error_log("After index.php strip: " . $request_uri);
 
 $uri = array_values(array_filter(explode('/', trim($request_uri, '/'))));
+
+// // Debug
+// echo "Request URI: " . $request_uri . "<br>";
+// echo "URI array: ";
+// print_r($uri);
+// echo "<br>";
+
+
+
 error_log("Parsed URI Array: " . print_r($uri, true));
 
 // Handle review routes
