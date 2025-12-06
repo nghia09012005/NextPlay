@@ -14,6 +14,7 @@ require_once __DIR__ . '/controller/FeedbackController.php';
 require_once __DIR__ . '/controller/PageController.php';
 require_once __DIR__ . '/controller/PageContentController.php';
 require_once __DIR__ . '/controller/ContactController.php';
+require_once __DIR__ . '/controller/FaqController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -81,6 +82,15 @@ $request_uri = preg_replace('|^/index\.php|', '', $request_uri);
 error_log("After index.php strip: " . $request_uri);
 
 $uri = array_values(array_filter(explode('/', trim($request_uri, '/'))));
+
+// // Debug
+// echo "Request URI: " . $request_uri . "<br>";
+// echo "URI array: ";
+// print_r($uri);
+// echo "<br>";
+
+
+
 error_log("Parsed URI Array: " . print_r($uri, true));
 
 print_r($uri);
@@ -412,6 +422,14 @@ if (isset($uri[0]) && $uri[0] === 'contact') {
 if (isset($uri[0]) && $uri[0] === 'content') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $pageContentController->getAllContent();
+        exit();
+    }
+}
+
+// Handle faqs endpoint
+if (isset($uri[0]) && $uri[0] === 'faqs') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $faqController->getAll();
         exit();
     }
 }

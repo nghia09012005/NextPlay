@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Dec 04, 2025 at 08:33 PM
+-- Generation Time: Dec 06, 2025 at 07:32 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.4
 
@@ -148,14 +148,48 @@ INSERT INTO `customer` (`uid`, `balance`) VALUES
 (5, NULL),
 (7, NULL),
 (24, '100.00'),
-(25, '6210100.00'),
+(25, '5490100.00'),
 (26, '100.00'),
 (28, '100.00'),
 (29, '100.00'),
 (31, '0.00'),
 (36, '8845000.00'),
 (37, '0.00'),
-(38, '0.00');
+(38, '0.00'),
+(39, '0.00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `faqs`
+--
+
+CREATE TABLE `faqs` (
+  `id` int(11) NOT NULL,
+  `topic_key` varchar(50) NOT NULL,
+  `topic_name` varchar(100) NOT NULL,
+  `topic_icon` varchar(50) NOT NULL,
+  `question` text NOT NULL,
+  `answer` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `faqs`
+--
+
+INSERT INTO `faqs` (`id`, `topic_key`, `topic_name`, `topic_icon`, `question`, `answer`, `created_at`) VALUES
+(1, 'general', 'Chung', 'bi-info-circle', 'NextPlay là gì?', 'NextPlay là nền tảng phân phối game trực tuyến hàng đầu, nơi bạn có thể tìm thấy hàng ngàn tựa game hấp dẫn từ các nhà phát hành nổi tiếng trên thế giới. Chúng tôi cung cấp trải nghiệm mua sắm an toàn, nhanh chóng và tiện lợi.', '2025-12-06 04:51:23'),
+(2, 'general', 'Chung', 'bi-info-circle', 'Làm thế nào để tạo tài khoản?', 'Để tạo tài khoản, bạn chỉ cần nhấp vào nút \"Đăng ký\" ở góc trên bên phải màn hình. Điền đầy đủ thông tin yêu cầu như tên đăng nhập, email và mật khẩu. Sau khi đăng ký, bạn có thể đăng nhập và bắt đầu sử dụng dịch vụ ngay lập tức.', '2025-12-06 04:51:23'),
+(3, 'general', 'Chung', 'bi-info-circle', 'NextPlay có miễn phí không?', 'Việc tạo tài khoản và duyệt web trên NextPlay là hoàn toàn miễn phí. Tuy nhiên, để tải và chơi các tựa game trả phí, bạn cần phải mua chúng. Chúng tôi cũng cung cấp nhiều tựa game miễn phí (Free-to-Play) để bạn trải nghiệm.', '2025-12-06 04:51:23'),
+(4, 'account', 'Tài khoản & Bảo mật', 'bi-shield-lock', 'Tôi quên mật khẩu, phải làm sao?', 'Đừng lo lắng! Bạn có thể nhấp vào liên kết \"Quên mật khẩu\" tại trang đăng nhập. Nhập email đã đăng ký và chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu cho bạn.', '2025-12-06 04:51:23'),
+(5, 'account', 'Tài khoản & Bảo mật', 'bi-shield-lock', 'Làm thế nào để đổi mật khẩu?', 'Sau khi đăng nhập, hãy truy cập vào trang \"Hồ sơ cá nhân\". Tại đó, bạn sẽ tìm thấy tùy chọn \"Đổi mật khẩu\". Bạn cần nhập mật khẩu hiện tại và mật khẩu mới để hoàn tất quá trình.', '2025-12-06 04:51:23'),
+(6, 'account', 'Tài khoản & Bảo mật', 'bi-shield-lock', 'Tài khoản của tôi có được bảo mật không?', 'Chúng tôi cam kết bảo mật thông tin cá nhân của bạn. NextPlay sử dụng các công nghệ mã hóa tiên tiến để bảo vệ dữ liệu người dùng. Chúng tôi không bao giờ chia sẻ thông tin của bạn với bên thứ ba trái phép.', '2025-12-06 04:51:23'),
+(7, 'payment', 'Thanh toán', 'bi-credit-card', 'NextPlay chấp nhận những phương thức thanh toán nào?', 'Hiện tại, chúng tôi hỗ trợ thanh toán qua thẻ tín dụng/ghi nợ (Visa, Mastercard), ví điện tử (Momo, ZaloPay) và chuyển khoản ngân hàng. Hệ thống nạp tiền của chúng tôi hoạt động 24/7.', '2025-12-06 04:51:23'),
+(8, 'payment', 'Thanh toán', 'bi-credit-card', 'Làm sao để nạp tiền vào tài khoản?', 'Truy cập vào trang \"Hồ sơ cá nhân\" và chọn nút \"Nạp tiền\". Chọn phương thức thanh toán mong muốn và nhập số tiền. Số dư sẽ được cập nhật ngay sau khi giao dịch thành công.', '2025-12-06 04:51:23'),
+(9, 'payment', 'Thanh toán', 'bi-credit-card', 'Tôi có thể hoàn tiền không?', 'Chính sách hoàn tiền của chúng tôi cho phép hoàn tiền trong vòng 14 ngày kể từ ngày mua nếu bạn chơi chưa quá 2 giờ. Vui lòng liên hệ bộ phận hỗ trợ để được giải quyết.', '2025-12-06 04:51:23'),
+(10, 'technical', 'Kỹ thuật & Cài đặt', 'bi-pc-display', 'Cấu hình tối thiểu để chơi game là gì?', 'Mỗi tựa game có yêu cầu cấu hình khác nhau. Bạn có thể xem chi tiết cấu hình tối thiểu và đề nghị tại trang chi tiết của từng game.', '2025-12-06 04:51:23'),
+(11, 'technical', 'Kỹ thuật & Cài đặt', 'bi-pc-display', 'Tôi gặp lỗi khi tải game, phải làm sao?', 'Vui lòng kiểm tra kết nối internet và dung lượng ổ cứng của bạn. Nếu vấn đề vẫn tiếp diễn, hãy thử khởi động lại ứng dụng hoặc liên hệ với đội ngũ hỗ trợ kỹ thuật của chúng tôi.', '2025-12-06 04:51:23');
 
 -- --------------------------------------------------------
 
@@ -293,6 +327,8 @@ INSERT INTO `lib_game` (`Gid`, `libname`, `uid`) VALUES
 (103, 'Payed', 36),
 (107, 'Payed', 36),
 (109, 'Payed', 25),
+(114, 'Payed', 25),
+(115, 'Payed', 25),
 (124, 'Payed', 25);
 
 -- --------------------------------------------------------
@@ -318,14 +354,14 @@ CREATE TABLE `news` (
 --
 
 INSERT INTO `news` (`id`, `title`, `content`, `thumbnail`, `author_id`, `created_at`, `views`, `category`, `source`) VALUES
-(1, 'Giải đấu NextPlay Championship 2025 chính thức khởi tranh', 'Sự kiện eSports lớn nhất năm đã trở lại với tổng giải thưởng lên đến 1 tỷ đồng. Các đội tuyển hàng đầu sẽ tranh tài...', 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop', 25, '2025-12-01 08:00:00', 1218, 'Esports', 'NextPlay Esports'),
-(2, 'Top 10 game nhập vai đáng chơi nhất tháng 12', 'Tổng hợp những tựa game RPG đình đám vừa ra mắt. Danh sách bao gồm những cái tên được mong chờ nhất...', 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop', 25, '2025-11-28 09:30:00', 857, 'Review', 'GameK'),
+(1, 'Giải đấu NextPlay Championship 2025 chính thức khởi tranh', 'Sự kiện eSports lớn nhất năm đã trở lại với tổng giải thưởng lên đến 1 tỷ đồng. Các đội tuyển hàng đầu sẽ tranh tài...', 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop', 25, '2025-12-01 08:00:00', 1220, 'Esports', 'NextPlay Esports'),
+(2, 'Top 10 game nhập vai đáng chơi nhất tháng 12', 'Tổng hợp những tựa game RPG đình đám vừa ra mắt. Danh sách bao gồm những cái tên được mong chờ nhất...', 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop', 25, '2025-11-28 09:30:00', 859, 'Review', 'GameK'),
 (3, 'Bản cập nhật mới của Cyber Future có gì hot?', 'Nhà phát triển vừa tung ra bản vá lỗi lớn cùng DLC mở rộng bản đồ. Người chơi sẽ được trải nghiệm khu vực mới...', 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-25 14:15:00', 2103, 'Tin Game', 'GenK'),
 (4, 'Hướng dẫn build PC chơi game giá rẻ năm 2025', 'Tối ưu hiệu năng trên giá thành với cấu hình PC gaming tầm trung. Chỉ với 15 triệu đồng, bạn có thể chiến tốt...', 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-20 10:00:00', 3501, 'Công nghệ', 'TinhTe'),
 (5, 'Review: Lost Kingdom - Siêu phẩm hay bom xịt?', 'Đánh giá chi tiết tựa game được mong chờ nhất năm. Cốt truyện sâu sắc nhưng gameplay còn nhiều sạn...', 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=2165&auto=format&fit=crop', 25, '2025-11-15 16:45:00', 1508, 'Review', 'Game4V'),
 (6, 'Cộng đồng game thủ Việt nói gì về sự kiện sắp tới?', 'Những ý kiến trái chiều xoay quanh việc thay đổi thể thức thi đấu. Nhiều người ủng hộ nhưng cũng không ít...', 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-10 11:20:00', 501, 'Cộng đồng', 'ThanhNien'),
-(7, 'Sony công bố PlayStation 6: Cấu hình khủng khiếp', 'Những thông tin rò rỉ đầu tiên về thế hệ console tiếp theo. Sức mạnh xử lý đồ họa được nâng cấp gấp đôi...', 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?q=80&w=2000&auto=format&fit=crop', 25, '2025-11-05 08:30:00', 5000, 'Công nghệ', 'Sony'),
-(8, 'GTA VI lộ diện trailer mới: Đồ họa siêu thực', 'Rockstar Games tiếp tục khiến cộng đồng đứng ngồi không yên. Trailer mới hé lộ bối cảnh Vice City hiện đại...', 'https://images.unsplash.com/photo-1628260412297-a3377e45006f?q=80&w=2000&auto=format&fit=crop', 25, '2025-11-01 20:00:00', 8009, 'Tin Game', 'Rockstar');
+(7, 'Sony công bố PlayStation 6: Cấu hình khủng khiếp', 'Những thông tin rò rỉ đầu tiên về thế hệ console tiếp theo. Sức mạnh xử lý đồ họa được nâng cấp gấp đôi...', 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?q=80&w=2000&auto=format&fit=crop', 25, '2025-11-05 08:30:00', 5001, 'Công nghệ', 'Sony'),
+(8, 'GTA VI lộ diện trailer mới: Đồ họa siêu thực', 'Rockstar Games tiếp tục khiến cộng đồng đứng ngồi không yên. Trailer mới hé lộ bối cảnh Vice City hiện đại...', 'https://images.unsplash.com/photo-1628260412297-a3377e45006f?q=80&w=2000&auto=format&fit=crop', 25, '2025-11-01 20:00:00', 8010, 'Tin Game', 'Rockstar');
 
 -- --------------------------------------------------------
 
@@ -405,7 +441,7 @@ INSERT INTO `publisher` (`uid`, `description`, `taxcode`, `location`) VALUES
 CREATE TABLE `receives_feedback` (
   `feedback_time` date NOT NULL,
   `customerid` int(11) NOT NULL,
-  `Gid` int(11) DEFAULT NULL,
+  `Gid` int(11) NOT NULL,
   `publisherid` int(11) DEFAULT NULL,
   `content` text DEFAULT NULL,
   `rating` int(11) DEFAULT NULL
@@ -416,7 +452,8 @@ CREATE TABLE `receives_feedback` (
 --
 
 INSERT INTO `receives_feedback` (`feedback_time`, `customerid`, `Gid`, `publisherid`, `content`, `rating`) VALUES
-('2025-12-04', 25, 103, NULL, 'game hay đáng để trải nghiệm', 4);
+('2025-12-04', 25, 103, NULL, 'game hay', 5),
+('2025-12-04', 25, 109, NULL, 'game hay', 5);
 
 -- --------------------------------------------------------
 
@@ -490,7 +527,8 @@ INSERT INTO `user` (`uid`, `uname`, `avatar`, `email`, `password`, `DOB`, `lname
 (31, 'tien', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1764863096/p2amdbvwoazomtgidzfi.jpg', 'tien2005@gmail.com', '$2y$10$WMtFyXVGMod/qu6YLgk12uW8hcLZHEBmhKW3bEC.9xS3B4nAt3Tk.', '2005-03-20', 'Minh', 'Tien', 0, NULL, '2025-12-05 00:26:33'),
 (36, 'tien2032005', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1764863876/fkcvzvfkjhfnunx0uhcr.jpg', 'tien2032005@gmail.com', '$2y$10$WMtFyXVGMod/qu6YLgk12uW8hcLZHEBmhKW3bEC.9xS3B4nAt3Tk.', '2005-03-20', 'Minh', 'Tien', 0, NULL, '2025-12-05 00:26:33'),
 (37, 'MinhTien2032005', NULL, 'tien.huynhminhcse@hcmut.edu.vn', '$2y$10$td4ESCCLhfgViQLOmHfQQOypaQSidfhO75c3oEoS2S/.15ZiHNPvK', '2005-03-20', 'Huỳnh', 'Minh Tiến', 0, NULL, '2025-12-05 00:26:33'),
-(38, 'minhtien2003', NULL, 'rrr@gmail.com', '$2y$10$kiydZLU2f7f2afISytYZnujdB7O0Xm2ob./biT57EYgKoAumjnj7m', '2005-03-20', 'Minh', 'Tien', 6, '2025-12-04 19:29:24', '2025-12-05 00:37:48');
+(38, 'minhtien2003', NULL, 'rrr@gmail.com', '$2y$10$kiydZLU2f7f2afISytYZnujdB7O0Xm2ob./biT57EYgKoAumjnj7m', '2005-03-20', 'Minh', 'Tien', 7, '2025-12-04 21:51:16', '2025-12-05 00:37:48'),
+(39, 'mtienn', NULL, 'm@gmail.com', '$2y$10$OtEtM5G.MGzl08R3pT0CJOcaNnruj0xqoEh.iiC2Nvg.p5Gm94cKW', '2005-03-20', 'minh', 'tien', 6, '2025-12-05 17:32:24', '2025-12-05 22:35:40');
 
 -- --------------------------------------------------------
 
@@ -514,7 +552,8 @@ INSERT INTO `wishlist` (`uid`, `wishname`) VALUES
 (25, 'Cart'),
 (36, 'Cart'),
 (37, 'Cart'),
-(38, 'Cart');
+(38, 'Cart'),
+(39, 'Cart');
 
 -- --------------------------------------------------------
 
@@ -569,6 +608,12 @@ ALTER TABLE `contactmessages`
 --
 ALTER TABLE `customer`
   ADD PRIMARY KEY (`uid`);
+
+--
+-- Indexes for table `faqs`
+--
+ALTER TABLE `faqs`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `game`
@@ -629,7 +674,7 @@ ALTER TABLE `publisher`
 -- Indexes for table `receives_feedback`
 --
 ALTER TABLE `receives_feedback`
-  ADD PRIMARY KEY (`feedback_time`,`customerid`),
+  ADD PRIMARY KEY (`feedback_time`,`customerid`,`Gid`),
   ADD KEY `customerid` (`customerid`),
   ADD KEY `Gid` (`Gid`),
   ADD KEY `publisherid` (`publisherid`);
@@ -687,7 +732,13 @@ ALTER TABLE `contactmessages`
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT for table `faqs`
+--
+ALTER TABLE `faqs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `game`
@@ -723,7 +774,7 @@ ALTER TABLE `publisher`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- Constraints for dumped tables
