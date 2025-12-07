@@ -251,7 +251,7 @@ class UserController {
     /**
      * Update current user's information
      */
-    public function update() {
+    public function update($targetUid = null) {
         // Start session if not already started
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -264,7 +264,8 @@ class UserController {
             return;
         }
         
-        $uid = $_SESSION['user_id'];
+        // Use target uid if provided (admin update), otherwise use session user id
+        $uid = $targetUid ?? $_SESSION['user_id'];
         header('Content-Type: application/json');
         
         try {
@@ -302,6 +303,7 @@ class UserController {
                 
                 http_response_code(200);
                 echo json_encode([
+                    'status' => 'success',
                     'message' => 'User updated successfully',
                     'user' => $updatedUser
                 ]);

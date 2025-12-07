@@ -328,6 +328,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[0]) && $uri[0] === 'users
         $userController->updatePassword();
     } else if (!isset($uri[1]) || $uri[1] === 'me') {
         $userController->update();
+    } else if (isset($uri[1]) && is_numeric($uri[1])) {
+        // Admin update specific user by ID
+        checkAuth();
+        $userController->update($uri[1]);
     }
     exit();
 }
@@ -543,7 +547,7 @@ if (isset($uri[0]) && $uri[0] === 'users') {
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1]) && is_numeric($uri[1])) {
         // PUT /users/{id} - Update user
         checkAuth();
-        $userController->update();
+        $userController->update($uri[1]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
         // DELETE /users/{id} - Delete user (admin only)
         checkAuth();

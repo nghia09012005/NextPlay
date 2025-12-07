@@ -126,7 +126,17 @@ class UserService {
         $this->userModel->password = $user['password'];
 
         // Update the user
-        return $this->userModel->update();
+        $userUpdated = $this->userModel->update();
+
+        // Update customer balance if provided
+        $balanceUpdated = true;
+        if (isset($data['balance'])) {
+            $this->customerModel->uid = $uid;
+            $this->customerModel->balance = $data['balance'];
+            $balanceUpdated = $this->customerModel->update();
+        }
+
+        return $userUpdated && $balanceUpdated;
     }
 
     public function updatePassword($uid, $currentPassword, $newPassword) {
