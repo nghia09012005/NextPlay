@@ -32,9 +32,9 @@ class NewsService {
             'content' => 'string',
             'author_id' => 'integer'
         ];
-        
+
         $errors = [];
-        
+
         foreach ($requiredFields as $field => $type) {
             if (!isset($data[$field]) || $data[$field] === '') {
                 $errors[] = "The $field field is required";
@@ -44,29 +44,31 @@ class NewsService {
                 $errors[] = "The $field must be a string";
             }
         }
-        
+
         if (!empty($errors)) {
             throw new Exception(implode(', ', $errors));
         }
-        
+
         // Sanitize and prepare data
         $newsData = [
             'title' => trim($data['title']),
             'content' => trim($data['content']),
             'author_id' => (int)$data['author_id'],
             'thumbnail' => isset($data['thumbnail']) ? trim($data['thumbnail']) : null,
+            'category' => isset($data['category']) ? trim($data['category']) : null,
+            'source' => isset($data['source']) ? trim($data['source']) : null,
             'created_at' => date('Y-m-d H:i:s')
         ];
-        
+
         // Additional validation
         if (strlen($newsData['title']) < 5) {
             throw new Exception('Title must be at least 5 characters long');
         }
-        
+
         if (strlen($newsData['content']) < 10) {
             throw new Exception('Content must be at least 10 characters long');
         }
-        
+
         return $this->newsModel->createNews($newsData);
     }
 
@@ -77,20 +79,28 @@ class NewsService {
         return $this->newsModel->updateNews($id, $data);
     }
 
+    public function updateNewsAdmin($id, $data) {
+        return $this->newsModel->updateNewsAdmin($id, $data);
+    }
+
     public function deleteNews($id, $author_id) {
         return $this->newsModel->deleteNews($id, $author_id);
+    }
+
+    public function deleteNewsAdmin($id) {
+        return $this->newsModel->deleteNewsAdmin($id);
     }
 
     public function addComment($data) {
         // Add a default rating since it's required by the Review model
         $data['rating'] = $data['rating'] ?? 5; // Default to 5 if not provided
-        
+
         // Set the review data
         $this->reviewModel->customerid = $data['customerid'];
         $this->reviewModel->news_id = $data['news_id'];
         $this->reviewModel->content = $data['content'];
         $this->reviewModel->rating = $data['rating'];
-        
+
         // Create the review (comment)
         return $this->reviewModel->create();
     }

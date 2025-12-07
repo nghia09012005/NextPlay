@@ -3,6 +3,7 @@ require_once __DIR__ . '/../config/Database.php';
 require_once __DIR__ . '/../service/PublisherService.php';
 
 class PublisherController {
+    private $db;
     private $service;
 
     public function __construct($db) {
@@ -64,13 +65,13 @@ class PublisherController {
             }
 
             // Sanitize inputs
-            $uname = filter_var($data['uname'], FILTER_SANITIZE_STRING);
+            $uname = htmlspecialchars($data['uname'], ENT_QUOTES, 'UTF-8');
             $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-            $lname = filter_var($data['lname'], FILTER_SANITIZE_STRING);
-            $fname = filter_var($data['fname'], FILTER_SANITIZE_STRING);
-            $description = filter_var($data['description'], FILTER_SANITIZE_STRING);
-            $taxcode = filter_var($data['taxcode'], FILTER_SANITIZE_STRING);
-            $location = filter_var($data['location'], FILTER_SANITIZE_STRING);
+            $lname = htmlspecialchars($data['lname'], ENT_QUOTES, 'UTF-8');
+            $fname = htmlspecialchars($data['fname'], ENT_QUOTES, 'UTF-8');
+            $description = htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8');
+            $taxcode = htmlspecialchars($data['taxcode'], ENT_QUOTES, 'UTF-8');
+            $location = htmlspecialchars($data['location'], ENT_QUOTES, 'UTF-8');
 
             // Attempt registration
             $uid = $this->service->register(
@@ -176,6 +177,78 @@ class PublisherController {
                 'status' => 'error',
                 'message' => 'Failed to retrieve publisher information. Please try again later.'
             ]);
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Update a publisher
+     */
+    public function update($uid) {
+        header('Content-Type: application/json');
+        
+        try {
+            if (!is_numeric($uid) || $uid <= 0) {
+                throw new Exception('Invalid publisher ID', 400);
+            }
+
+            $json = file_get_contents("php://input");
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON format', 400);
+            }
+
+            $result = $this->service->update($uid, $data);
+            
+            if ($result) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Publisher updated successfully'
+                ]);
+            } else {
+                throw new Exception('Failed to update publisher', 500);
+            }
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Delete a publisher
+     */
+    public function delete($uid) {
+        header('Content-Type: application/json');
+        
+        try {
+            if (!is_numeric($uid) || $uid <= 0) {
+                throw new Exception('Invalid publisher ID', 400);
+            }
+
+            $result = $this->service->delete($uid);
+            
+            if ($result) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Publisher deleted successfully'
+                ]);
+            } else {
+                throw new Exception('Failed to delete publisher', 500);
+            }
         } catch (Exception $e) {
             $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
             http_response_code($statusCode);

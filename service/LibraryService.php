@@ -280,5 +280,75 @@ class LibraryService {
             ];
         }
     }
+
+    /**
+     * Get all purchased games (all users' libraries) - for admin
+     * @return array Array of all library entries with user and game info
+     */
+    public function getAllPurchases() {
+        try {
+            $query = "SELECT lg.uid, lg.Gid, lg.libname, 
+                            g.name as game_name, g.cost as game_price, g.thumbnail,
+                            u.uname, u.fname, u.lname
+                     FROM `lib_game` lg
+                     JOIN `game` g ON lg.Gid = g.Gid
+                     JOIN `user` u ON lg.uid = u.uid
+                     ORDER BY lg.uid, lg.libname";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error in getAllPurchases: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get purchase statistics - for admin
+     * @return array Statistics about purchases
+     */
+    public function getPurchaseStats() {
+        try {
+            // Total games purchased
+            $query1 = "SELECT COUNT(*) as total_purchases FROM `lib_game`";
+            $stmt1 = $this->db->prepare($query1);
+            $stmt1->execute();
+            $totalPurchases = $stmt1->fetch(PDO::FETCH_ASSOC)['total_purchases'];
+
+            // Total users with purchases
+            $query2 = "SELECT COUNT(DISTINCT uid) as total_customers FROM `lib_game`";
+            $stmt2 = $this->db->prepare($query2);
+            $stmt2->execute();
+            $totalCustomers = $stmt2->fetch(PDO::FETCH_ASSOC)['total_customers'];
+
+            // Total revenue (sum of game prices in libraries)
+            $query3 = "SELECT COALESCE(SUM(g.cost), 0) as total_revenue 
+                       FROM `lib_game` lg 
+                       JOIN `game` g ON lg.Gid = g.Gid";
+            $stmt3 = $this->db->prepare($query3);
+            $stmt3->execute();
+            $totalRevenue = $stmt3->fetch(PDO::FETCH_ASSOC)['total_revenue'];
+
+            // Average games per customer
+            $avgGames = $totalCustomers > 0 ? round($totalPurchases / $totalCustomers, 1) : 0;
+
+            return [
+                'total_purchases' => (int)$totalPurchases,
+                'total_customers' => (int)$totalCustomers,
+                'total_revenue' => (float)$totalRevenue,
+                'avg_games_per_customer' => $avgGames
+            ];
+        } catch (PDOException $e) {
+            error_log('Error in getPurchaseStats: ' . $e->getMessage());
+            return [
+                'total_purchases' => 0,
+                'total_customers' => 0,
+                'total_revenue' => 0,
+                'avg_games_per_customer' => 0
+            ];
+        }
+    }
 }
 ?>

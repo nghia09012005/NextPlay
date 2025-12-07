@@ -14,6 +14,65 @@ class FeedbackController {
         echo json_encode($data);
     }
 
+    // Get all feedback (for admin)
+    public function getAllFeedback() {
+        try {
+            $feedback = $this->feedbackService->getAllFeedback();
+            $this->jsonResponse(200, [
+                'status' => 'success',
+                'data' => $feedback
+            ]);
+        } catch (Exception $e) {
+            $this->jsonResponse(500, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // Get single feedback
+    public function getFeedback($customerid, $gid) {
+        try {
+            $feedback = $this->feedbackService->getFeedbackByCustomerAndGame($customerid, $gid);
+            if ($feedback) {
+                $this->jsonResponse(200, [
+                    'status' => 'success',
+                    'data' => $feedback
+                ]);
+            } else {
+                $this->jsonResponse(404, [
+                    'status' => 'error',
+                    'message' => 'Feedback not found'
+                ]);
+            }
+        } catch (Exception $e) {
+            $this->jsonResponse(500, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // Admin delete feedback
+    public function adminDeleteFeedback($customerid, $gid) {
+        try {
+            $result = $this->feedbackService->adminDeleteFeedback($customerid, $gid);
+            if ($result) {
+                $this->jsonResponse(200, [
+                    'status' => 'success',
+                    'message' => 'Feedback deleted successfully'
+                ]);
+            } else {
+                throw new Exception('Failed to delete feedback');
+            }
+        } catch (Exception $e) {
+            $this->jsonResponse(400, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     public function getGameReviews($gameId) {
         try {
             $reviews = $this->feedbackService->getGameReviews($gameId);

@@ -1,21 +1,27 @@
 <?php
 class Database {
-    // XAMPP LOCAL
-    private $host = "localhost";
-    private $db_name = "ltw_game_shop";
-    private $username = "root";
-    private $password = ""; 
-    private $port = "3306"; // Default MySQL port
+    private $host;
+    private $db_name;
+    private $username;
+    private $password; 
+    private $port;
     public $conn;
 
-
-    // RAILWAY
-    // private $host = "tramway.proxy.rlwy.net";
-    // private $db_name = "railway";
-    // private $username = "root";
-    // private $password = "zqRZpHByLbLhYOzKgWRfCDYhqbNYpTeB";
-    // private $port = "42537";
-    //public $conn;
+    public function __construct() {
+        // RAILWAY
+        // this->$host = "tramway.proxy.rlwy.net";
+        // this->$db_name = "railway";
+        // this->$username = "root";
+        // this->$password = "zqRZpHByLbLhYOzKgWRfCDYhqbNYpTeB";
+        // this->$port = "42537";
+        
+        // Use environment variables if available (Docker), otherwise use defaults (XAMPP)
+        $this->host = getenv('DB_HOST') ?: 'localhost';
+        $this->db_name = getenv('DB_NAME') ?: 'ltw_game_shop';
+        $this->username = getenv('DB_USER') ?: 'root';
+        $this->password = getenv('DB_PASSWORD') ?: '';
+        $this->port = getenv('DB_PORT') ?: '3306';
+    }
 
     public function getConnection() {
         $this->conn = null;
@@ -26,8 +32,6 @@ class Database {
                 $this->password
             );
             $this->conn->exec("set names utf8");
-
-            
             
         } catch(PDOException $exception) {
             header('Content-Type: application/json');
@@ -35,7 +39,6 @@ class Database {
             exit();
         }
 
-        print("ko lỗi here");
         return $this->conn;
     }
 }

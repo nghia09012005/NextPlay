@@ -65,8 +65,8 @@ class GameService {
     }
 
     public function deleteGame($gameId) {
-        $this->gameModel->gid = $gameId;
-        return $this->gameModel->delete($gameId);
+        $this->gameModel->Gid = $gameId;
+        return $this->gameModel->delete();
     }
 
     private function formatGameData($row) {

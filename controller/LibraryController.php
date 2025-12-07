@@ -8,6 +8,50 @@ class LibraryController {
         $this->libraryService = new LibraryService($db);
     }
 
+    private function jsonResponse($statusCode, $data) {
+        http_response_code($statusCode);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+
+    /**
+     * Get all purchases (for admin)
+     * @return void
+     */
+    public function getAllPurchases() {
+        try {
+            $purchases = $this->libraryService->getAllPurchases();
+            $this->jsonResponse(200, [
+                'status' => 'success',
+                'data' => $purchases
+            ]);
+        } catch (Exception $e) {
+            $this->jsonResponse(500, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Get purchase statistics (for admin)
+     * @return void
+     */
+    public function getPurchaseStats() {
+        try {
+            $stats = $this->libraryService->getPurchaseStats();
+            $this->jsonResponse(200, [
+                'status' => 'success',
+                'data' => $stats
+            ]);
+        } catch (Exception $e) {
+            $this->jsonResponse(500, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     /**
      * Get all games in the current user's library
      * @return void
