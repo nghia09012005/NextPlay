@@ -96,6 +96,17 @@ error_log("Parsed URI Array: " . print_r($uri, true));
 print_r($uri);
 
 
+// Include Homepage controller
+require_once __DIR__ . '/controller/HomepageController.php';
+require_once __DIR__ . '/service/HomepageService.php';
+
+// Handle homepage routes
+if (isset($uri[0]) && $uri[0] === 'homepage') {
+    $homepageController = new HomepageController($db);
+    $homepageController->processRequest();
+    exit();
+}
+
 // Handle review routes
 if (isset($uri[0]) && $uri[0] === 'reviews') {
     // GET /reviews/news/{news_id}
