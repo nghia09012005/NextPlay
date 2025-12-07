@@ -876,3 +876,25 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+CREATE TABLE `homepage`(
+  `id` INT primary key ,
+  `title` VARCHAR(255),
+  `description` TEXT ,
+  `variety` INT,
+  `activeplayer` VARCHAR(20),
+  `supporttime` VARCHAR(20),
+  `free` VARCHAR(20)
+);
+
+
+-- Thêm dữ liệu mẫu vào bảng homepage
+INSERT INTO `homepage` (`id`, `title`, `description`, `variety`, `activeplayer`, `supporttime`, `free`) VALUES
+(1, 'Chào mừng đến với NextPlay', 'Nền tảng chơi game trực tuyến hàng đầu Việt Nam', 1500, '10,000+', '24/7', '100%'),
+(2, 'Khám phá thế giới game', 'Hàng ngàn tựa game đa dạng đang chờ đón bạn', 2000, '15,000+', '24/7', '100%'),
+(3, 'Sự kiện đặc biệt', 'Tham gia ngay các sự kiện hấp dẫn với nhiều phần quà giá trị', 500, '8,000+', '24/7', '100%'),
+(4, 'Hỗ trợ người chơi', 'Đội ngũ hỗ trợ luôn sẵn sàng giúp đỡ bạn', 100, '5,000+', '24/7', '100%'),
+(5, 'Cập nhật mới nhất', 'Khám phá những tính năng và cập nhật mới nhất', 800, '12,000+', '24/7', '100%');
+
+
+

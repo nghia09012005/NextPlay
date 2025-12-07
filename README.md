@@ -40,6 +40,101 @@ public url: https://nghiadz.alwaysdata.net/...
 mysql://root:zqrZpHByLbLHYozKGRrFCDYhQbINYpTe8@tramway.proxy.rlwy.net:42537/railway
 ```
 
+## Homepage API
+
+### Base URL
+```
+http://localhost/Assignment/NextPlay/index.php
+```
+
+### Authentication
+- Các endpoint GET không yêu cầu xác thực
+- Các endpoint POST, PUT, DELETE yêu cầu xác thực JWT token
+- Thêm header: `Authorization: Bearer {token}`
+
+### Get All Homepage Items
+- **URL**: `/homepage`
+- **Method**: `GET`
+- **Response**:
+  ```json
+  [
+    {
+      "id": 1,
+      "title": "Chào mừng đến với NextPlay",
+      "description": "Nền tảng chơi game trực tuyến hàng đầu Việt Nam",
+      "variety": 1500,
+      "activeplayer": "10,000+",
+      "supporttime": "24/7",
+      "free": "100%"
+    },
+    ...
+  ]
+  ```
+
+### Get Single Homepage Item
+- **URL**: `/homepage/{id}`
+- **Method**: `GET`
+- **Response**:
+  ```json
+  {
+    "id": 1,
+    "title": "Chào mừng đến với NextPlay",
+    "description": "Nền tảng chơi game trực tuyến hàng đầu Việt Nam",
+    "variety": 1500,
+    "activeplayer": "10,000+",
+    "supporttime": "24/7",
+    "free": "100%"
+  }
+  ```
+
+### Create New Homepage Item
+- **URL**: `/homepage`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "title": "Tiêu đề mới",
+    "description": "Mô tả mới",
+    "variety": 1000,
+    "activeplayer": "5,000+",
+    "supporttime": "24/7",
+    "free": "100%"
+  }
+  ```
+- **Response (Success - 201)**:
+  ```json
+  {
+    "message": "Homepage created successfully."
+  }
+  ```
+
+### Update Homepage Item
+- **URL**: `/homepage/{id}`
+- **Method**: `PUT`
+- **Request Body** (only include fields to update):
+  ```json
+  {
+    "title": "Tiêu đề đã cập nhật",
+    "description": "Mô tả đã cập nhật"
+  }
+  ```
+- **Response (Success - 200)**:
+  ```json
+  {
+    "message": "Homepage updated successfully."
+  }
+  ```
+
+### Delete Homepage Item
+- **URL**: `/homepage/{id}`
+- **Method**: `DELETE`
+- **Response (Success - 200)**:
+  ```json
+  {
+    "message": "Homepage deleted successfully."
+  }
+  ```
+
 ## Quick Reference
 
 | Method | Endpoint | Description | Auth Required |
@@ -50,15 +145,11 @@ mysql://root:zqrZpHByLbLHYozKGRrFCDYhQbINYpTe8@tramway.proxy.rlwy.net:42537/rail
 | GET    | /users/profile | Get current user profile with role | Yes |
 | PUT    | /users | Update current user | Yes |
 | PUT    | /users/password | Update user password | Yes |
-| GET    | /admins | Get all admins | No |
-| GET    | /admins/{uid} | Get admin by ID | No |
-| GET    | /admins/stats | Get dashboard statistics | No |
-| GET    | /admins/check/{uid} | Check if user is admin | No |
-| GET    | /admins/non-admin-users | Get users who are not admins | Yes |
-| POST   | /admins | Create new admin user | Yes |
-| POST   | /admins/promote/{uid} | Promote user to admin | Yes |
-| POST   | /admins/demote/{uid} | Demote admin to user | Yes |
-| DELETE | /admins/{uid} | Delete admin | Yes |
+| GET    | /homepage | Get all homepage items | No |
+| GET    | /homepage/{id} | Get a specific homepage item | No |
+| POST   | /homepage | Create a new homepage item | Yes |
+| PUT    | /homepage/{id} | Update a homepage item | Yes |
+| DELETE | /homepage/{id} | Delete a homepage item | Yes |
 | POST   | /publishers/register | Register new publisher | No |
 | GET    | /users | Get all users | Yes |
 | GET    | /users/{id} | Get user by ID | Yes |
