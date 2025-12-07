@@ -15,7 +15,9 @@ class Game {
     public $release_date;
     public $rating;
     public $reviews;
+    public $status; // 'pending', 'approved', 'rejected'
     public $trailer;
+    public $publisherid; // Foreign key to User table
 
     public function __construct($db) {
         $this->conn = $db;
@@ -68,8 +70,8 @@ class Game {
     // CREATE new game
     public function create() {
         $query = "INSERT INTO {$this->table_name} 
-            (`name`, `description`, `price`, `thumbnail`, `category`, `tags`, `developer`, `publisher`, `release_date`, `rating`, `reviews`, `trailer`) 
-            VALUES (:name, :description, :price, :thumbnail, :category, :tags, :developer, :publisher, :release_date, :rating, :reviews, :trailer)";
+            (`name`, `description`, `price`, `thumbnail`, `category`, `tags`, `developer`, `publisherid`, `release_date`, `rating`, `reviews`, `status`) 
+            VALUES (:name, :description, :price, :thumbnail, :category, :tags, :developer, :publisherid, :release_date, :rating, :reviews, :status)";
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":name", $this->name);
@@ -79,10 +81,12 @@ class Game {
         $stmt->bindParam(":category", $this->category);
         $stmt->bindParam(":tags", $this->tags);
         $stmt->bindParam(":developer", $this->developer);
-        $stmt->bindParam(":publisher", $this->publisher);
+        $stmt->bindParam(":publisherid", $this->publisherid);
         $stmt->bindParam(":release_date", $this->release_date);
         $stmt->bindParam(":rating", $this->rating);
         $stmt->bindParam(":reviews", $this->reviews);
+        // $stmt->bindParam(":trailer", $this->trailer); // Removed
+        $stmt->bindParam(":status", $this->status);
 
         if($stmt->execute()){
             return true;
@@ -97,10 +101,10 @@ class Game {
                 SET `name`=:name, `description`=:description, 
                     `price`=:price, `thumbnail`=:thumbnail,
                     `category`=:category, `tags`=:tags,
-                    `developer`=:developer, `publisher`=:publisher,
+                    `developer`=:developer, `publisherid`=:publisherid,
                     `release_date`=:release_date, `rating`=:rating,
-                    `reviews`=:reviews, `trailer`=:trailer
-                WHERE `gid`=:gid";
+                    `reviews`=:reviews, `status`=:status
+                WHERE `Gid`=:gid";
 
         $stmt = $this->conn->prepare($query);
 
@@ -111,22 +115,28 @@ class Game {
         $stmt->bindParam(":category", $this->category);
         $stmt->bindParam(":tags", $this->tags);
         $stmt->bindParam(":developer", $this->developer);
-        $stmt->bindParam(":publisher", $this->publisher);
+        $stmt->bindParam(":publisherid", $this->publisherid);
         $stmt->bindParam(":release_date", $this->release_date);
         $stmt->bindParam(":rating", $this->rating);
         $stmt->bindParam(":reviews", $this->reviews);
-        $stmt->bindParam(":trailer", $this->trailer);
+        // $stmt->bindParam(":trailer", $this->trailer); // Removed
+        $stmt->bindParam(":status", $this->status);
         $stmt->bindParam(":gid", $this->gid);
 
-        return $stmt->execute();
+        if($stmt->execute()) {
+            return true;
+        }
+        
+        $error = $stmt->errorInfo();
+        throw new Exception("Update failed: " . $error[2]);
     }
 
     // DELETE game
     public function delete() {
         $query = "DELETE FROM {$this->table_name} WHERE Gid = :Gid";
         $stmt = $this->conn->prepare($query);
-        $this->Gid = htmlspecialchars(strip_tags($this->Gid));
-        $stmt->bindParam(":Gid", $this->Gid);
+        $this->gid = htmlspecialchars(strip_tags($this->gid));
+        $stmt->bindParam(":Gid", $this->gid);
         return $stmt->execute();
     }
 }

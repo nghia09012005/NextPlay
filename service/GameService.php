@@ -43,30 +43,70 @@ class GameService {
         return $games;
     }
 
-    public function createGame($name, $version, $description, $price, $publisherId) {
-        $this->gameModel->name = $name;
-        $this->gameModel->version = $version; // Game model might not have version? I removed it in my previous edit?
-        // Let's check Game.php again.
-        $this->gameModel->description = $description;
-        $this->gameModel->price = $price;
-        $this->gameModel->publisher = $publisherId; // Model has 'publisher' (string) and 'publisherid' (int)? 
-        // My Game.php update had 'publisher' as varchar.
-        // The original SQL had 'publisherid'.
-        // My update to Game.php: public $publisher; (varchar)
-        // The original GameService used $this->gameModel->publisherid.
-        
-        // This GameService is quite out of sync with my new Game model.
-        // I should probably just focus on the read methods for now as that's what the user is asking about.
-        return false;
+    public function createGame($data) {
+        $this->gameModel->name = $data['name'];
+        $this->gameModel->description = $data['description'];
+        $this->gameModel->price = $data['price'];
+        $this->gameModel->thumbnail = $data['thumbnail'];
+        $this->gameModel->category = $data['category'];
+        $this->gameModel->tags = json_encode($data['tags']); // Ensure tags are JSON encoded for storage
+        $this->gameModel->developer = $data['developer'];
+        $this->gameModel->publisherid = $data['publisherid'];
+        $this->gameModel->release_date = date('Y-m-d'); // Default to today if not provided, or handle in input
+        $this->gameModel->rating = 0;
+        $this->gameModel->reviews = 0;
+        $this->gameModel->trailer = $data['trailer'] ?? '';
+        $this->gameModel->status = $data['status'] ?? 'pending';
+
+        return $this->gameModel->create();
     }
 
-    public function updateGame($gameId, $name, $version, $description, $price) {
-        return false;
+    public function updateGame($gameId, $data) {
+        $this->gameModel->gid = $gameId;
+        $this->gameModel->name = $data['name'];
+        $this->gameModel->description = $data['description'];
+        $this->gameModel->price = $data['price'];
+        $this->gameModel->thumbnail = $data['thumbnail'];
+        $this->gameModel->category = $data['category'];
+        $this->gameModel->tags = json_encode($data['tags']);
+        $this->gameModel->developer = $data['developer'];
+        $this->gameModel->publisherid = $data['publisherid'];
+        // Keep existing release date or update? Assuming update for now
+        $this->gameModel->release_date = $data['release_date'] ?? date('Y-m-d'); 
+        $this->gameModel->rating = $data['rating'] ?? 0;
+        $this->gameModel->reviews = $data['reviews'] ?? 0;
+        $this->gameModel->trailer = $data['trailer'] ?? '';
+        $this->gameModel->status = $data['status'];
+
+        return $this->gameModel->update();
+    }
+
+    public function updateGameStatus($gameId, $status) {
+        // First get the game to preserve other fields
+        $game = $this->gameModel->readOne($gameId);
+        if (!$game) return false;
+
+        $this->gameModel->gid = $gameId;
+        $this->gameModel->name = $game['name'];
+        $this->gameModel->description = $game['description'];
+        $this->gameModel->price = $game['price'];
+        $this->gameModel->thumbnail = $game['thumbnail'];
+        $this->gameModel->category = $game['category'];
+        $this->gameModel->tags = $game['tags']; // Already JSON string from DB
+        $this->gameModel->developer = $game['developer'];
+        $this->gameModel->publisherid = $game['publisherid'];
+        $this->gameModel->release_date = $game['release_date'];
+        $this->gameModel->rating = $game['rating'];
+        $this->gameModel->reviews = $game['reviews'];
+        $this->gameModel->trailer = $game['trailer'];
+        $this->gameModel->status = $status;
+
+        return $this->gameModel->update();
     }
 
     public function deleteGame($gameId) {
         $this->gameModel->gid = $gameId;
-        return $this->gameModel->delete($gameId);
+        return $this->gameModel->delete();
     }
 
     private function formatGameData($row) {
@@ -81,6 +121,8 @@ class GameService {
             "tags" => json_decode($tags),
             "developer" => $developer,
             "publisher" => $publisher,
+            "publisherid" => $publisherid,
+            "status" => $status ?? 'pending',
             "releaseDate" => $release_date,
             "rating" => $rating,
             "reviews" => $reviews

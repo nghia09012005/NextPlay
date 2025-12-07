@@ -14,7 +14,8 @@ class Publisher {
 
     // GET all publishers
     public function readAll() {
-        $query = "SELECT P.*, U.uname, U.email 
+        $query = "SELECT P.*, U.uname, U.email, U.avatar, U.DOB,
+                 (SELECT COUNT(*) FROM `Game` G WHERE G.publisherid = P.uid) as games_count
                  FROM {$this->table_name} P
                  JOIN `User` U ON U.uid = P.uid";
         $stmt = $this->conn->prepare($query);

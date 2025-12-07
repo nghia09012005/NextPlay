@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../model/User.php';
 require_once __DIR__ . '/../model/Customer.php';
 require_once __DIR__ . '/../model/Admin.php';
+require_once __DIR__ . '/../model/Publisher.php';
 require_once __DIR__ . '/../service/WishlistService.php';
 
 class UserService {
@@ -9,6 +10,7 @@ class UserService {
     private $userModel;
     private $customerModel;
     private $adminModel;
+    private $publisherModel;
     private $wishlistService;
 
     public function __construct($db) {
@@ -16,7 +18,12 @@ class UserService {
         $this->userModel = new User($db);
         $this->customerModel = new Customer($db);
         $this->adminModel = new Admin($db);
+        $this->publisherModel = new Publisher($db);
         $this->wishlistService = new WishlistService($db);
+    }
+
+    public function getDb() {
+        return $this->db;
     }
 
     private function validatePasswordStrength($password) {
@@ -89,6 +96,16 @@ class UserService {
             if ($customer) {
                 $user['balance'] = $customer['balance'];
             }
+            
+            // Determine userType
+            if ($this->isAdmin($uid)) {
+                $user['userType'] = 'admin';
+            } elseif ($this->isPublisher($uid)) {
+                $user['userType'] = 'publisher';
+            } else {
+                $user['userType'] = 'user';
+            }
+            
             unset($user['password']);
         }
         return $user;
@@ -148,6 +165,56 @@ class UserService {
         return 'Failed to update password';
     }
 
+    public function adminResetPassword($uid, $newPassword) {
+        try {
+            // Validate password strength
+            $this->validatePasswordStrength($newPassword);
+            
+            // Hash new password
+            $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+            
+            $query = "UPDATE `User` SET password = :password, password_changed_at = NOW() WHERE uid = :uid";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':password', $hashedPassword);
+            $stmt->bindParam(':uid', $uid);
+            
+            if ($stmt->execute()) {
+                return true;
+            }
+            return false;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function toggleUserLock($uid, $shouldLock, $duration = 'permanent') {
+        try {
+            $lockoutTime = null;
+            if ($shouldLock) {
+                if ($duration === 'permanent') {
+                    $lockoutTime = date('Y-m-d H:i:s', strtotime('+100 years'));
+                } else {
+                    // Expecting formats like '+15 minutes', '+1 hour', '+1 day'
+                    // If no '+' prefix, add it
+                    if (strpos($duration, '+') !== 0) {
+                        $duration = '+' . $duration;
+                    }
+                    $lockoutTime = date('Y-m-d H:i:s', strtotime($duration));
+                }
+            }
+
+            $query = "UPDATE `User` SET lockout_time = :lockout_time, failed_attempts = 0 WHERE uid = :uid";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':lockout_time', $lockoutTime);
+            $stmt->bindParam(':uid', $uid);
+            
+            return $stmt->execute();
+        } catch (Exception $e) {
+            error_log('Error toggling user lock: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function authenticate($uname, $password) {
         try {
             // Get user by username
@@ -177,6 +244,8 @@ class UserService {
             if (password_verify($password, $user['password'])) {
                 // Reset failed attempts on success
                 $this->resetLockout($user['uid']);
+                // Update last login time
+                $this->updateLastLogin($user['uid']);
 
                 // Remove password from returned user data
                 unset($user['password']);
@@ -185,6 +254,15 @@ class UserService {
                 $customer = $this->customerModel->readOne($user['uid']);
                 if ($customer) {
                     $user['balance'] = $customer['balance'];
+                }
+
+                // Determine userType
+                if ($this->isAdmin($user['uid'])) {
+                    $user['userType'] = 'admin';
+                } elseif ($this->isPublisher($user['uid'])) {
+                    $user['userType'] = 'publisher';
+                } else {
+                    $user['userType'] = 'user';
                 }
                 
                 return $user;
@@ -214,6 +292,18 @@ class UserService {
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':uid', $uid);
         $stmt->execute();
+    }
+
+    private function updateLastLogin($uid) {
+        try {
+            $query = "UPDATE `User` SET last_login = NOW() WHERE uid = :uid";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':uid', $uid);
+            $stmt->execute();
+        } catch (Exception $e) {
+            // Log error but don't fail login if this optional update fails
+            error_log('Error updating last_login: ' . $e->getMessage());
+        }
     }
 
     private function handleFailedLogin($uid, $currentAttempts) {
@@ -266,6 +356,10 @@ class UserService {
 
     public function isAdmin($uid) {
         return $this->adminModel->readOne($uid) ? true : false;
+    }
+
+    public function isPublisher($uid) {
+        return $this->publisherModel->readOne($uid) ? true : false;
     }
 
     public function deposit($uid, $amount) {

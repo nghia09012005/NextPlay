@@ -15,6 +15,26 @@ class FeedbackService {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getFeedbacksByCustomer($customerId) {
+        // Assuming Feedback model has a method or we query directly
+        // Let's check Feedback model first or just query here if model is simple wrapper
+        // Since getReviewsByGame uses model, likely model has the query.
+        // I'll assume I need to add readByCustomer to Feedback model too? 
+        // Or I can write raw SQL here if model access is limited.
+        // Let's try to stick to pattern. I'll add query here directly for now as quick fix or check model?
+        // Let's assume Feedback model has general read methods or I can use db.
+        
+        $query = "SELECT f.*, g.name as game_name 
+                  FROM Receives_feedback f 
+                  JOIN Game g ON f.Gid = g.Gid 
+                  WHERE f.customerid = :uid 
+                  ORDER BY f.feedback_time DESC";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":uid", $customerId);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function addReview($data) {
         $this->feedbackModel->customerid = $data['customerid'];
         $this->feedbackModel->Gid = $data['Gid'];

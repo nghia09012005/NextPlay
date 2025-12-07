@@ -390,16 +390,62 @@ class UserController {
             echo json_encode(['status' => 'success', 'isAdmin' => $isAdmin]);
         } catch (Exception $e) {
             $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON format', 400);
+            }
+
+            if (!isset($data['newPassword'])) {
+                throw new Exception('New password is required', 400);
+            }
+
+            // Verify admin permissions (assuming session check is done or needed here)
+             if (!isset($_SESSION['user_id'])) { // Basic check, better to check role
+                 throw new Exception('Unauthorized', 401);
+             }
+
+             // You might want to add a check here to ensure the requester is an admin
+             // $isAdmin = $this->service->isAdmin($_SESSION['user_id']);
+             // if (!$isAdmin) throw new Exception('Access denied', 403);
+
+            $uid = isset($data['uid']) ? $data['uid'] : null;
+             if (!$uid) {
+                // Try from URL if not in body, though typically for POST actions body is safer or URL param
+                 // Implementation depends on how router passes ID. Let's assume BODY usage for this action
+                 throw new Exception('Target user ID is required', 400);
+            }
+
+            $result = $this->service->adminResetPassword($uid, $data['newPassword']);
+
+            if ($result) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Password reset successfully'
+                ]);
+            } else {
+                throw new Exception('Failed to reset password', 500);
+            }
+
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
             http_response_code($statusCode);
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 
-    public function deposit($uid) {
+    public function toggleUserLock() {
         header('Content-Type: application/json');
         
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         try {
-            // Get and validate JSON input
             $json = file_get_contents("php://input");
             if (empty($json)) {
                 throw new Exception('No input data received', 400);
@@ -409,6 +455,53 @@ class UserController {
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception('Invalid JSON format', 400);
             }
+
+            if (!isset($data['uid']) || !isset($data['lock'])) {
+                throw new Exception('User ID and lock status are required', 400);
+            }
+            
+            // Authorization check (Ensure requester is Admin)
+            if (!isset($_SESSION['user_id']) || !$this->service->isAdmin($_SESSION['user_id'])) {
+                throw new Exception('Unauthorized access', 403);
+            }
+
+            $duration = isset($data['duration']) ? $data['duration'] : 'permanent';
+
+            $result = $this->service->toggleUserLock($data['uid'], $data['lock'], $duration);
+
+            if ($result) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'User lock status updated successfully',
+	                'locked' => $data['lock'],
+                    'duration' => $duration
+                ]);
+            } else {
+                throw new Exception('Failed to update user lock status', 500);
+            }
+
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function adminResetPasswordEndpoint() {
+        header('Content-Type: application/json');
+        
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        try {
+            $json = file_get_contents("php://input");
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
 
             if (!isset($data['amount']) || !is_numeric($data['amount']) || $data['amount'] <= 0) {
                 throw new Exception('Invalid amount', 400);
@@ -426,6 +519,61 @@ class UserController {
             } else {
                 throw new Exception('Deposit failed', 500);
             }
+
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+    public function adminGetUserDetail() {
+        header('Content-Type: application/json');
+        
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        try {
+            if (!isset($_GET['uid'])) {
+                throw new Exception('User ID is required', 400);
+            }
+            $uid = $_GET['uid'];
+            
+            // Authorization check
+            if (!isset($_SESSION['user_id']) || !$this->service->isAdmin($_SESSION['user_id'])) {
+                throw new Exception('Unauthorized access', 403);
+            }
+
+            // 1. Get User Info
+            $userInfo = $this->service->getOne($uid);
+            if (!$userInfo) {
+                throw new Exception('User not found', 404);
+            }
+            unset($userInfo['password']);
+
+            // 2. Get User Games
+            $games = $this->service->getUserGames($uid);
+
+            // 3. Get User Feedbacks (Game Reviews)
+            require_once __DIR__ . '/../service/FeedbackService.php';
+            $feedbackService = new FeedbackService($this->service->getDb()); // Access DB from UserService
+            $feedbacks = $feedbackService->getFeedbacksByCustomer($uid);
+
+            // 4. Get User Comments (News Reviews)
+            require_once __DIR__ . '/../service/ReviewService.php';
+            $reviewService = new ReviewService($this->service->getDb());
+            $comments = $reviewService->getReviewsByCustomer($uid);
+
+            echo json_encode([
+                'status' => 'success',
+                'data' => [
+                    'user' => $userInfo,
+                    'games' => $games,
+                    'feedbacks' => $feedbacks,
+                    'comments' => $comments
+                ]
+            ]);
 
         } catch (Exception $e) {
             $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;

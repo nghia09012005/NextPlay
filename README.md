@@ -1144,3 +1144,239 @@ All error responses follow this format:
 - 405 Method Not Allowed: HTTP method not supported
 - 409 Conflict: Resource already exists
 - 500 Internal Server Error: Server error
+## Admin User Management
+
+### Get User Detail (Aggregated)
+- **URL**: `/admin/users/detail`
+- **Method**: `GET`
+- **Authentication**: Required (Admin)
+- **URL Parameters**:
+  - `uid` (required): User ID
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "user": {
+        "uid": 1,
+        "uname": "username",
+        "email": "email@example.com",
+        "balance": 100.00,
+        "status": "active"
+        // ... other user fields
+      },
+      "games": [
+        {
+          "name": "Game Name",
+          "price": 29.99,
+          "purchase_date": "2024-01-01"
+        }
+      ],
+      "feedbacks": [
+        {
+          "game_name": "Game Name",
+          "rating": 5,
+          "content": "Great game!",
+          "feedback_time": "2024-01-02"
+        }
+      ],
+      "comments": [
+        {
+          "news_id": 1,
+          "content": "Nice article",
+          "created_at": "2024-01-03"
+        }
+      ]
+    }
+  }
+  ```
+
+### Admin Reset Password
+- **URL**: `/admin/users/reset-password`
+- **Method**: `POST`
+- **Authentication**: Required (Admin)
+- **Request Body**:
+  ```json
+  {
+    "uid": 1,
+    "newPassword": "newSecurePassword123!"
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Password reset successfully"
+  }
+  ```
+
+### Toggle User Lock
+- **URL**: `/admin/users/toggle-lock`
+- **Method**: `POST`
+- **Authentication**: Required (Admin)
+- **Request Body**:
+  ```json
+  {
+    "uid": 1,
+    "lock": true, // true to lock, false to unlock
+    "duration": "permanent" // Optional for lock: 'permanent', '15 minutes', '1 hour', etc.
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "User locked successfully"
+  }
+  ```
+
+## Admin Game Management
+
+### Update Game Status (Approve/Reject)
+- **URL**: `/games/{id}/status`
+- **Method**: `PATCH`
+- **Authentication**: Required (Admin)
+- **Request Body**:
+  ```json
+  {
+    "status": "approved" 
+  }
+  ```
+  Note: status can be 'approved', 'rejected', 'pending'.
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Game status updated successfully"
+  }
+  ```
+
+## Admin User Management
+
+### Get User Details (Admin View)
+- **URL**: `/admin/users/detail`
+- **Method**: `GET`
+- **Authentication**: Required (Admin)
+- **URL Parameters**:
+  - `uid` (required): User ID
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "user": { ... },
+      "games": [ ... ],
+      "feedbacks": [ ... ],
+      "comments": [ ... ]
+    }
+  }
+  ```
+
+### Admin Reset Password
+- **URL**: `/admin/users/reset-password`
+- **Method**: `POST`
+- **Authentication**: Required (Admin)
+- **Request Body**:
+  ```json
+  {
+    "uid": 123,
+    "newPassword": "newSecretPassword123!"
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Password updated successfully"
+  }
+  ```
+
+### Toggle User Lock
+- **URL**: `/admin/users/toggle-lock`
+- **Method**: `POST`
+- **Authentication**: Required (Admin)
+- **Request Body**:
+  ```json
+  {
+    "uid": 123,
+    "lock": true,
+    "duration": "permanent" 
+  }
+  ```
+  Note: duration can be 'permanent' or time string like '+1 day'.
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "User lock status updated successfully",
+    "locked": true,
+    "duration": "permanent"
+  }
+  ```
+
+## Admin Cart Management
+
+### Get All Active Carts
+- **URL**: `/admin/carts`
+- **Method**: `GET`
+- **Authentication**: Required (Admin)
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": [
+      {
+        "uid": 1,
+        "uname": "user1",
+        "fname": "First",
+        "lname": "Last",
+        "item_count": 2,
+        "total_amount": 59.98,
+        "wishname": "Cart"
+      }
+    ]
+  }
+  ```
+
+### Get Cart Details
+- **URL**: `/admin/carts/{uid}`
+- **Method**: `GET`
+- **Authentication**: Required (Admin)
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "uid": 1,
+      "uname": "user1",
+      "total": 59.98,
+      "items": [
+        {
+          "id": 1,
+          "name": "Game 1",
+          "price": 29.99,
+          "quantity": 1
+        }
+      ]
+    }
+  }
+  ```
+
+### Get Cart Stats
+- **URL**: `/admin/carts/stats`
+- **Method**: `GET`
+- **Authentication**: Required (Admin)
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "stats": {
+        "active_carts": 5,
+        "pending_value": 150.00,
+        "completed_orders": 0,
+        "total_revenue": 0
+      }
+    }
+  }
+  ```

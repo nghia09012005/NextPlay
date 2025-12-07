@@ -21,5 +21,21 @@ class ContactService {
         }
         return false;
     }
+    public function getAllMessages() {
+        $stmt = $this->contactModel->getAll();
+        $messages = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $messages[] = $row;
+        }
+        return $messages;
+    }
+
+    public function updateStatus($id, $status) {
+        return $this->contactModel->updateStatus($id, $status);
+    }
+
+    public function deleteMessage($id) {
+        return $this->contactModel->delete($id);
+    }
 }
 ?>

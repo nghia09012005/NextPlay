@@ -43,5 +43,43 @@ class ContactMessage {
         }
         return false;
     }
+    public function getAll() {
+        $query = "SELECT * FROM " . $this->table_name . " ORDER BY created_at DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    public function updateStatus($id, $status) {
+        $query = "UPDATE " . $this->table_name . "
+                SET status = :status
+                WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        
+        $status = htmlspecialchars(strip_tags($status));
+        $id = htmlspecialchars(strip_tags($id));
+        
+        $stmt->bindParam(':status', $status);
+        $stmt->bindParam(':id', $id);
+        
+        if($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    public function delete($id) {
+        $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        
+        $id = htmlspecialchars(strip_tags($id));
+        $stmt->bindParam(':id', $id);
+        
+        if($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
 }
 ?>
