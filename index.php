@@ -15,6 +15,7 @@ require_once __DIR__ . '/controller/PageController.php';
 require_once __DIR__ . '/controller/PageContentController.php';
 require_once __DIR__ . '/controller/ContactController.php';
 require_once __DIR__ . '/controller/FaqController.php';
+require_once __DIR__ . '/controller/AdminController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -43,37 +44,43 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 // Initialize controllers with the database connection
 $userController = new UserController($db);
-// $gameController = new GameController($db);
-// $publisherController = new PublisherController($db);
-// $categoryController = new CategoryController($db);
-// $libraryController = new LibraryController($db);
-// $wishlistController = new WishlistController($db);
-// $paymentController = new PaymentController($db);
-// $pageContentController = new PageContentController($db);
-// $contactController = new ContactController($db);
-// $pageController = new PageController();
-// $newsController = new NewsController($db);
-// $reviewController = new ReviewController($db);
-// $feedbackController = new FeedbackController($db);
+$gameController = new GameController($db);
+$publisherController = new PublisherController($db);
+$categoryController = new CategoryController($db);
+$libraryController = new LibraryController($db);
+$wishlistController = new WishlistController($db);
+$paymentController = new PaymentController($db);
+$pageContentController = new PageContentController($db);
+$contactController = new ContactController($db);
+$pageController = new PageController();
+$newsController = new NewsController($db);
+$reviewController = new ReviewController($db);
+$feedbackController = new FeedbackController($db);
+$faqController = new FaqController($db);
+$adminController = new AdminController($db);
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-    $base_path = '/Assignment/NextPlay';
-    $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-    error_log("Original URI: " . $request_uri);
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-
-
 error_log("Original URI: " . $request_uri);
 
-// Remove base path
-if (strpos($request_uri, $base_path) === 0) {
-    $request_uri = substr($request_uri, strlen($base_path));
+// List of possible base paths to strip
+$base_paths = [
+    '/Assignment/NextPlay',
+    '/BTL_LTW/BTL_LTW_BE',
+    '/index.php'
+];
+
+// Remove any matching base path
+foreach ($base_paths as $base_path) {
+    if (strpos($request_uri, $base_path) === 0) {
+        $request_uri = substr($request_uri, strlen($base_path));
+        error_log("Stripped base path: " . $base_path);
+        break;
+    }
 }
 error_log("After Base Path: " . $request_uri);
 
@@ -93,7 +100,7 @@ $uri = array_values(array_filter(explode('/', trim($request_uri, '/'))));
 
 error_log("Parsed URI Array: " . print_r($uri, true));
 
-print_r($uri);
+// print_r($uri);
 
 
 // Handle review routes
@@ -139,6 +146,22 @@ if (isset($uri[0]) && $uri[0] === 'reviews') {
 
 // Handle feedback routes (Game Reviews)
 if (isset($uri[0]) && $uri[0] === 'feedback') {
+    // GET /feedback - Get all feedback (admin)
+    if (count($uri) === 1 && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $feedbackController->getAllFeedback();
+        exit();
+    }
+    // GET /feedback/{customerid}/{gid} - Get specific feedback
+    if (count($uri) === 3 && is_numeric($uri[1]) && is_numeric($uri[2]) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $feedbackController->getFeedback($uri[1], $uri[2]);
+        exit();
+    }
+    // DELETE /feedback/{customerid}/{gid} - Admin delete feedback
+    if (count($uri) === 3 && is_numeric($uri[1]) && is_numeric($uri[2]) && $_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        checkAuth();
+        $feedbackController->adminDeleteFeedback($uri[1], $uri[2]);
+        exit();
+    }
     // GET /feedback/game/{id}
     if (isset($uri[1]) && $uri[1] === 'game' && isset($uri[2]) && is_numeric($uri[2])) {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -180,6 +203,17 @@ if (isset($uri[0]) && $uri[0] === 'review' && isset($uri[1]) && is_numeric($uri[
 
 // Handle library route
 if (isset($uri[0]) && $uri[0] === 'library') {
+    // GET /library/all - Get all purchases (admin)
+    if (isset($uri[1]) && $uri[1] === 'all' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $libraryController->getAllPurchases();
+        exit();
+    }
+    // GET /library/stats - Get purchase statistics (admin)
+    if (isset($uri[1]) && $uri[1] === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $libraryController->getPurchaseStats();
+        exit();
+    }
+    // GET /library - Get current user's library
     checkAuth();
     $libraryController->getUserLibrary();
     exit();
@@ -198,12 +232,83 @@ function checkAuth() {
     return true;
 }
 
+// Handle admin endpoints
+if (isset($uri[0]) && $uri[0] === 'admins') {
+    // GET /admins/stats - Dashboard statistics (public for now, can add auth)
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && $uri[1] === 'stats') {
+        $adminController->getStats();
+        exit();
+    }
+    
+    // GET /admins/non-admin-users - Get users who can be promoted
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && $uri[1] === 'non-admin-users') {
+        checkAuth();
+        $adminController->getNonAdminUsers();
+        exit();
+    }
+    
+    // GET /admins/check/{uid} - Check if user is admin
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && $uri[1] === 'check' && isset($uri[2]) && is_numeric($uri[2])) {
+        $adminController->checkAdmin($uri[2]);
+        exit();
+    }
+    
+    // POST /admins/promote/{uid} - Promote user to admin
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && $uri[1] === 'promote' && isset($uri[2]) && is_numeric($uri[2])) {
+        checkAuth();
+        $adminController->promote($uri[2]);
+        exit();
+    }
+    
+    // POST /admins/demote/{uid} - Demote admin to user
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && $uri[1] === 'demote' && isset($uri[2]) && is_numeric($uri[2])) {
+        checkAuth();
+        $adminController->demote($uri[2]);
+        exit();
+    }
+    
+    // GET /admins/{uid} - Get one admin
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && is_numeric($uri[1])) {
+        $adminController->getOne($uri[1]);
+        exit();
+    }
+    
+    // GET /admins - Get all admins
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $adminController->getAll();
+        exit();
+    }
+    
+    // POST /admins - Create new admin
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        checkAuth();
+        $adminController->create();
+        exit();
+    }
+    
+    // DELETE /admins/{uid} - Delete admin
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
+        checkAuth();
+        $adminController->delete($uri[1]);
+        exit();
+    }
+    
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+    exit();
+}
+
 // Public endpoints (no auth required)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[0])) {
     if ($uri[0] === 'users' && isset($uri[1]) && $uri[1] === 'signin') {
         // print("sigin here");
         $userController->signin();
         // print("sigin out");
+        exit();
+    } elseif ($uri[0] === 'users' && isset($uri[1]) && $uri[1] === 'logout') {
+        // Handle logout - destroy session
+        session_destroy();
+        echo json_encode(['status' => 'success', 'message' => 'Logged out successfully']);
         exit();
     } elseif ($uri[0] === 'users' && (!isset($uri[1]) || $uri[1] === 'register')) {
         $userController->register();
@@ -265,14 +370,17 @@ if (isset($uri[0]) && $uri[0] === 'news') {
         exit();
     }
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        checkAuth();
         $newsController->createNews();
         exit();
     }
     if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1]) && is_numeric($uri[1])) {
+        checkAuth();
         $newsController->updateNews($uri[1]);
         exit();
     }
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
+        checkAuth();
         $newsController->deleteNews($uri[1]);
         exit();
     }
@@ -289,6 +397,18 @@ if (isset($uri[0]) && $uri[0] === 'games') {
         $gameController->getOne($uri[1]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($uri[1])) {
         $gameController->getAll();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($uri[1])) {
+        checkAuth();
+        $gameController->create();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1]) && is_numeric($uri[1])) {
+        checkAuth();
+        $gameController->update($uri[1]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
+        checkAuth();
+        $gameController->delete($uri[1]);
+    } else {
+        http_response_code(405);
+        echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
     }
     exit();
 }
@@ -310,10 +430,16 @@ if (isset($uri[0]) && $uri[0] === 'publishers') {
         if (isset($uri[1]) && is_numeric($uri[1])) {
             $publisherController->getOne($uri[1]);
         } else {
-            $publisherController->getAllPublishers();
+            $publisherController->getAll();
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $publisherController->create();
+        $publisherController->register();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1]) && is_numeric($uri[1])) {
+        checkAuth();
+        $publisherController->update($uri[1]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
+        checkAuth();
+        $publisherController->delete($uri[1]);
     } else {
         http_response_code(405);
         echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
@@ -390,6 +516,16 @@ if (isset($uri[0]) && $uri[0] === 'users') {
         $userController->checkAdmin();
         exit();
     }
+    // Handle GET /users/profile or /users/me - return current logged in user
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[1]) && ($uri[1] === 'profile' || $uri[1] === 'me')) {
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
+            exit();
+        }
+        $userController->getOne($_SESSION['user_id']);
+        exit();
+    }
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($uri[1]) && is_numeric($uri[1])) {
             $userController->getOne($uri[1]);
@@ -400,6 +536,18 @@ if (isset($uri[0]) && $uri[0] === 'users') {
         $userController->uploadAvatar($uri[1]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && is_numeric($uri[1]) && isset($uri[2]) && $uri[2] === 'deposit') {
         $userController->deposit($uri[1]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($uri[1])) {
+        // POST /users - Create new user (admin only)
+        checkAuth();
+        $userController->create();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1]) && is_numeric($uri[1])) {
+        // PUT /users/{id} - Update user
+        checkAuth();
+        $userController->update();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
+        // DELETE /users/{id} - Delete user (admin only)
+        checkAuth();
+        $userController->delete($uri[1]);
     } else {
         http_response_code(405);
         echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
@@ -428,8 +576,42 @@ if (isset($uri[0]) && $uri[0] === 'content') {
 
 // Handle faqs endpoint
 if (isset($uri[0]) && $uri[0] === 'faqs') {
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // GET /faqs - Get all FAQs grouped by topic
+    if (count($uri) === 1 && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $faqController->getAll();
+        exit();
+    }
+    // GET /faqs/flat - Get all FAQs as flat list
+    if (isset($uri[1]) && $uri[1] === 'flat' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $faqController->getAllFlat();
+        exit();
+    }
+    // GET /faqs/topics - Get unique topics
+    if (isset($uri[1]) && $uri[1] === 'topics' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $faqController->getTopics();
+        exit();
+    }
+    // GET /faqs/{id} - Get single FAQ
+    if (isset($uri[1]) && is_numeric($uri[1]) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $faqController->getById($uri[1]);
+        exit();
+    }
+    // POST /faqs - Create new FAQ
+    if (count($uri) === 1 && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        checkAuth();
+        $faqController->create();
+        exit();
+    }
+    // PUT /faqs/{id} - Update FAQ
+    if (isset($uri[1]) && is_numeric($uri[1]) && $_SERVER['REQUEST_METHOD'] === 'PUT') {
+        checkAuth();
+        $faqController->update($uri[1]);
+        exit();
+    }
+    // DELETE /faqs/{id} - Delete FAQ
+    if (isset($uri[1]) && is_numeric($uri[1]) && $_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        checkAuth();
+        $faqController->delete($uri[1]);
         exit();
     }
 }

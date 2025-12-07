@@ -46,8 +46,19 @@ mysql://root:zqrZpHByLbLHYozKGRrFCDYhQbINYpTe8@tramway.proxy.rlwy.net:42537/rail
 |--------|----------|-------------|---------------|
 | POST   | /users/signin | User login | No |
 | POST   | /users/register | Register new user | No |
+| POST   | /users/logout | Logout user | No |
+| GET    | /users/profile | Get current user profile with role | Yes |
 | PUT    | /users | Update current user | Yes |
 | PUT    | /users/password | Update user password | Yes |
+| GET    | /admins | Get all admins | No |
+| GET    | /admins/{uid} | Get admin by ID | No |
+| GET    | /admins/stats | Get dashboard statistics | No |
+| GET    | /admins/check/{uid} | Check if user is admin | No |
+| GET    | /admins/non-admin-users | Get users who are not admins | Yes |
+| POST   | /admins | Create new admin user | Yes |
+| POST   | /admins/promote/{uid} | Promote user to admin | Yes |
+| POST   | /admins/demote/{uid} | Demote admin to user | Yes |
+| DELETE | /admins/{uid} | Delete admin | Yes |
 | POST   | /publishers/register | Register new publisher | No |
 | GET    | /users | Get all users | Yes |
 | GET    | /users/{id} | Get user by ID | Yes |
@@ -91,6 +102,192 @@ mysql://root:zqrZpHByLbLHYozKGRrFCDYhQbINYpTe8@tramway.proxy.rlwy.net:42537/rail
 | POST   | /contact | Submit contact message | No |
 | GET    | /content | Get page content | No |
 | PUT    | /admin/content | Update page content | Admin |
+
+## Admin Endpoints
+
+### Get All Admins
+- **URL**: `/admins`
+- **Method**: `GET`
+- **Authentication**: Not required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": [
+      {
+        "uid": 1,
+        "uname": "admin1",
+        "email": "admin1@example.com",
+        "avatar": "avatar.jpg"
+      }
+    ],
+    "total": 1
+  }
+  ```
+
+### Get Admin by ID
+- **URL**: `/admins/{uid}`
+- **Method**: `GET`
+- **Authentication**: Not required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "uid": 1,
+      "uname": "admin1",
+      "email": "admin1@example.com",
+      "avatar": "avatar.jpg"
+    }
+  }
+  ```
+- **Error Response (404 Not Found)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Admin not found"
+  }
+  ```
+
+### Check if User is Admin
+- **URL**: `/admins/check/{uid}`
+- **Method**: `GET`
+- **Authentication**: Not required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "isAdmin": true
+  }
+  ```
+
+### Get Dashboard Statistics
+- **URL**: `/admins/stats`
+- **Method**: `GET`
+- **Authentication**: Not required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "totalUsers": 150,
+      "totalGames": 45,
+      "totalOrders": 320,
+      "totalRevenue": 15000.00
+    }
+  }
+  ```
+
+### Get Non-Admin Users
+- **URL**: `/admins/non-admin-users`
+- **Method**: `GET`
+- **Authentication**: Required
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "data": [
+      {
+        "uid": 2,
+        "uname": "user1",
+        "email": "user1@example.com",
+        "avatar": "avatar.jpg"
+      }
+    ],
+    "total": 1
+  }
+  ```
+
+### Create New Admin
+- **URL**: `/admins`
+- **Method**: `POST`
+- **Authentication**: Required (Admin)
+- **Request Body**:
+  ```json
+  {
+    "uname": "newadmin",
+    "email": "newadmin@example.com",
+    "password": "securepassword123"
+  }
+  ```
+- **Success Response (201 Created)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Admin created successfully",
+    "data": {
+      "uid": 3,
+      "uname": "newadmin",
+      "email": "newadmin@example.com"
+    }
+  }
+  ```
+- **Error Response (400 Bad Request)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Missing required fields"
+  }
+  ```
+
+### Promote User to Admin
+- **URL**: `/admins/promote/{uid}`
+- **Method**: `POST`
+- **Authentication**: Required (Admin)
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "User promoted to admin successfully"
+  }
+  ```
+- **Error Response (400 Bad Request)**:
+  ```json
+  {
+    "status": "error",
+    "message": "User is already an admin"
+  }
+  ```
+
+### Demote Admin to User
+- **URL**: `/admins/demote/{uid}`
+- **Method**: `POST`
+- **Authentication**: Required (Admin)
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Admin demoted to user successfully"
+  }
+  ```
+- **Error Response (400 Bad Request)**:
+  ```json
+  {
+    "status": "error",
+    "message": "User is not an admin"
+  }
+  ```
+
+### Delete Admin
+- **URL**: `/admins/{uid}`
+- **Method**: `DELETE`
+- **Authentication**: Required (Admin)
+- **Query Parameters**:
+  - `deleteUser` (optional): If `true`, also deletes the user account
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Admin deleted successfully"
+  }
+  ```
+- **Error Response (404 Not Found)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Admin not found"
+  }
+  ```
 
 ## Review Endpoints (News)
 

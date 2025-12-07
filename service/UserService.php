@@ -19,6 +19,13 @@ class UserService {
         $this->wishlistService = new WishlistService($db);
     }
 
+    /**
+     * Get database connection (for testing purposes)
+     */
+    public function getDb() {
+        return $this->db;
+    }
+
     private function validatePasswordStrength($password) {
         // Min 8 chars, at least 1 uppercase, 1 lowercase, 1 number, 1 special char
         $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
@@ -319,6 +326,31 @@ class UserService {
         } catch (Exception $e) {
             error_log('Error in UserService::deposit: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Delete a user by ID
+     */
+    public function delete($uid) {
+        try {
+            // First check if user exists
+            $user = $this->userModel->readOne($uid);
+            if (!$user) {
+                throw new Exception('User not found', 404);
+            }
+
+            // Delete from admin table if exists
+            $this->adminModel->delete($uid);
+
+            // Delete from customer table if exists
+            $this->customerModel->delete($uid);
+
+            // Delete from user table
+            return $this->userModel->delete($uid);
+        } catch (Exception $e) {
+            error_log('Error in UserService::delete: ' . $e->getMessage());
+            throw $e;
         }
     }
 }

@@ -32,5 +32,30 @@ class FaqService {
 
         return array_values($grouped);
     }
+
+    public function getAllFaqs() {
+        $stmt = $this->faqModel->readAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getFaqById($id) {
+        return $this->faqModel->readOne($id);
+    }
+
+    public function createFaq($data) {
+        return $this->faqModel->create($data);
+    }
+
+    public function updateFaq($id, $data) {
+        return $this->faqModel->update($id, $data);
+    }
+
+    public function deleteFaq($id) {
+        return $this->faqModel->delete($id);
+    }
+
+    public function getTopics() {
+        return $this->faqModel->getTopics();
+    }
 }
 ?>

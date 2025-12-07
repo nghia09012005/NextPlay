@@ -433,5 +433,81 @@ class UserController {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Delete a user by ID (Admin only)
+     */
+    public function delete($uid) {
+        header('Content-Type: application/json');
+        
+        try {
+            if (!is_numeric($uid) || $uid <= 0) {
+                throw new Exception('Invalid user ID', 400);
+            }
+
+            $result = $this->service->delete($uid);
+            
+            if ($result) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'User deleted successfully'
+                ]);
+            } else {
+                throw new Exception('Failed to delete user', 500);
+            }
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Create a new user (Admin only)
+     */
+    public function create() {
+        header('Content-Type: application/json');
+        
+        try {
+            $json = file_get_contents("php://input");
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON format', 400);
+            }
+
+            // Required fields
+            if (empty($data['uname']) || empty($data['email']) || empty($data['password'])) {
+                throw new Exception('Username, email, and password are required', 400);
+            }
+
+            $uid = $this->service->register(
+                $data['uname'],
+                $data['email'],
+                $data['password'],
+                $data['DOB'] ?? null,
+                $data['lname'] ?? null,
+                $data['fname'] ?? null
+            );
+
+            if ($uid) {
+                http_response_code(201);
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'User created successfully',
+                    'data' => ['uid' => $uid]
+                ]);
+            } else {
+                throw new Exception('Failed to create user', 500);
+            }
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
 }
 ?>

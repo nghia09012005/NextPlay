@@ -186,5 +186,77 @@ class PublisherController {
             ]);
         }
     }
+
+    /**
+     * Update a publisher
+     */
+    public function update($uid) {
+        header('Content-Type: application/json');
+        
+        try {
+            if (!is_numeric($uid) || $uid <= 0) {
+                throw new Exception('Invalid publisher ID', 400);
+            }
+
+            $json = file_get_contents("php://input");
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON format', 400);
+            }
+
+            $result = $this->service->update($uid, $data);
+            
+            if ($result) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Publisher updated successfully'
+                ]);
+            } else {
+                throw new Exception('Failed to update publisher', 500);
+            }
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Delete a publisher
+     */
+    public function delete($uid) {
+        header('Content-Type: application/json');
+        
+        try {
+            if (!is_numeric($uid) || $uid <= 0) {
+                throw new Exception('Invalid publisher ID', 400);
+            }
+
+            $result = $this->service->delete($uid);
+            
+            if ($result) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Publisher deleted successfully'
+                ]);
+            } else {
+                throw new Exception('Failed to delete publisher', 500);
+            }
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
 }
 ?>

@@ -44,9 +44,11 @@ class User {
         return false;
     }
 
-    // GET all users
+    // GET all users with balance from customer table
     public function readAll() {
-        $query = "SELECT * FROM {$this->table_name}";
+        $query = "SELECT u.*, c.balance 
+                  FROM {$this->table_name} u 
+                  LEFT JOIN `customer` c ON u.uid = c.uid";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;

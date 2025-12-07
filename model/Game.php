@@ -125,8 +125,8 @@ class Game {
     public function delete() {
         $query = "DELETE FROM {$this->table_name} WHERE Gid = :Gid";
         $stmt = $this->conn->prepare($query);
-        $this->Gid = htmlspecialchars(strip_tags($this->Gid));
-        $stmt->bindParam(":Gid", $this->Gid);
+        $gid = htmlspecialchars(strip_tags($this->gid));
+        $stmt->bindParam(":Gid", $gid);
         return $stmt->execute();
     }
 }

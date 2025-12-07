@@ -68,5 +68,63 @@ class PublisherService {
     public function getOne($uid) {
         return $this->publisherModel->readOne($uid);
     }
+
+    /**
+     * Update a publisher
+     */
+    public function update($uid, $data) {
+        try {
+            // Check if publisher exists
+            $publisher = $this->publisherModel->readOne($uid);
+            if (!$publisher) {
+                throw new Exception('Publisher not found', 404);
+            }
+
+            // Update publisher data
+            $this->publisherModel->uid = $uid;
+            $this->publisherModel->description = $data['description'] ?? $publisher['description'];
+            $this->publisherModel->taxcode = $data['taxcode'] ?? $publisher['taxcode'];
+            $this->publisherModel->location = $data['location'] ?? $publisher['location'];
+
+            // Also update user data if provided
+            if (isset($data['lname']) || isset($data['fname']) || isset($data['email'])) {
+                $user = $this->userModel->readOne($uid);
+                if ($user) {
+                    $this->userModel->uid = $uid;
+                    $this->userModel->lname = $data['lname'] ?? $user['lname'];
+                    $this->userModel->fname = $data['fname'] ?? $user['fname'];
+                    $this->userModel->email = $data['email'] ?? $user['email'];
+                    $this->userModel->update();
+                }
+            }
+
+            return $this->publisherModel->update();
+        } catch (Exception $e) {
+            error_log('Error in PublisherService::update: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Delete a publisher
+     */
+    public function delete($uid) {
+        try {
+            // Check if publisher exists
+            $publisher = $this->publisherModel->readOne($uid);
+            if (!$publisher) {
+                throw new Exception('Publisher not found', 404);
+            }
+
+            // Delete publisher first (foreign key constraint)
+            $this->publisherModel->delete($uid);
+            
+            // Then delete user
+            return $this->userModel->delete($uid);
+        } catch (Exception $e) {
+            error_log('Error in PublisherService::delete: ' . $e->getMessage());
+            throw $e;
+        }
+    }
 }
 ?>

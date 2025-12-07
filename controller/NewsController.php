@@ -65,7 +65,11 @@ class NewsController {
 
             // Set default values
             $data['publish_date'] = date('Y-m-d H:i:s');
-            $data['adminid'] = $_SESSION['user_id'] ?? null; // Get admin ID from session
+            $data['author_id'] = $_SESSION['user_id'] ?? null; // Get admin ID from session
+
+            if (empty($data['author_id'])) {
+                throw new Exception('User not authenticated');
+            }
 
             $result = $this->newsService->createNews($data);
             
@@ -86,7 +90,7 @@ class NewsController {
         }
     }
 
-    // Update news article
+    // Update news article (admin)
     public function updateNews($id) {
         try {
             $data = json_decode(file_get_contents('php://input'), true);
@@ -95,7 +99,7 @@ class NewsController {
                 throw new Exception('No data provided');
             }
 
-            $result = $this->newsService->updateNews($id, $data);
+            $result = $this->newsService->updateNewsAdmin($id, $data);
             
             if ($result) {
                 $this->jsonResponse(200, [
@@ -113,10 +117,10 @@ class NewsController {
         }
     }
 
-    // Delete news article
+    // Delete news article (admin)
     public function deleteNews($id) {
         try {
-            $result = $this->newsService->deleteNews($id);
+            $result = $this->newsService->deleteNewsAdmin($id);
             
             if ($result) {
                 $this->jsonResponse(200, [
