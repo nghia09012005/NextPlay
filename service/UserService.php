@@ -43,7 +43,7 @@ class UserService {
         
         try {
 
-            print("register user service");
+            error_log("register user service");
             // Set user data
             $this->userModel->uname = $uname;
             $this->userModel->email = $email;
@@ -200,8 +200,8 @@ class UserService {
             
     
 
-            // Verify password (plain text comparison for testing)
-            if ($password === $user['password']) {
+            // Verify password using password_verify()
+            if (password_verify($password, $user['password'])) {
                 // Reset failed attempts on success
 
           
