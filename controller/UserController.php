@@ -54,10 +54,10 @@ class UserController {
             }
 
             // Sanitize inputs
-            $uname = filter_var($data['uname'], FILTER_SANITIZE_STRING);
+            $uname = htmlspecialchars($data['uname'], ENT_QUOTES, 'UTF-8');
             $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-            $lname = filter_var($data['lname'], FILTER_SANITIZE_STRING);
-            $fname = filter_var($data['fname'], FILTER_SANITIZE_STRING);
+            $lname = htmlspecialchars($data['lname'], ENT_QUOTES, 'UTF-8');
+            $fname = htmlspecialchars($data['fname'], ENT_QUOTES, 'UTF-8');
 
             try {
                 // Attempt registration
@@ -120,8 +120,8 @@ class UserController {
                 throw new Exception('Username and password are required', 400);
             }
 
-            // Sanitize inputs
-            $uname = filter_var($data['uname'], FILTER_SANITIZE_STRING);
+            // Sanitize inputs (htmlspecialchars replaces deprecated FILTER_SANITIZE_STRING)
+            $uname = htmlspecialchars($data['uname'], ENT_QUOTES, 'UTF-8');
             $password = $data['password']; // Don't sanitize password
 
             // Authenticate user

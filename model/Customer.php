@@ -14,7 +14,7 @@ class Customer {
     public function readAll() {
         $query = "SELECT C.*, U.uname, U.email 
                   FROM {$this->table_name} C
-                  JOIN `User` U ON U.uid = C.uid";
+                  JOIN `user` U ON U.uid = C.uid";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
@@ -29,14 +29,7 @@ class Customer {
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":uid", $uid);
-
-        print("lỗi đây");
-
-        print($stmt->execute());
-
-        print("excute xong");
-
-       
+        $stmt->execute();
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }

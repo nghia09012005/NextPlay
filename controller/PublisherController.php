@@ -3,6 +3,7 @@ require_once __DIR__ . '/../config/Database.php';
 require_once __DIR__ . '/../service/PublisherService.php';
 
 class PublisherController {
+    private $db;
     private $service;
 
     public function __construct($db) {
@@ -64,13 +65,13 @@ class PublisherController {
             }
 
             // Sanitize inputs
-            $uname = filter_var($data['uname'], FILTER_SANITIZE_STRING);
+            $uname = htmlspecialchars($data['uname'], ENT_QUOTES, 'UTF-8');
             $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-            $lname = filter_var($data['lname'], FILTER_SANITIZE_STRING);
-            $fname = filter_var($data['fname'], FILTER_SANITIZE_STRING);
-            $description = filter_var($data['description'], FILTER_SANITIZE_STRING);
-            $taxcode = filter_var($data['taxcode'], FILTER_SANITIZE_STRING);
-            $location = filter_var($data['location'], FILTER_SANITIZE_STRING);
+            $lname = htmlspecialchars($data['lname'], ENT_QUOTES, 'UTF-8');
+            $fname = htmlspecialchars($data['fname'], ENT_QUOTES, 'UTF-8');
+            $description = htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8');
+            $taxcode = htmlspecialchars($data['taxcode'], ENT_QUOTES, 'UTF-8');
+            $location = htmlspecialchars($data['location'], ENT_QUOTES, 'UTF-8');
 
             // Attempt registration
             $uid = $this->service->register(

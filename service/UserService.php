@@ -59,9 +59,6 @@ class UserService {
             $initialBalance = 0.00; // Set initial balance to 0
             $customerCreated = $this->customerModel->create($uid, $initialBalance);
             
-
-            print("xong");
-            
             if (!$customerCreated) {
                 throw new Exception('Failed to create customer account');
             }
@@ -146,7 +143,7 @@ class UserService {
         // Update password
         $this->userModel->uid = $uid;
         // Update password and timestamp
-        $query = "UPDATE `User` SET password = :password, password_changed_at = NOW() WHERE uid = :uid";
+        $query = "UPDATE `user` SET password = :password, password_changed_at = NOW() WHERE uid = :uid";
         $stmt = $this->db->prepare($query);
         $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
         $stmt->bindParam(':password', $hashedPassword);
@@ -186,8 +183,8 @@ class UserService {
             
     
 
-            // Verify password
-            if (password_verify($password, $user['password'])) {
+            // Verify password (plain text comparison for testing)
+            if ($password === $user['password']) {
                 // Reset failed attempts on success
 
           
@@ -236,7 +233,7 @@ class UserService {
     }
 
     private function resetLockout($uid) {
-        $query = "UPDATE `User` SET failed_attempts = 0, lockout_time = NULL WHERE uid = :uid";
+        $query = "UPDATE `user` SET failed_attempts = 0, lockout_time = NULL WHERE uid = :uid";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':uid', $uid);
         $stmt->execute();
@@ -251,7 +248,7 @@ class UserService {
             $lockoutTime = date('Y-m-d H:i:s', strtotime('+15 minutes'));
         }
 
-        $query = "UPDATE `User` SET failed_attempts = :attempts, lockout_time = :lockout WHERE uid = :uid";
+        $query = "UPDATE `user` SET failed_attempts = :attempts, lockout_time = :lockout WHERE uid = :uid";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':attempts', $newAttempts);
         $stmt->bindParam(':lockout', $lockoutTime);

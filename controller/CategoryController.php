@@ -61,8 +61,8 @@ class CategoryController {
                 throw new Exception('Category name is required');
             }
 
-            $name = filter_var($data['name'], FILTER_SANITIZE_STRING);
-            $description = isset($data['description']) ? filter_var($data['description'], FILTER_SANITIZE_STRING) : null;
+            $name = htmlspecialchars($data['name'], ENT_QUOTES, 'UTF-8');
+            $description = isset($data['description']) ? htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8') : null;
 
             $result = $this->categoryService->createCategory($name, $description);
             
@@ -94,8 +94,8 @@ class CategoryController {
                 throw new Exception('Category name is required');
             }
 
-            $name = filter_var($data['name'], FILTER_SANITIZE_STRING);
-            $description = isset($data['description']) ? filter_var($data['description'], FILTER_SANITIZE_STRING) : null;
+            $name = htmlspecialchars($data['name'], ENT_QUOTES, 'UTF-8');
+            $description = isset($data['description']) ? htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8') : null;
 
             $result = $this->categoryService->updateCategory($catId, $name, $description);
             
