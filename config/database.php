@@ -18,7 +18,7 @@ class Database {
         // this->$username = "root";
         // this->$password = "zqRZpHByLbLhYOzKgWRfCDYhqbNYpTeB";
         // this->$port = "42537";
-
+        
         // Use environment variables if available (Docker), otherwise use defaults (XAMPP)
         $this->host = getenv('DB_HOST') ?: 'localhost';
         $this->db_name = getenv('DB_NAME') ?: 'ltw_game_shop';
