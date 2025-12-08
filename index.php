@@ -57,7 +57,6 @@ $publisherController = new PublisherController($db);
 $gameController = new GameController($db);
 $libraryController = new LibraryController($db);
 $newsController = new NewsController($db);
-$newsController = new NewsController($db);
 $reviewController = new ReviewController($db);
 $feedbackController = new FeedbackController($db);
 $pageController = new PageController();
@@ -130,6 +129,28 @@ if (isset($uri[0]) && $uri[0] === 'reviews') {
     http_response_code(404);
     echo json_encode(['status' => 'error', 'message' => 'Endpoint not found']);
     exit();
+}
+
+// Handle admin reviews
+if (isset($uri[0]) && $uri[0] === 'admin' && isset($uri[1]) && $uri[1] === 'reviews') {
+    checkAuth();
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $reviewController->getAll();
+        exit();
+    }
+    // DELETE /admin/reviews?customerid=X&news_id=Y
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $customer_id = $_GET['customerid'] ?? null;
+        $news_id = $_GET['news_id'] ?? null;
+        
+        if ($customer_id && $news_id) {
+            $reviewController->deleteReview($customer_id, $news_id);
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Missing customerid or news_id']);
+        }
+        exit();
+    }
 }
 
 // Handle feedback routes (Game Reviews)
@@ -240,33 +261,38 @@ if (isset($uri[0]) && $uri[0] === 'news') {
     }
     // POST /news/{id}/comments
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[1]) && is_numeric($uri[1]) && isset($uri[2]) && $uri[2] === 'comments') {
+        checkAuth();
         $newsController->addComment($uri[1]);
         exit();
     }
     // DELETE /news/{id}/comments
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1]) && isset($uri[2]) && $uri[2] === 'comments') {
+        checkAuth();
         $newsController->deleteComment($uri[1]);
         exit();
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($uri[1]) && is_numeric($uri[1])) {
-            $newsController->getNewsById($uri[1]);
+            $newsController->getOne($uri[1]);
         } else {
-            $newsController->getAllNews();
+            $newsController->getAll();
         }
         exit();
     }
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $newsController->createNews();
+        checkAuth();
+        $newsController->create();
         exit();
     }
     if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($uri[1]) && is_numeric($uri[1])) {
-        $newsController->updateNews($uri[1]);
+        checkAuth();
+        $newsController->update($uri[1]);
         exit();
     }
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($uri[1]) && is_numeric($uri[1])) {
-        $newsController->deleteNews($uri[1]);
+        checkAuth();
+        $newsController->delete($uri[1]);
         exit();
     }
     http_response_code(404);
@@ -440,10 +466,40 @@ if (isset($uri[0]) && $uri[0] === 'faqs') {
     }
 }
 
+// Handle admin faqs endpoints
+if (isset($uri[0]) && $uri[0] === 'admin' && isset($uri[1]) && $uri[1] === 'faqs') {
+    checkAuth(); // Enforce authentication
+
+    // GET /admin/faqs (alias to GET /faqs?raw=true handled by controller if passed, or we can force it here)
+    // Actually controller checks $_GET['raw']. Front end can call /faqs?raw=true
+
+    // POST /admin/faqs
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $faqController->create();
+        exit();
+    }
+
+    // PUT /admin/faqs/{id}
+    if (isset($uri[2]) && is_numeric($uri[2]) && $_SERVER['REQUEST_METHOD'] === 'PUT') {
+        $faqController->update($uri[2]);
+        exit();
+    }
+
+    // DELETE /admin/faqs/{id}
+    if (isset($uri[2]) && is_numeric($uri[2]) && $_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $faqController->delete($uri[2]);
+        exit();
+    }
+}
+
 if (isset($uri[0]) && $uri[0] === 'admin' && isset($uri[1]) && $uri[1] === 'content') {
     if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         // checkAuth(); // Uncomment to enforce auth
         $pageContentController->updateContent();
+        exit();
+    }
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($uri[2]) && $uri[2] === 'upload') {
+        $pageContentController->uploadContentImage();
         exit();
     }
 }

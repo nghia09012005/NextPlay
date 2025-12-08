@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Dec 06, 2025 at 07:32 AM
+-- Generation Time: Dec 08, 2025 at 07:48 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.4
 
@@ -39,7 +39,8 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`uid`, `startdate`) VALUES
-(3, '2025-01-01');
+(3, '2025-01-01'),
+(25, '2025-07-12');
 
 -- --------------------------------------------------------
 
@@ -123,7 +124,7 @@ CREATE TABLE `contactmessages` (
 --
 
 INSERT INTO `contactmessages` (`id`, `name`, `email`, `subject`, `message`, `status`, `created_at`) VALUES
-(1, 'Huỳnh Minh Tiến', 'randy2032005@gmail.com', 'Web Lỏ', 'Admin ơi hãy sửa lại giúp em với, ban đầu em định nạp 50000 nhưng mà lỡ bấm lộn thành 500000 giờ má em chửi em quá trời, có cách nào để trả lại tiền cho em được không. Em cảm ơn!!!', 'new', '2025-12-04 19:03:10');
+(1, 'Huỳnh Minh Tiến', 'randy2032005@gmail.com', 'Báo cáo sự cố kỹ thuật', 'Admin ơi hãy sửa lại giúp em với, ban đầu em định nạp 50000 nhưng mà lỡ bấm lộn thành 500000 giờ má em chửi em quá trời, có cách nào để trả lại tiền cho em được không. Em cảm ơn!!!', 'read', '2025-12-04 19:03:10');
 
 -- --------------------------------------------------------
 
@@ -148,7 +149,7 @@ INSERT INTO `customer` (`uid`, `balance`) VALUES
 (5, NULL),
 (7, NULL),
 (24, '100.00'),
-(25, '5490100.00'),
+(25, '9050100.00'),
 (26, '100.00'),
 (28, '100.00'),
 (29, '100.00'),
@@ -156,7 +157,8 @@ INSERT INTO `customer` (`uid`, `balance`) VALUES
 (36, '8845000.00'),
 (37, '0.00'),
 (38, '0.00'),
-(39, '0.00');
+(39, '0.00'),
+(40, '0.00');
 
 -- --------------------------------------------------------
 
@@ -182,7 +184,7 @@ INSERT INTO `faqs` (`id`, `topic_key`, `topic_name`, `topic_icon`, `question`, `
 (1, 'general', 'Chung', 'bi-info-circle', 'NextPlay là gì?', 'NextPlay là nền tảng phân phối game trực tuyến hàng đầu, nơi bạn có thể tìm thấy hàng ngàn tựa game hấp dẫn từ các nhà phát hành nổi tiếng trên thế giới. Chúng tôi cung cấp trải nghiệm mua sắm an toàn, nhanh chóng và tiện lợi.', '2025-12-06 04:51:23'),
 (2, 'general', 'Chung', 'bi-info-circle', 'Làm thế nào để tạo tài khoản?', 'Để tạo tài khoản, bạn chỉ cần nhấp vào nút \"Đăng ký\" ở góc trên bên phải màn hình. Điền đầy đủ thông tin yêu cầu như tên đăng nhập, email và mật khẩu. Sau khi đăng ký, bạn có thể đăng nhập và bắt đầu sử dụng dịch vụ ngay lập tức.', '2025-12-06 04:51:23'),
 (3, 'general', 'Chung', 'bi-info-circle', 'NextPlay có miễn phí không?', 'Việc tạo tài khoản và duyệt web trên NextPlay là hoàn toàn miễn phí. Tuy nhiên, để tải và chơi các tựa game trả phí, bạn cần phải mua chúng. Chúng tôi cũng cung cấp nhiều tựa game miễn phí (Free-to-Play) để bạn trải nghiệm.', '2025-12-06 04:51:23'),
-(4, 'account', 'Tài khoản & Bảo mật', 'bi-shield-lock', 'Tôi quên mật khẩu, phải làm sao?', 'Đừng lo lắng! Bạn có thể nhấp vào liên kết \"Quên mật khẩu\" tại trang đăng nhập. Nhập email đã đăng ký và chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu cho bạn.', '2025-12-06 04:51:23'),
+(4, 'account', 'Tài khoản &amp; Bảo mật', 'bi-shield-lock', 'Tôi quên mật khẩu, phải làm sao?', 'Đừng lo lắng! Bạn có thể nhấp vào liên kết &quot;Quên mật khẩu&quot; tại trang đăng nhập. Nhập email đã đăng ký và chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu cho bạn.', '2025-12-06 04:51:23'),
 (5, 'account', 'Tài khoản & Bảo mật', 'bi-shield-lock', 'Làm thế nào để đổi mật khẩu?', 'Sau khi đăng nhập, hãy truy cập vào trang \"Hồ sơ cá nhân\". Tại đó, bạn sẽ tìm thấy tùy chọn \"Đổi mật khẩu\". Bạn cần nhập mật khẩu hiện tại và mật khẩu mới để hoàn tất quá trình.', '2025-12-06 04:51:23'),
 (6, 'account', 'Tài khoản & Bảo mật', 'bi-shield-lock', 'Tài khoản của tôi có được bảo mật không?', 'Chúng tôi cam kết bảo mật thông tin cá nhân của bạn. NextPlay sử dụng các công nghệ mã hóa tiên tiến để bảo vệ dữ liệu người dùng. Chúng tôi không bao giờ chia sẻ thông tin của bạn với bên thứ ba trái phép.', '2025-12-06 04:51:23'),
 (7, 'payment', 'Thanh toán', 'bi-credit-card', 'NextPlay chấp nhận những phương thức thanh toán nào?', 'Hiện tại, chúng tôi hỗ trợ thanh toán qua thẻ tín dụng/ghi nợ (Visa, Mastercard), ví điện tử (Momo, ZaloPay) và chuyển khoản ngân hàng. Hệ thống nạp tiền của chúng tôi hoạt động 24/7.', '2025-12-06 04:51:23'),
@@ -212,38 +214,39 @@ CREATE TABLE `game` (
   `release_date` varchar(50) DEFAULT NULL,
   `rating` float DEFAULT 0,
   `reviews` int(11) DEFAULT 0,
-  `thumbnail` varchar(255) DEFAULT NULL
+  `thumbnail` varchar(255) DEFAULT NULL,
+  `status` varchar(20) DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `game`
 --
 
-INSERT INTO `game` (`Gid`, `name`, `version`, `description`, `price`, `adminid`, `publisherid`, `category`, `tags`, `developer`, `publisher`, `release_date`, `rating`, `reviews`, `thumbnail`) VALUES
-(103, 'Elden Ring', NULL, 'THE NEW FANTASY ACTION RPG. Rise, Tarnished, and be guided by grace to brandish the power of the Elden Ring and become an Elden Lord in the Lands Between.', '990000', NULL, NULL, 'RPG', '[\"Souls-like\",\"Open World\"]', 'FromSoftware Inc.', 'Bandai Namco Entertainment', '25 Feb, 2022', 4.8, 520000, 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/header.jpg'),
-(104, 'Cyberpunk 2077', NULL, 'Cyberpunk 2077 is an open-world, action-adventure RPG set in the megalopolis of Night City, where you play as a cyberpunk mercenary wrapped up in a do-or-die fight for survival.', '850000', NULL, NULL, 'Action', '[\"Sci-fi\",\"FPS\"]', 'CD PROJEKT RED', 'CD PROJEKT RED', '10 Dec, 2020', 4.5, 600000, 'https://cdn.akamai.steamstatic.com/steam/apps/1091500/header.jpg'),
-(105, 'God of War Ragnarök', NULL, 'Kratos and Atreus must journey to each of the Nine Realms in search of answers as Asgardian forces prepare for a prophesied battle that will end the world.', '1200000', NULL, NULL, 'Adventure', '[\"Story Rich\",\"Action\"]', 'Santa Monica Studio', 'PlayStation Publishing', '19 Sep, 2024', 4.9, 15000, 'https://cdn.akamai.steamstatic.com/steam/apps/2322010/header.jpg'),
-(106, 'Hollow Knight', NULL, 'Forge your own path in Hollow Knight! An epic action adventure through a vast ruined kingdom of insects and heroes. Explore twisting caverns, battle tainted creatures and befriend bizarre bugs, all in a classic, hand-drawn 2D style.', '165000', NULL, NULL, 'Indie', '[\"Metroidvania\",\"2D\"]', 'Team Cherry', 'Team Cherry', '24 Feb, 2017', 4.9, 300000, 'https://cdn.akamai.steamstatic.com/steam/apps/367520/header.jpg'),
-(107, 'Stardew Valley', NULL, 'You\'ve inherited your grandfather\'s old farm plot in Stardew Valley. Armed with hand-me-down tools and a few coins, you set out to begin your new life.', '165000', NULL, NULL, 'Simulation', '[\"Farming\",\"Relaxing\"]', 'ConcernedApe', 'ConcernedApe', '26 Feb, 2016', 4.9, 550000, 'https://cdn.akamai.steamstatic.com/steam/apps/413150/header.jpg'),
-(108, 'Dota 2', NULL, 'Every day, millions of players worldwide enter battle as one of over a hundred Dota heroes. And no matter if it\'s their 10th hour of play or 1,000th, there\'s always something new to discover.', '0', NULL, NULL, 'MOBA', '[\"Multiplayer\",\"Strategy\"]', 'Valve', 'Valve', '9 Jul, 2013', 4.6, 2000000, 'https://cdn.akamai.steamstatic.com/steam/apps/570/header.jpg'),
-(109, 'The Witcher 3: Wild Hunt', NULL, 'You are Geralt of Rivia, mercenary monster slayer. Before you stands a war-torn, monster-infested continent you can explore at will. Your current contract? Tracking down the Child of Prophecy, a living weapon that can alter the shape of the world.', '390000', NULL, NULL, 'RPG', '[\"Open World\",\"Story Rich\"]', 'CD PROJEKT RED', 'CD PROJEKT RED', '18 May, 2015', 4.9, 700000, 'https://cdn.akamai.steamstatic.com/steam/apps/292030/header.jpg'),
-(110, 'Red Dead Redemption 2', NULL, 'Winner of over 175 Game of the Year Awards and recipient of over 250 perfect scores, RDR2 is the epic tale of outlaw Arthur Morgan and the infamous Van der Linde gang, on the run across America at the dawn of the modern age.', '1000000', NULL, NULL, 'Adventure', '[\"Open World\",\"Western\"]', 'Rockstar Games', 'Rockstar Games', '5 Dec, 2019', 4.8, 500000, 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/header.jpg'),
-(111, 'Grand Theft Auto V', NULL, 'Grand Theft Auto V for PC offers players the option to explore the award-winning world of Los Santos and Blaine County in resolutions of up to 4k and beyond, as well as the chance to experience the game running at 60 frames per second.', '450000', NULL, NULL, 'Action', '[\"Open World\",\"Crime\"]', 'Rockstar North', 'Rockstar Games', '14 Apr, 2015', 4.7, 1500000, 'https://cdn.akamai.steamstatic.com/steam/apps/271590/header.jpg'),
-(112, 'Hades', NULL, 'Defy the god of the dead as you hack and slash out of the Underworld in this rogue-like dungeon crawler from the creators of Bastion, Transistor, and Pyre.', '220000', NULL, NULL, 'Indie', '[\"Roguelike\",\"Action\"]', 'Supergiant Games', 'Supergiant Games', '17 Sep, 2020', 4.9, 230000, 'https://cdn.akamai.steamstatic.com/steam/apps/1145360/header.jpg'),
-(113, 'Terraria', NULL, 'Dig, fight, explore, build! Nothing is impossible in this action-packed adventure game. The world is your canvas and the ground itself is your paint.', '120000', NULL, NULL, 'Indie', '[\"Sandbox\",\"Survival\"]', 'Re-Logic', 'Re-Logic', '16 May, 2011', 4.8, 1000000, 'https://cdn.akamai.steamstatic.com/steam/apps/105600/header.jpg'),
-(114, 'Among Us', NULL, 'An online and local party game of teamwork and betrayal for 4-15 players... in space!', '70000', NULL, NULL, 'Casual', '[\"Multiplayer\",\"Social Deduction\"]', 'Innersloth', 'Innersloth', '16 Nov, 2018', 4.5, 600000, 'https://cdn.akamai.steamstatic.com/steam/apps/945360/header.jpg'),
-(115, 'Minecraft', NULL, 'Prepare for an adventure of limitless possibilities as you build, mine, battle mobs, and explore the ever-changing Minecraft landscape.', '650000', NULL, NULL, 'Simulation', '[\"Sandbox\",\"Survival\"]', 'Mojang Studios', 'Xbox Game Studios', '18 Nov, 2011', 4.8, 900000, 'https://image.api.playstation.com/vulcan/img/rnd/202010/2618/w48z6bzefZPrRcJHc7L8SO66.png'),
-(116, 'Valorant', NULL, 'Blend your style and experience on a global, competitive stage. You have 13 rounds to attack and defend your side using sharp gunplay and tactical abilities.', '0', NULL, NULL, 'FPS', '[\"Multiplayer\",\"Tactical\"]', 'Riot Games', 'Riot Games', '2 Jun, 2020', 4.4, 300000, 'https://cdn.dribbble.com/users/2340268/screenshots/11924683/media/4c029671954593683833230552733979.jpg'),
-(117, 'League of Legends', NULL, 'League of Legends is a team-based game with over 140 champions to make epic plays with.', '0', NULL, NULL, 'MOBA', '[\"Multiplayer\",\"Strategy\"]', 'Riot Games', 'Riot Games', '27 Oct, 2009', 4.5, 800000, 'https://cdn1.epicgames.com/offer/24b9b5e323bc40eea252a10cdd3b2f10/EGS_LeagueofLegends_RiotGames_S1_2560x1440-80471666c140f790f28dff68d72c384b'),
-(118, 'Genshin Impact', NULL, 'Step into Teyvat, a vast world teeming with life and flowing with elemental energy. You and your sibling arrived here from another world.', '0', NULL, NULL, 'RPG', '[\"Open World\",\"Anime\"]', 'miHoYo', 'miHoYo', '28 Sep, 2020', 4.6, 400000, 'https://cdn1.epicgames.com/offer/879b0d8776ab46a59a129983ba78f0ce/genshin-impact-1_2560x1440-5556236553d7b53d4b2767f4c54b3706'),
-(119, 'FIFA 23', NULL, 'Experience The World\'s Game with 19,000+ players, 700+ teams, 100+ stadiums, and over 30 leagues.', '1090000', NULL, NULL, 'Sports', '[\"Football\",\"Multiplayer\"]', 'EA Canada', 'Electronic Arts', '30 Sep, 2022', 4, 100000, 'https://cdn.akamai.steamstatic.com/steam/apps/1811260/header.jpg'),
-(120, 'NBA 2K23', NULL, 'Rise to the occasion and realize your full potential in NBA 2K23. Prove yourself against the best players in the world.', '1000000', NULL, NULL, 'Sports', '[\"Basketball\",\"Simulation\"]', 'Visual Concepts', '2K', '9 Sep, 2022', 3.8, 50000, 'https://cdn.akamai.steamstatic.com/steam/apps/1919590/header.jpg'),
-(121, 'Sekiro: Shadows Die Twice', NULL, 'Carve your own clever path to vengeance in the award winning adventure from developer FromSoftware, creators of Bloodborne and the Dark Souls series.', '1290000', NULL, NULL, 'Action', '[\"Souls-like\",\"Difficult\"]', 'FromSoftware Inc.', 'Activision', '22 Mar, 2019', 4.9, 200000, 'https://cdn.akamai.steamstatic.com/steam/apps/814380/header.jpg'),
-(122, 'Dark Souls III', NULL, 'Dark Souls III continues to push the boundaries with the latest, ambitious chapter in the critically-acclaimed and genre-defining series.', '990000', NULL, NULL, 'RPG', '[\"Souls-like\",\"Dark Fantasy\"]', 'FromSoftware Inc.', 'Bandai Namco Entertainment', '12 Apr, 2016', 4.8, 350000, 'https://cdn.akamai.steamstatic.com/steam/apps/374320/header.jpg'),
-(123, 'Resident Evil 4 Remake', NULL, 'Survival is just the beginning. Six years have passed since the biological disaster in Raccoon City. Leon S. Kennedy, one of the survivors, tracks the president\'s kidnapped daughter to a secluded European village.', '1300000', NULL, NULL, 'Horror', '[\"Action\",\"Survival Horror\"]', 'CAPCOM Co., Ltd.', 'CAPCOM Co., Ltd.', '24 Mar, 2023', 4.9, 120000, 'https://cdn.akamai.steamstatic.com/steam/apps/2050650/header.jpg'),
-(124, 'Silent Hill 2', NULL, 'Having received a letter from his deceased wife, James heads to where they shared so many memories, in the hope of seeing her one more time: Silent Hill.', '1100000', NULL, NULL, 'Horror', '[\"Psychological Horror\"]', 'Bloober Team SA', 'Konami Digital Entertainment', 'TBA', 4.5, 0, 'https://cdn.akamai.steamstatic.com/steam/apps/2124490/header.jpg'),
-(125, 'Dead Space', NULL, 'The sci-fi survival horror classic Dead Space returns, completely rebuilt from the ground up to offer a deeper and more immersive experience.', '1000000', NULL, NULL, 'Horror', '[\"Sci-fi\",\"Survival Horror\"]', 'Motive', 'Electronic Arts', '27 Jan, 2023', 4.8, 30000, 'https://cdn.akamai.steamstatic.com/steam/apps/1693980/header.jpg'),
-(126, 'Final Fantasy VII Remake', NULL, 'Cloud Strife, an ex-SOLDIER operative, descends on the mako-powered city of Midgar. The world of the timeless classic FINAL FANTASY VII is reborn.', '1700000', NULL, NULL, 'RPG', '[\"JRPG\",\"Story Rich\"]', 'Square Enix', 'Square Enix', '17 Jun, 2022', 4.7, 40000, 'https://cdn.akamai.steamstatic.com/steam/apps/1462040/header.jpg');
+INSERT INTO `game` (`Gid`, `name`, `version`, `description`, `price`, `adminid`, `publisherid`, `category`, `tags`, `developer`, `publisher`, `release_date`, `rating`, `reviews`, `thumbnail`, `status`) VALUES
+(103, 'Elden Ring', NULL, 'THE NEW FANTASY ACTION RPG. Rise, Tarnished, and be guided by grace to brandish the power of the Elden Ring and become an Elden Lord in the Lands Between.', '990000', NULL, NULL, 'RPG', '[\"Souls-like\",\"Open World\"]', 'FromSoftware Inc.', 'Bandai Namco Entertainment', '25 Feb, 2022', 4.8, 520000, 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/header.jpg', 'approved'),
+(104, 'Cyberpunk 2077', NULL, 'Cyberpunk 2077 is an open-world, action-adventure RPG set in the megalopolis of Night City, where you play as a cyberpunk mercenary wrapped up in a do-or-die fight for survival.', '850000', NULL, NULL, 'Action', '[\"Sci-fi\",\"FPS\"]', 'CD PROJEKT RED', 'CD PROJEKT RED', '10 Dec, 2020', 4.5, 600000, 'https://cdn.akamai.steamstatic.com/steam/apps/1091500/header.jpg', 'approved'),
+(105, 'God of War Ragnarök', NULL, 'Kratos and Atreus must journey to each of the Nine Realms in search of answers as Asgardian forces prepare for a prophesied battle that will end the world.', '1200000', NULL, NULL, 'Adventure', '[\"Story Rich\",\"Action\"]', 'Santa Monica Studio', 'PlayStation Publishing', '19 Sep, 2024', 4.9, 15000, 'https://cdn.akamai.steamstatic.com/steam/apps/2322010/header.jpg', 'approved'),
+(106, 'Hollow Knight', NULL, 'Forge your own path in Hollow Knight! An epic action adventure through a vast ruined kingdom of insects and heroes. Explore twisting caverns, battle tainted creatures and befriend bizarre bugs, all in a classic, hand-drawn 2D style.', '165000', NULL, NULL, 'Indie', '[\"Metroidvania\",\"2D\"]', 'Team Cherry', 'Team Cherry', '24 Feb, 2017', 4.9, 300000, 'https://cdn.akamai.steamstatic.com/steam/apps/367520/header.jpg', 'approved'),
+(107, 'Stardew Valley', NULL, 'You\'ve inherited your grandfather\'s old farm plot in Stardew Valley. Armed with hand-me-down tools and a few coins, you set out to begin your new life.', '165000', NULL, NULL, 'Simulation', '[\"Farming\",\"Relaxing\"]', 'ConcernedApe', 'ConcernedApe', '26 Feb, 2016', 4.9, 550000, 'https://cdn.akamai.steamstatic.com/steam/apps/413150/header.jpg', 'approved'),
+(108, 'Dota 2', NULL, 'Every day, millions of players worldwide enter battle as one of over a hundred Dota heroes. And no matter if it\'s their 10th hour of play or 1,000th, there\'s always something new to discover.', '0', NULL, NULL, 'MOBA', '[\"Multiplayer\",\"Strategy\"]', 'Valve', 'Valve', '9 Jul, 2013', 4.6, 2000000, 'https://cdn.akamai.steamstatic.com/steam/apps/570/header.jpg', 'approved'),
+(109, 'The Witcher 3: Wild Hunt', NULL, 'You are Geralt of Rivia, mercenary monster slayer. Before you stands a war-torn, monster-infested continent you can explore at will. Your current contract? Tracking down the Child of Prophecy, a living weapon that can alter the shape of the world.', '390000', NULL, NULL, 'RPG', '[\"Open World\",\"Story Rich\"]', 'CD PROJEKT RED', 'CD PROJEKT RED', '18 May, 2015', 4.9, 700000, 'https://cdn.akamai.steamstatic.com/steam/apps/292030/header.jpg', 'approved'),
+(110, 'Red Dead Redemption 2', NULL, 'Winner of over 175 Game of the Year Awards and recipient of over 250 perfect scores, RDR2 is the epic tale of outlaw Arthur Morgan and the infamous Van der Linde gang, on the run across America at the dawn of the modern age.', '1000000', NULL, NULL, 'Adventure', '[\"Open World\",\"Western\"]', 'Rockstar Games', 'Rockstar Games', '5 Dec, 2019', 4.8, 500000, 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/header.jpg', 'approved'),
+(111, 'Grand Theft Auto V', NULL, 'Grand Theft Auto V for PC offers players the option to explore the award-winning world of Los Santos and Blaine County in resolutions of up to 4k and beyond, as well as the chance to experience the game running at 60 frames per second.', '450000', NULL, NULL, 'Action', '[\"Open World\",\"Crime\"]', 'Rockstar North', 'Rockstar Games', '14 Apr, 2015', 4.7, 1500000, 'https://cdn.akamai.steamstatic.com/steam/apps/271590/header.jpg', 'approved'),
+(112, 'Hades', NULL, 'Defy the god of the dead as you hack and slash out of the Underworld in this rogue-like dungeon crawler from the creators of Bastion, Transistor, and Pyre.', '220000', NULL, NULL, 'Indie', '[\"Roguelike\",\"Action\"]', 'Supergiant Games', 'Supergiant Games', '17 Sep, 2020', 4.9, 230000, 'https://cdn.akamai.steamstatic.com/steam/apps/1145360/header.jpg', 'approved'),
+(113, 'Terraria', NULL, 'Dig, fight, explore, build! Nothing is impossible in this action-packed adventure game. The world is your canvas and the ground itself is your paint.', '120000', NULL, NULL, 'Indie', '[\"Sandbox\",\"Survival\"]', 'Re-Logic', 'Re-Logic', '16 May, 2011', 4.8, 1000000, 'https://cdn.akamai.steamstatic.com/steam/apps/105600/header.jpg', 'approved'),
+(114, 'Among Us', NULL, 'An online and local party game of teamwork and betrayal for 4-15 players... in space!', '70000', NULL, NULL, 'Casual', '[\"Multiplayer\",\"Social Deduction\"]', 'Innersloth', 'Innersloth', '16 Nov, 2018', 4.5, 600000, 'https://cdn.akamai.steamstatic.com/steam/apps/945360/header.jpg', 'approved'),
+(115, 'Minecraft', NULL, 'Prepare for an adventure of limitless possibilities as you build, mine, battle mobs, and explore the ever-changing Minecraft landscape.', '650000', NULL, NULL, 'Simulation', '[\"Sandbox\",\"Survival\"]', 'Mojang Studios', 'Xbox Game Studios', '18 Nov, 2011', 4.8, 900000, 'https://image.api.playstation.com/vulcan/img/rnd/202010/2618/w48z6bzefZPrRcJHc7L8SO66.png', 'approved'),
+(116, 'Valorant', NULL, 'Blend your style and experience on a global, competitive stage. You have 13 rounds to attack and defend your side using sharp gunplay and tactical abilities.', '0', NULL, NULL, 'FPS', '[\"Multiplayer\",\"Tactical\"]', 'Riot Games', 'Riot Games', '2 Jun, 2020', 4.4, 300000, 'https://cdn.dribbble.com/users/2340268/screenshots/11924683/media/4c029671954593683833230552733979.jpg', 'rejected'),
+(117, 'League of Legends', NULL, 'League of Legends is a team-based game with over 140 champions to make epic plays with.', '0', NULL, NULL, 'MOBA', '[\"Multiplayer\",\"Strategy\"]', 'Riot Games', 'Riot Games', '27 Oct, 2009', 4.5, 800000, 'https://cdn1.epicgames.com/offer/24b9b5e323bc40eea252a10cdd3b2f10/EGS_LeagueofLegends_RiotGames_S1_2560x1440-80471666c140f790f28dff68d72c384b', 'approved'),
+(118, 'Genshin Impact', NULL, 'Step into Teyvat, a vast world teeming with life and flowing with elemental energy. You and your sibling arrived here from another world.', '0', NULL, NULL, 'RPG', '[\"Open World\",\"Anime\"]', 'miHoYo', 'miHoYo', '28 Sep, 2020', 4.6, 400000, 'https://cdn1.epicgames.com/offer/879b0d8776ab46a59a129983ba78f0ce/genshin-impact-1_2560x1440-5556236553d7b53d4b2767f4c54b3706', 'pending'),
+(119, 'FIFA 23', NULL, 'Experience The World\'s Game with 19,000+ players, 700+ teams, 100+ stadiums, and over 30 leagues.', '1090000', NULL, NULL, 'Sports', '[\"Football\",\"Multiplayer\"]', 'EA Canada', 'Electronic Arts', '30 Sep, 2022', 4, 100000, 'https://cdn.akamai.steamstatic.com/steam/apps/1811260/header.jpg', 'approved'),
+(120, 'NBA 2K23', NULL, 'Rise to the occasion and realize your full potential in NBA 2K23. Prove yourself against the best players in the world.', '1000000', NULL, NULL, 'Sports', '[\"Basketball\",\"Simulation\"]', 'Visual Concepts', '2K', '9 Sep, 2022', 3.8, 50000, 'https://cdn.akamai.steamstatic.com/steam/apps/1919590/header.jpg', 'approved'),
+(121, 'Sekiro: Shadows Die Twice', NULL, 'Carve your own clever path to vengeance in the award winning adventure from developer FromSoftware, creators of Bloodborne and the Dark Souls series.', '1290000', NULL, NULL, 'Action', '[\"Souls-like\",\"Difficult\"]', 'FromSoftware Inc.', 'Activision', '22 Mar, 2019', 4.9, 200000, 'https://cdn.akamai.steamstatic.com/steam/apps/814380/header.jpg', 'approved'),
+(122, 'Dark Souls III', NULL, 'Dark Souls III continues to push the boundaries with the latest, ambitious chapter in the critically-acclaimed and genre-defining series.', '990000', NULL, NULL, 'RPG', '[\"Souls-like\",\"Dark Fantasy\"]', 'FromSoftware Inc.', 'Bandai Namco Entertainment', '12 Apr, 2016', 4.8, 350000, 'https://cdn.akamai.steamstatic.com/steam/apps/374320/header.jpg', 'approved'),
+(123, 'Resident Evil 4 Remake', NULL, 'Survival is just the beginning. Six years have passed since the biological disaster in Raccoon City. Leon S. Kennedy, one of the survivors, tracks the president\'s kidnapped daughter to a secluded European village.', '1300000', NULL, NULL, 'Horror', '[\"Action\",\"Survival Horror\"]', 'CAPCOM Co., Ltd.', 'CAPCOM Co., Ltd.', '24 Mar, 2023', 4.9, 120000, 'https://cdn.akamai.steamstatic.com/steam/apps/2050650/header.jpg', 'approved'),
+(124, 'Silent Hill 2', NULL, 'Having received a letter from his deceased wife, James heads to where they shared so many memories, in the hope of seeing her one more time: Silent Hill.', '1100000', NULL, NULL, 'Horror', '[\"Psychological Horror\"]', 'Bloober Team SA', 'Konami Digital Entertainment', 'TBA', 4.5, 0, 'https://cdn.akamai.steamstatic.com/steam/apps/2124490/header.jpg', 'approved'),
+(125, 'Dead Space', NULL, 'The sci-fi survival horror classic Dead Space returns, completely rebuilt from the ground up to offer a deeper and more immersive experience.', '1000000', NULL, NULL, 'Horror', '[\"Sci-fi\",\"Survival Horror\"]', 'Motive', 'Electronic Arts', '27 Jan, 2023', 4.8, 30000, 'https://cdn.akamai.steamstatic.com/steam/apps/1693980/header.jpg', 'approved'),
+(126, 'Final Fantasy VII Remake', NULL, 'Cloud Strife, an ex-SOLDIER operative, descends on the mako-powered city of Midgar. The world of the timeless classic FINAL FANTASY VII is reborn.', '1700000', NULL, NULL, 'RPG', '[\"JRPG\",\"Story Rich\"]', 'Square Enix', 'Square Enix', '17 Jun, 2022', 4.7, 40000, 'https://cdn.akamai.steamstatic.com/steam/apps/1462040/header.jpg', 'approved');
 
 -- --------------------------------------------------------
 
@@ -325,10 +328,12 @@ CREATE TABLE `lib_game` (
 
 INSERT INTO `lib_game` (`Gid`, `libname`, `uid`) VALUES
 (103, 'Payed', 36),
+(104, 'Payed', 25),
 (107, 'Payed', 36),
 (109, 'Payed', 25),
 (114, 'Payed', 25),
 (115, 'Payed', 25),
+(119, 'Payed', 25),
 (124, 'Payed', 25);
 
 -- --------------------------------------------------------
@@ -354,13 +359,13 @@ CREATE TABLE `news` (
 --
 
 INSERT INTO `news` (`id`, `title`, `content`, `thumbnail`, `author_id`, `created_at`, `views`, `category`, `source`) VALUES
-(1, 'Giải đấu NextPlay Championship 2025 chính thức khởi tranh', 'Sự kiện eSports lớn nhất năm đã trở lại với tổng giải thưởng lên đến 1 tỷ đồng. Các đội tuyển hàng đầu sẽ tranh tài...', 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop', 25, '2025-12-01 08:00:00', 1220, 'Esports', 'NextPlay Esports'),
-(2, 'Top 10 game nhập vai đáng chơi nhất tháng 12', 'Tổng hợp những tựa game RPG đình đám vừa ra mắt. Danh sách bao gồm những cái tên được mong chờ nhất...', 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop', 25, '2025-11-28 09:30:00', 859, 'Review', 'GameK'),
-(3, 'Bản cập nhật mới của Cyber Future có gì hot?', 'Nhà phát triển vừa tung ra bản vá lỗi lớn cùng DLC mở rộng bản đồ. Người chơi sẽ được trải nghiệm khu vực mới...', 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-25 14:15:00', 2103, 'Tin Game', 'GenK'),
+(1, 'Giải đấu NextPlay Championship 2025 chính thức khởi tranh', 'Sự kiện eSports lớn nhất năm đã trở lại với tổng giải thưởng lên đến 1 tỷ đồng. Các đội tuyển hàng đầu sẽ tranh tài...', 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop', 25, '2025-12-01 08:00:00', 1229, 'Esports', 'NextPlay Esports'),
+(2, 'Top 10 game nhập vai đáng chơi nhất tháng 12', 'Tổng hợp những tựa game RPG đình đám vừa ra mắt. Danh sách bao gồm những cái tên được mong chờ nhất...', 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop', 25, '2025-11-28 09:30:00', 867, 'Review', 'GameK'),
+(3, 'Bản cập nhật mới của Cyber Future có gì hot?', 'Nhà phát triển vừa tung ra bản vá lỗi lớn cùng DLC mở rộng bản đồ. Người chơi sẽ được trải nghiệm khu vực mới...', 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-25 14:15:00', 2114, 'Tin Game', 'GenK'),
 (4, 'Hướng dẫn build PC chơi game giá rẻ năm 2025', 'Tối ưu hiệu năng trên giá thành với cấu hình PC gaming tầm trung. Chỉ với 15 triệu đồng, bạn có thể chiến tốt...', 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-20 10:00:00', 3501, 'Công nghệ', 'TinhTe'),
-(5, 'Review: Lost Kingdom - Siêu phẩm hay bom xịt?', 'Đánh giá chi tiết tựa game được mong chờ nhất năm. Cốt truyện sâu sắc nhưng gameplay còn nhiều sạn...', 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=2165&auto=format&fit=crop', 25, '2025-11-15 16:45:00', 1508, 'Review', 'Game4V'),
+(5, 'Review: Lost Kingdom - Siêu phẩm hay bom xịt?', 'Đánh giá chi tiết tựa game được mong chờ nhất năm. Cốt truyện sâu sắc nhưng gameplay còn nhiều sạn...', 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=2165&auto=format&fit=crop', 25, '2025-11-15 16:45:00', 1509, 'Review', 'Game4V'),
 (6, 'Cộng đồng game thủ Việt nói gì về sự kiện sắp tới?', 'Những ý kiến trái chiều xoay quanh việc thay đổi thể thức thi đấu. Nhiều người ủng hộ nhưng cũng không ít...', 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?q=80&w=2070&auto=format&fit=crop', 25, '2025-11-10 11:20:00', 501, 'Cộng đồng', 'ThanhNien'),
-(7, 'Sony công bố PlayStation 6: Cấu hình khủng khiếp', 'Những thông tin rò rỉ đầu tiên về thế hệ console tiếp theo. Sức mạnh xử lý đồ họa được nâng cấp gấp đôi...', 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?q=80&w=2000&auto=format&fit=crop', 25, '2025-11-05 08:30:00', 5001, 'Công nghệ', 'Sony'),
+(7, 'Sony công bố PlayStation 6: Cấu hình khủng khiếp', 'Những thông tin rò rỉ đầu tiên về thế hệ console tiếp theo. Sức mạnh xử lý đồ họa được nâng cấp gấp đôi...', 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?q=80&w=2000&auto=format&fit=crop', 25, '2025-11-05 08:30:00', 5002, 'Công nghệ', 'Sony'),
 (8, 'GTA VI lộ diện trailer mới: Đồ họa siêu thực', 'Rockstar Games tiếp tục khiến cộng đồng đứng ngồi không yên. Trailer mới hé lộ bối cảnh Vice City hiện đại...', 'https://images.unsplash.com/photo-1628260412297-a3377e45006f?q=80&w=2000&auto=format&fit=crop', 25, '2025-11-01 20:00:00', 8010, 'Tin Game', 'Rockstar');
 
 -- --------------------------------------------------------
@@ -371,24 +376,38 @@ INSERT INTO `news` (`id`, `title`, `content`, `thumbnail`, `author_id`, `created
 
 CREATE TABLE `pagecontent` (
   `id` int(11) NOT NULL,
-  `page_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `section_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content_value` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `page_key` varchar(50) NOT NULL,
+  `section_key` varchar(50) NOT NULL,
+  `content_key` varchar(50) NOT NULL,
+  `content_value` text DEFAULT NULL,
+  `content_type` varchar(20) DEFAULT 'text',
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `pagecontent`
 --
 
-INSERT INTO `pagecontent` (`id`, `page_key`, `section_key`, `content_value`, `updated_at`) VALUES
-(1, 'contact', 'address', '14/17 Khu phố Tây B, Dĩ An, TP.HCM', '2025-12-04 19:12:08'),
-(2, 'contact', 'email', 'support@nextplay.com', '2025-12-04 19:06:28'),
-(3, 'contact', 'hotline', '0948 467 394', '2025-12-04 19:12:22'),
-(4, 'contact', 'facebook', 'https://www.facebook.com/mintieeen/', '2025-12-04 19:13:31'),
-(5, 'contact', 'instagram', '#', '2025-12-04 19:06:28'),
-(6, 'contact', 'twitter', '#', '2025-12-04 19:06:28'),
-(7, 'contact', 'youtube', '#', '2025-12-04 19:06:28');
+INSERT INTO `pagecontent` (`id`, `page_key`, `section_key`, `content_key`, `content_value`, `content_type`, `updated_at`) VALUES
+(1, 'system', 'info', 'company_name', 'NextPlay - Nền tảng phân phối Game trực tuyến', 'text', '2025-12-08 04:50:30'),
+(2, 'system', 'info', 'slogan', 'Nơi hội tụ và trải nghiệm gaming được nâng tầm', 'text', '2025-12-08 03:27:26'),
+(3, 'system', 'info', 'address', '3 Bùi Đình Túy, Phường 26, Quận Bình Thạnh, TPHCM', 'text', '2025-12-08 03:27:26'),
+(4, 'system', 'info', 'hotline', '0916567359', 'text', '2025-12-08 04:18:18'),
+(5, 'system', 'info', 'email', 'info@nextplay.com', 'text', '2025-12-08 03:27:26'),
+(6, 'system', 'info', 'copyright', 'Copyright 2025 - Bản quyền thuộc về NextPlay', 'text', '2025-12-08 03:27:26'),
+(7, 'system', 'info', 'facebook_url', 'https://www.facebook.com/NextPlay', 'text', '2025-12-08 03:27:26'),
+(8, 'system', 'assets', 'logo', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1765169092/u8sb7uhqsfxiantai3g6.png', 'image', '2025-12-08 04:47:57'),
+(9, 'system', 'assets', 'favicon', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1765169110/btundz3pir2lv46emrk6.png', 'image', '2025-12-08 04:48:15'),
+(10, 'home', 'hero', 'title', 'Mang trải nghiệm tốt hơn đến bên bạn', 'text', '2025-12-08 04:17:06'),
+(11, 'home', 'hero', 'description', 'Từ việc làm chủ các cơ chế gameplay nâng cao đến việc rèn luyện phản xạ và khả năng ra quyết định, NextPlay mang đến những hiểu biết và chiến lược vô giá cho game thủ ở mọi cấp độ.', 'text', '2025-12-08 03:27:26'),
+(12, 'home', 'hero', 'badge_text', 'Manifest', 'text', '2025-12-08 03:27:26'),
+(13, 'home', 'hero', 'primary_btn_text', 'Đăng nhập', 'text', '2025-12-08 03:27:27'),
+(14, 'home', 'hero', 'primary_btn_url', '#contact', 'text', '2025-12-08 03:27:27'),
+(15, 'home', 'services', 'title', 'Dịch vụ', 'text', '2025-12-08 03:27:27'),
+(16, 'home', 'stats', 'stat_1_value', '100+', 'text', '2025-12-08 03:27:27'),
+(17, 'home', 'stats', 'stat_1_label', 'Game đa dạng', 'text', '2025-12-08 03:27:27'),
+(18, 'home', 'stats', 'stat_2_value', '50K+', 'text', '2025-12-08 03:27:27'),
+(19, 'home', 'stats', 'stat_2_label', 'Người chơi hoạt động', 'text', '2025-12-08 03:27:27');
 
 -- --------------------------------------------------------
 
@@ -453,7 +472,9 @@ CREATE TABLE `receives_feedback` (
 
 INSERT INTO `receives_feedback` (`feedback_time`, `customerid`, `Gid`, `publisherid`, `content`, `rating`) VALUES
 ('2025-12-04', 25, 103, NULL, 'game hay', 5),
-('2025-12-04', 25, 109, NULL, 'game hay', 5);
+('2025-12-04', 25, 109, NULL, 'game hay', 5),
+('2025-12-07', 25, 104, NULL, 'good', 5),
+('2025-12-07', 25, 124, NULL, 'ngu', 5);
 
 -- --------------------------------------------------------
 
@@ -481,7 +502,8 @@ INSERT INTO `review` (`customerid`, `news_id`, `review_time`, `content`, `rating
 (2, 3, '2025-12-02 00:25:45', 'Sony làm tốt lắm, PS6 chắc chắn sẽ hot.', 4),
 (2, 4, '2025-11-25 00:25:45', 'Thông tin rất chi tiết, 10 điểm.', 5),
 (2, 5, '2025-11-25 00:25:45', 'Thông tin rất chi tiết, 10 điểm.', 4),
-(25, 5, '2025-12-03 06:41:54', 'game cơ chế quá dở', 1),
+(25, 3, '2025-12-07 08:57:02', 'TQ thật xinh', 5),
+(25, 5, '2025-12-07 12:49:19', 'Hel.', 5),
 (25, 8, '2025-12-03 08:45:44', 'Game hay đáng để mong đợi', 5),
 (36, 1, '2025-12-04 16:12:27', 'ngu quá', 3);
 
@@ -516,7 +538,7 @@ INSERT INTO `user` (`uid`, `uname`, `avatar`, `email`, `password`, `DOB`, `lname
 (4, 'publisher1', NULL, 'pub1@example.com', 'pubpass', '1980-07-20', 'Publisher', 'One', 0, NULL, '2025-12-05 00:26:33'),
 (5, 'MinTieeen', NULL, 'randy2032005@gmail.com', '$2y$10$oFFceR6mwmh1vu8cVgKEnOht6sevmXIWyQFNnX8cAuKnmGCtmpyrG', '2005-03-20', 'Huỳnh', 'Minh Tiến', 0, NULL, '2025-12-05 00:26:33'),
 (7, 'minhtien', 'profile_7_692694190b0277.67205973.jpg', 'tien@gmail.com', '$2y$10$BDM4FPwU.KtfHRbU8i6QU.fO.U4TPKtTS9O7pwSSQR9K18JjOVDpe', '2005-03-20', 'Huỳnh', 'Minh Tiến', 0, NULL, '2025-12-05 00:26:33'),
-(9, 'minhtien203', 'profile_9_6927164961f507.19706739.jpg', 'tien203@gmail.com', '$2y$10$gfbgAHU1BFietHvs13TY5eAadhVOCyh4lQrLTUYLibFeCkKOir6uy', '2005-03-20', 'minh', 'tiến', 0, NULL, '2025-12-05 00:26:33'),
+(9, 'minhtien203', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1765139596/uhgj5vl2sdysesld0qqg.png', 'tien203@gmail.com', '$2y$10$gfbgAHU1BFietHvs13TY5eAadhVOCyh4lQrLTUYLibFeCkKOir6uy', '2005-03-20', 'minh', 'tiến', 0, NULL, '2025-12-05 00:26:33'),
 (10, 'lu', 'profile_10_692d0e41340c81.98419979.png', 'lu@gmail.com', '$2y$10$MBj8p3T4s13PZj.JhpKyNeeA86qPtgDaQwAtj2mwZaeVwAy5b8wzS', '2005-03-20', 'Lu', 'Lu', 0, NULL, '2025-12-05 00:26:33'),
 (24, 'testuser_692d6acf70bb9', NULL, 'test_692d6acf70bbc@example.com', '$2y$10$/wmV/kNdqQhkf/8B2GIvQuOeVTr57rvAbW5TYgDs1Lwg8ILP2HuMK', '2000-01-01', 'Test', 'User', 0, NULL, '2025-12-05 00:26:33'),
 (25, 'minhtien2005', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1764854901/gy3v8vrd6uoukelxbor6.jpg', 'randy2@gmail.com', '$2y$10$WMtFyXVGMod/qu6YLgk12uW8hcLZHEBmhKW3bEC.9xS3B4nAt3Tk.', '2005-03-20', 'Huỳnh Minh', 'Tiến', 0, NULL, '2025-12-05 00:26:33'),
@@ -528,7 +550,8 @@ INSERT INTO `user` (`uid`, `uname`, `avatar`, `email`, `password`, `DOB`, `lname
 (36, 'tien2032005', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1764863876/fkcvzvfkjhfnunx0uhcr.jpg', 'tien2032005@gmail.com', '$2y$10$WMtFyXVGMod/qu6YLgk12uW8hcLZHEBmhKW3bEC.9xS3B4nAt3Tk.', '2005-03-20', 'Minh', 'Tien', 0, NULL, '2025-12-05 00:26:33'),
 (37, 'MinhTien2032005', NULL, 'tien.huynhminhcse@hcmut.edu.vn', '$2y$10$td4ESCCLhfgViQLOmHfQQOypaQSidfhO75c3oEoS2S/.15ZiHNPvK', '2005-03-20', 'Huỳnh', 'Minh Tiến', 0, NULL, '2025-12-05 00:26:33'),
 (38, 'minhtien2003', NULL, 'rrr@gmail.com', '$2y$10$kiydZLU2f7f2afISytYZnujdB7O0Xm2ob./biT57EYgKoAumjnj7m', '2005-03-20', 'Minh', 'Tien', 7, '2025-12-04 21:51:16', '2025-12-05 00:37:48'),
-(39, 'mtienn', NULL, 'm@gmail.com', '$2y$10$OtEtM5G.MGzl08R3pT0CJOcaNnruj0xqoEh.iiC2Nvg.p5Gm94cKW', '2005-03-20', 'minh', 'tien', 6, '2025-12-05 17:32:24', '2025-12-05 22:35:40');
+(39, 'mtienn', NULL, 'm@gmail.com', '$2y$10$OtEtM5G.MGzl08R3pT0CJOcaNnruj0xqoEh.iiC2Nvg.p5Gm94cKW', '2005-03-20', 'minh', 'tien', 6, '2025-12-05 17:32:24', '2025-12-05 22:35:40'),
+(40, 'tienmup', NULL, 'huynhminhtien@gmail.com', '$2y$10$F2kENHG8DoXHESUlh8O4Zuc6tRYMoRZbU2rSjewOc2bFCezs6qZLK', '2005-09-07', 'hUỲNH', 'mINH', 0, NULL, '2025-12-07 19:13:58');
 
 -- --------------------------------------------------------
 
@@ -553,7 +576,8 @@ INSERT INTO `wishlist` (`uid`, `wishname`) VALUES
 (36, 'Cart'),
 (37, 'Cart'),
 (38, 'Cart'),
-(39, 'Cart');
+(39, 'Cart'),
+(40, 'Cart');
 
 -- --------------------------------------------------------
 
@@ -566,6 +590,13 @@ CREATE TABLE `wish_game` (
   `wishname` varchar(50) NOT NULL,
   `uid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `wish_game`
+--
+
+INSERT INTO `wish_game` (`Gid`, `wishname`, `uid`) VALUES
+(126, 'Cart', 25);
 
 --
 -- Indexes for dumped tables
@@ -655,7 +686,7 @@ ALTER TABLE `news`
 --
 ALTER TABLE `pagecontent`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_content` (`page_key`,`section_key`);
+  ADD UNIQUE KEY `unique_content` (`page_key`,`section_key`,`content_key`);
 
 --
 -- Indexes for table `pages`
@@ -714,7 +745,7 @@ ALTER TABLE `wish_game`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -732,13 +763,13 @@ ALTER TABLE `contactmessages`
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `faqs`
 --
 ALTER TABLE `faqs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `game`
@@ -756,7 +787,7 @@ ALTER TABLE `news`
 -- AUTO_INCREMENT for table `pagecontent`
 --
 ALTER TABLE `pagecontent`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `pages`
@@ -774,7 +805,7 @@ ALTER TABLE `publisher`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- Constraints for dumped tables

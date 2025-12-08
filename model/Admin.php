@@ -1,7 +1,7 @@
 <?php
 class Admin {
     private $conn;
-    private $table_name = "`Admin`";
+    private $table_name = "`admin`";
 
     public $uid;
     public $startdate;

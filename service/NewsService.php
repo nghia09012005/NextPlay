@@ -1,117 +1,84 @@
 <?php
 require_once __DIR__ . '/../model/News.php';
-require_once __DIR__ . '/../model/Review.php';
 
 class NewsService {
-    private $newsModel;
-    private $reviewModel;
+    private $db;
+    private $news;
 
     public function __construct($db) {
-        $this->newsModel = new News($db);
-        $this->reviewModel = new Review($db);
+        $this->db = $db;
+        $this->news = new News($db);
     }
 
-    public function getAllNews() {
-        return $this->newsModel->getAllNews();
-    }
-
-    public function getNewsById($id) {
-        $news = $this->newsModel->getNewsById($id);
-        if ($news) {
-            // Get reviews as comments
-            $stmt = $this->reviewModel->readByNews($id);
-            $news['comments'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-        return $news;
-    }
-
-    public function createNews($data) {
-        // Validate required fields
-        $requiredFields = [
-            'title' => 'string',
-            'content' => 'string',
-            'author_id' => 'integer'
-        ];
+    public function getAll() {
+        $stmt = $this->news->readAll();
+        $num = $stmt->rowCount();
+        $news_arr = array();
         
-        $errors = [];
-        
-        foreach ($requiredFields as $field => $type) {
-            if (!isset($data[$field]) || $data[$field] === '') {
-                $errors[] = "The $field field is required";
-            } elseif ($type === 'integer' && !is_numeric($data[$field])) {
-                $errors[] = "The $field must be a number";
-            } elseif ($type === 'string' && !is_string($data[$field])) {
-                $errors[] = "The $field must be a string";
+        if($num > 0) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $news_item = array(
+                    "id" => $id,
+                    "title" => $title,
+                    "content" => html_entity_decode($content),
+                    "thumbnail" => $thumbnail,
+                    "author_id" => $author_id,
+                    "created_at" => $created_at,
+                    "views" => $views,
+                    "category" => $category,
+                    "source" => $source
+                );
+                array_push($news_arr, $news_item);
             }
         }
-        
-        if (!empty($errors)) {
-            throw new Exception(implode(', ', $errors));
+        return $news_arr;
+    }
+
+    public function getOne($id) {
+        $this->news->id = $id;
+        $stmt = $this->news->readOne();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if($row) {
+            return $row;
         }
-        
-        // Sanitize and prepare data
-        $newsData = [
-            'title' => trim($data['title']),
-            'content' => trim($data['content']),
-            'author_id' => (int)$data['author_id'],
-            'thumbnail' => isset($data['thumbnail']) ? trim($data['thumbnail']) : null,
-            'created_at' => date('Y-m-d H:i:s')
-        ];
-        
-        // Additional validation
-        if (strlen($newsData['title']) < 5) {
-            throw new Exception('Title must be at least 5 characters long');
+        return null;
+    }
+
+    public function create($data) {
+        $this->news->title = $data->title;
+        $this->news->content = $data->content;
+        $this->news->thumbnail = $data->thumbnail;
+        $this->news->author_id = $data->author_id ?? 1; // Default author
+        $this->news->category = $data->category;
+        $this->news->source = $data->source;
+
+        if($this->news->create()) {
+            return true;
         }
-        
-        if (strlen($newsData['content']) < 10) {
-            throw new Exception('Content must be at least 10 characters long');
+        return false;
+    }
+
+    public function update($id, $data) {
+        $this->news->id = $id;
+        $this->news->title = $data->title;
+        $this->news->content = $data->content;
+        $this->news->thumbnail = $data->thumbnail;
+        $this->news->category = $data->category;
+        $this->news->source = $data->source;
+
+        if($this->news->update()) {
+            return true;
         }
-        
-        return $this->newsModel->createNews($newsData);
+        return false;
     }
 
-    public function updateNews($id, $data) {
-        if (empty($data['author_id'])) {
-            throw new Exception("Author ID is required");
+    public function delete($id) {
+        $this->news->id = $id;
+        if($this->news->delete()) {
+            return true;
         }
-        return $this->newsModel->updateNews($id, $data);
-    }
-
-    public function deleteNews($id, $author_id) {
-        return $this->newsModel->deleteNews($id, $author_id);
-    }
-
-    public function addComment($data) {
-        // Add a default rating since it's required by the Review model
-        $data['rating'] = $data['rating'] ?? 5; // Default to 5 if not provided
-        
-        // Set the review data
-        $this->reviewModel->customerid = $data['customerid'];
-        $this->reviewModel->news_id = $data['news_id'];
-        $this->reviewModel->content = $data['content'];
-        $this->reviewModel->rating = $data['rating'];
-        
-        // Create the review (comment)
-        return $this->reviewModel->create();
-    }
-
-    public function getNewsComments($news_id) {
-        $stmt = $this->reviewModel->readByNews($news_id);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function deleteComment($news_id, $user_id) {
-        // Delete the review directly using composite key
-        $this->reviewModel->customerid = $user_id;
-        $this->reviewModel->news_id = $news_id;
-        return $this->reviewModel->delete();
-    }
-
-    private function isAdmin($user_id) {
-        // Implement admin check logic here
-        // This is a placeholder - you'll need to implement actual admin check
-        // For example, check if user has admin role in the database
         return false;
     }
 }
-?>

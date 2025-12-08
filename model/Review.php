@@ -38,7 +38,28 @@ class Review {
         return $stmt;
     }
 
-    // CREATE review
+    // GET all reviews (Admin)
+    public function readAll() {
+        // Assume 'user' table name is `user` (lowercase) based on User.php. But User class uses `user`
+        // However Review.php calls table `Review` (PascalCase?).
+        // Let's check database queries elsewhere. User.php: `user`. News model: `news`?
+        // SQL join in readByNews uses `User` (backticked in original file... no `User` U).
+        // Check line 19/20 of original: `FROM {$this->table_name} R JOIN User U`.
+        // User.php says `private $table_name = "user";` (line 4).
+        // I will use `user` (lowercase) to match User.php or `User` if SQL is case insensitive on Windows (it is).
+        // Optimally use `user`.
+        
+        $query = "SELECT R.*, U.uname, U.avatar, N.title as news_title,
+                  (CASE WHEN U.lockout_time IS NOT NULL AND U.lockout_time > NOW() THEN 1 ELSE 0 END) as is_locked
+                  FROM {$this->table_name} R
+                  JOIN `user` U ON U.uid = R.customerid
+                  JOIN `news` N ON N.id = R.news_id
+                  ORDER BY R.review_time DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
     public function create() {
         $query = "INSERT INTO {$this->table_name} 
                  (customerid, news_id, content, rating) 

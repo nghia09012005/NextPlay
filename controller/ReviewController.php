@@ -15,6 +15,22 @@ class ReviewController {
         echo json_encode($data);
     }
 
+    // Get all reviews (Admin)
+    public function getAll() {
+        try {
+            $reviews = $this->reviewService->getAll();
+            $this->jsonResponse(200, [
+                'status' => 'success',
+                'data' => $reviews
+            ]);
+        } catch (Exception $e) {
+            $this->jsonResponse(500, [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     // Get all reviews for a news article
     public function getNewsReviews($news_id) {
         try {

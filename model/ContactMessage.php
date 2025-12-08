@@ -1,7 +1,7 @@
 <?php
 class ContactMessage {
     private $conn;
-    private $table_name = "ContactMessages";
+    private $table_name = "`Contactmessages`";
 
     public $id;
     public $name;

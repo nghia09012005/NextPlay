@@ -20,6 +20,12 @@ class ReviewService {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Get all reviews (Admin)
+    public function getAll() {
+        $stmt = $this->reviewModel->readAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     // Add or update a review
     public function saveReview($data) {
         // Validate required fields
