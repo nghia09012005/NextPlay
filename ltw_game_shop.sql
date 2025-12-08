@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Dec 08, 2025 at 07:48 AM
+-- Generation Time: Dec 08, 2025 at 11:43 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.4
 
@@ -124,7 +124,8 @@ CREATE TABLE `contactmessages` (
 --
 
 INSERT INTO `contactmessages` (`id`, `name`, `email`, `subject`, `message`, `status`, `created_at`) VALUES
-(1, 'Huỳnh Minh Tiến', 'randy2032005@gmail.com', 'Báo cáo sự cố kỹ thuật', 'Admin ơi hãy sửa lại giúp em với, ban đầu em định nạp 50000 nhưng mà lỡ bấm lộn thành 500000 giờ má em chửi em quá trời, có cách nào để trả lại tiền cho em được không. Em cảm ơn!!!', 'read', '2025-12-04 19:03:10');
+(1, 'Huỳnh Minh Tiến', 'randy2032005@gmail.com', 'Báo cáo sự cố kỹ thuật', 'Admin ơi hãy sửa lại giúp em với, ban đầu em định nạp 50000 nhưng mà lỡ bấm lộn thành 500000 giờ má em chửi em quá trời, có cách nào để trả lại tiền cho em được không. Em cảm ơn!!!', 'read', '2025-12-04 19:03:10'),
+(2, 'Huỳnh Minh Tiến', 'randy2@gmail.com', 'web lỗi', 'agihadgchsdbviuks', 'read', '2025-12-08 08:12:41');
 
 -- --------------------------------------------------------
 
@@ -155,10 +156,11 @@ INSERT INTO `customer` (`uid`, `balance`) VALUES
 (29, '100.00'),
 (31, '0.00'),
 (36, '8845000.00'),
-(37, '0.00'),
+(37, '500000.00'),
 (38, '0.00'),
 (39, '0.00'),
-(40, '0.00');
+(40, '0.00'),
+(42, '0.00');
 
 -- --------------------------------------------------------
 
@@ -238,7 +240,7 @@ INSERT INTO `game` (`Gid`, `name`, `version`, `description`, `price`, `adminid`,
 (115, 'Minecraft', NULL, 'Prepare for an adventure of limitless possibilities as you build, mine, battle mobs, and explore the ever-changing Minecraft landscape.', '650000', NULL, NULL, 'Simulation', '[\"Sandbox\",\"Survival\"]', 'Mojang Studios', 'Xbox Game Studios', '18 Nov, 2011', 4.8, 900000, 'https://image.api.playstation.com/vulcan/img/rnd/202010/2618/w48z6bzefZPrRcJHc7L8SO66.png', 'approved'),
 (116, 'Valorant', NULL, 'Blend your style and experience on a global, competitive stage. You have 13 rounds to attack and defend your side using sharp gunplay and tactical abilities.', '0', NULL, NULL, 'FPS', '[\"Multiplayer\",\"Tactical\"]', 'Riot Games', 'Riot Games', '2 Jun, 2020', 4.4, 300000, 'https://cdn.dribbble.com/users/2340268/screenshots/11924683/media/4c029671954593683833230552733979.jpg', 'rejected'),
 (117, 'League of Legends', NULL, 'League of Legends is a team-based game with over 140 champions to make epic plays with.', '0', NULL, NULL, 'MOBA', '[\"Multiplayer\",\"Strategy\"]', 'Riot Games', 'Riot Games', '27 Oct, 2009', 4.5, 800000, 'https://cdn1.epicgames.com/offer/24b9b5e323bc40eea252a10cdd3b2f10/EGS_LeagueofLegends_RiotGames_S1_2560x1440-80471666c140f790f28dff68d72c384b', 'approved'),
-(118, 'Genshin Impact', NULL, 'Step into Teyvat, a vast world teeming with life and flowing with elemental energy. You and your sibling arrived here from another world.', '0', NULL, NULL, 'RPG', '[\"Open World\",\"Anime\"]', 'miHoYo', 'miHoYo', '28 Sep, 2020', 4.6, 400000, 'https://cdn1.epicgames.com/offer/879b0d8776ab46a59a129983ba78f0ce/genshin-impact-1_2560x1440-5556236553d7b53d4b2767f4c54b3706', 'pending'),
+(118, 'Genshin Impact', NULL, 'Step into Teyvat, a vast world teeming with life and flowing with elemental energy. You and your sibling arrived here from another world.', '0', NULL, NULL, 'RPG', '[\"Open World\",\"Anime\"]', 'miHoYo', 'miHoYo', '28 Sep, 2020', 4.6, 400000, 'https://cdn1.epicgames.com/offer/879b0d8776ab46a59a129983ba78f0ce/genshin-impact-1_2560x1440-5556236553d7b53d4b2767f4c54b3706', 'approved'),
 (119, 'FIFA 23', NULL, 'Experience The World\'s Game with 19,000+ players, 700+ teams, 100+ stadiums, and over 30 leagues.', '1090000', NULL, NULL, 'Sports', '[\"Football\",\"Multiplayer\"]', 'EA Canada', 'Electronic Arts', '30 Sep, 2022', 4, 100000, 'https://cdn.akamai.steamstatic.com/steam/apps/1811260/header.jpg', 'approved'),
 (120, 'NBA 2K23', NULL, 'Rise to the occasion and realize your full potential in NBA 2K23. Prove yourself against the best players in the world.', '1000000', NULL, NULL, 'Sports', '[\"Basketball\",\"Simulation\"]', 'Visual Concepts', '2K', '9 Sep, 2022', 3.8, 50000, 'https://cdn.akamai.steamstatic.com/steam/apps/1919590/header.jpg', 'approved'),
 (121, 'Sekiro: Shadows Die Twice', NULL, 'Carve your own clever path to vengeance in the award winning adventure from developer FromSoftware, creators of Bloodborne and the Dark Souls series.', '1290000', NULL, NULL, 'Action', '[\"Souls-like\",\"Difficult\"]', 'FromSoftware Inc.', 'Activision', '22 Mar, 2019', 4.9, 200000, 'https://cdn.akamai.steamstatic.com/steam/apps/814380/header.jpg', 'approved'),
@@ -308,7 +310,8 @@ INSERT INTO `library` (`uid`, `libname`) VALUES
 (1, 'MyLibrary'),
 (2, 'JaneLib'),
 (25, 'Payed'),
-(36, 'Payed');
+(36, 'Payed'),
+(37, 'Payed');
 
 -- --------------------------------------------------------
 
@@ -371,68 +374,6 @@ INSERT INTO `news` (`id`, `title`, `content`, `thumbnail`, `author_id`, `created
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pagecontent`
---
-
-CREATE TABLE `pagecontent` (
-  `id` int(11) NOT NULL,
-  `page_key` varchar(50) NOT NULL,
-  `section_key` varchar(50) NOT NULL,
-  `content_key` varchar(50) NOT NULL,
-  `content_value` text DEFAULT NULL,
-  `content_type` varchar(20) DEFAULT 'text',
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `pagecontent`
---
-
-INSERT INTO `pagecontent` (`id`, `page_key`, `section_key`, `content_key`, `content_value`, `content_type`, `updated_at`) VALUES
-(1, 'system', 'info', 'company_name', 'NextPlay - Nền tảng phân phối Game trực tuyến', 'text', '2025-12-08 04:50:30'),
-(2, 'system', 'info', 'slogan', 'Nơi hội tụ và trải nghiệm gaming được nâng tầm', 'text', '2025-12-08 03:27:26'),
-(3, 'system', 'info', 'address', '3 Bùi Đình Túy, Phường 26, Quận Bình Thạnh, TPHCM', 'text', '2025-12-08 03:27:26'),
-(4, 'system', 'info', 'hotline', '0916567359', 'text', '2025-12-08 04:18:18'),
-(5, 'system', 'info', 'email', 'info@nextplay.com', 'text', '2025-12-08 03:27:26'),
-(6, 'system', 'info', 'copyright', 'Copyright 2025 - Bản quyền thuộc về NextPlay', 'text', '2025-12-08 03:27:26'),
-(7, 'system', 'info', 'facebook_url', 'https://www.facebook.com/NextPlay', 'text', '2025-12-08 03:27:26'),
-(8, 'system', 'assets', 'logo', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1765169092/u8sb7uhqsfxiantai3g6.png', 'image', '2025-12-08 04:47:57'),
-(9, 'system', 'assets', 'favicon', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1765169110/btundz3pir2lv46emrk6.png', 'image', '2025-12-08 04:48:15'),
-(10, 'home', 'hero', 'title', 'Mang trải nghiệm tốt hơn đến bên bạn', 'text', '2025-12-08 04:17:06'),
-(11, 'home', 'hero', 'description', 'Từ việc làm chủ các cơ chế gameplay nâng cao đến việc rèn luyện phản xạ và khả năng ra quyết định, NextPlay mang đến những hiểu biết và chiến lược vô giá cho game thủ ở mọi cấp độ.', 'text', '2025-12-08 03:27:26'),
-(12, 'home', 'hero', 'badge_text', 'Manifest', 'text', '2025-12-08 03:27:26'),
-(13, 'home', 'hero', 'primary_btn_text', 'Đăng nhập', 'text', '2025-12-08 03:27:27'),
-(14, 'home', 'hero', 'primary_btn_url', '#contact', 'text', '2025-12-08 03:27:27'),
-(15, 'home', 'services', 'title', 'Dịch vụ', 'text', '2025-12-08 03:27:27'),
-(16, 'home', 'stats', 'stat_1_value', '100+', 'text', '2025-12-08 03:27:27'),
-(17, 'home', 'stats', 'stat_1_label', 'Game đa dạng', 'text', '2025-12-08 03:27:27'),
-(18, 'home', 'stats', 'stat_2_value', '50K+', 'text', '2025-12-08 03:27:27'),
-(19, 'home', 'stats', 'stat_2_label', 'Người chơi hoạt động', 'text', '2025-12-08 03:27:27');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pages`
---
-
-CREATE TABLE `pages` (
-  `id` int(11) NOT NULL,
-  `slug` varchar(50) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`content`)),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `pages`
---
-
-INSERT INTO `pages` (`id`, `slug`, `title`, `content`, `updated_at`) VALUES
-(1, 'about', 'Về Chúng Tôi', '{\"hero_title\":\"NEXTPLAY - KỶ NGUYÊN GAME MỚI\",\"hero_subtitle\":\"Nơi đam mê hội tụ, nơi game thủ tỏa sáng. Chúng tôi không chỉ bán game, chúng tôi kiến tạo trải nghiệm.\",\"intro_title\":\"Sứ Mệnh Của Chúng Tôi\",\"intro_text\":\"NextPlay ra đời với sứ mệnh kết nối cộng đồng game thủ Việt Nam với những tựa game đỉnh cao thế giới. Chúng tôi cam kết mang đến nền tảng phân phối game bản quyền uy tín, tốc độ và giá cả hợp lý nhất. Hơn cả một cửa hàng, NextPlay là ngôi nhà chung cho những ai yêu thích thế giới ảo, nơi bạn có thể tìm thấy niềm vui, sự thử thách và những người bạn đồng hành.\",\"intro_image\":\"https:\\/\\/images.unsplash.com\\/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop\",\"features\":[{\"title\":\"Kho Game Khổng Lồ\",\"desc\":\"Hàng ngàn tựa game AAA và Indie được cập nhật liên tục, đáp ứng mọi gu chơi game.\",\"icon\":\"bi-controller\"},{\"title\":\"Bảo Mật Tuyệt Đối\",\"desc\":\"Hệ thống thanh toán và bảo vệ tài khoản chuẩn quốc tế, an tâm tuyệt đối khi giao dịch.\",\"icon\":\"bi-shield-check\"},{\"title\":\"Hỗ Trợ 24\\/7\",\"desc\":\"Đội ngũ hỗ trợ nhiệt tình, chuyên nghiệp, sẵn sàng giải đáp mọi thắc mắc bất kể ngày đêm.\",\"icon\":\"bi-headset\"}],\"stats\":[{\"value\":\"10K+\",\"label\":\"Người dùng tin tưởng\"},{\"value\":\"500+\",\"label\":\"Tựa game bản quyền\"},{\"value\":\"99%\",\"label\":\"Đánh giá hài lòng\"}]}', '2025-12-02 15:17:23');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `publisher`
 --
 
@@ -449,7 +390,8 @@ CREATE TABLE `publisher` (
 
 INSERT INTO `publisher` (`uid`, `description`, `taxcode`, `location`) VALUES
 (4, 'Top game publisher', 'TX12345', 'New York'),
-(30, '11', '1234567891011', '11');
+(30, '11', '1234567891011', '11'),
+(41, 'aaa', '1234567891011', 'tp.HCM');
 
 -- --------------------------------------------------------
 
@@ -505,7 +447,29 @@ INSERT INTO `review` (`customerid`, `news_id`, `review_time`, `content`, `rating
 (25, 3, '2025-12-07 08:57:02', 'TQ thật xinh', 5),
 (25, 5, '2025-12-07 12:49:19', 'Hel.', 5),
 (25, 8, '2025-12-03 08:45:44', 'Game hay đáng để mong đợi', 5),
-(36, 1, '2025-12-04 16:12:27', 'ngu quá', 3);
+(36, 1, '2025-12-04 16:12:27', 'ngu quá', 3),
+(37, 1, '2025-12-08 08:55:14', 'aaa hay quá, chắc dui lắm nè', 5);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system_settings`
+--
+
+CREATE TABLE `system_settings` (
+  `setting_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `setting_value` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL CHECK (json_valid(`setting_value`)),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `system_settings`
+--
+
+INSERT INTO `system_settings` (`setting_key`, `setting_value`, `updated_at`) VALUES
+('about_us', '{\"hero\":{\"title\":\"NEXTPLAY - KỶ NGUYÊN GAME MỚI\",\"subtitle\":\"Nơi đam mê hội tụ, nơi game thủ tỏa sáng. Chúng tôi không chỉ bán game, chúng tôi kiến tạo trải nghiệm.\"},\"intro\":{\"title\":\"Sứ Mệnh\",\"content\":\"NextPlay ra đời với sứ mệnh kết nối cộng đồng game thủ Việt Nam với những tựa game đỉnh cao thế giới. Chúng tôi cam kết mang đến nền tảng phân phối game bản quyền uy tín, tốc độ và giá cả hợp lý nhất. Hơn cả một cửa hàng, NextPlay là ngôi nhà chung cho những ai yêu thích thế giới ảo, nơi bạn có thể tìm thấy niềm vui, sự thử thách và những người bạn đồng hành.\",\"image\":\"https:\\/\\/res.cloudinary.com\\/dlmaw4de5\\/image\\/upload\\/v1765189959\\/e2x9xnfltsgap0uob9tw.jpg\"},\"stats\":[{\"value\":\"10K+\",\"label\":\"Người dùng tin tưởng\"},{\"value\":\"500+\",\"label\":\"Tựa game bản quyền\"},{\"value\":\"99%\",\"label\":\"Đánh giá hài lòng\"}],\"features\":[{\"title\":\"Kho Game Khổng Lồ\",\"desc\":\"Hàng ngàn tựa game AAA và Indie được cập nhật liên tục, đáp ứng mọi gu chơi game.\",\"icon\":\"bi-controller\"},{\"title\":\"Bảo Mật Tuyệt Đối\",\"desc\":\"Hệ thống thanh toán và bảo vệ tài khoản chuẩn quốc tế, an tâm tuyệt đối khi giao dịch.\",\"icon\":\"bi-shield-check\"},{\"title\":\"Hỗ Trợ 24\\/7\",\"desc\":\"Đội ngũ hỗ trợ nhiệt tình, chuyên nghiệp, sẵn sàng giải đáp mọi thắc mắc bất kể ngày đêm.\",\"icon\":\"bi-headset\"}]}', '2025-12-08 10:36:04'),
+('general', '{\"company_name\":\"NextPlay\",\"slogan\":\"Nơi hội tụ và trải nghiệm gaming được nâng tầm, biết rồi\",\"logo\":\"https:\\/\\/res.cloudinary.com\\/dlmaw4de5\\/image\\/upload\\/v1765188993\\/czlqopb4aclzlrojvuft.png\",\"contact\":{\"address\":\"Trường Đại học Bách khoa - ĐHQG TP.HCM - 268 Lý Thường Kiệt\",\"email\":\"info@nextplay.com\",\"hotline\":\"0916567359\",\"facebook\":\"https:\\/\\/www.facebook.com\\/NextPlay\",\"twitter\":\"\",\"instagram\":\"\"},\"favicon\":\"https:\\/\\/res.cloudinary.com\\/dlmaw4de5\\/image\\/upload\\/v1765169110\\/btundz3pir2lv46emrk6.png\"}', '2025-12-08 10:32:03'),
+('home_config', '{\"hero\":{\"title\":\"NextPlay\",\"description\":\"Từ việc làm chủ các cơ chế gameplay nâng cao đến việc rèn luyện phản xạ và khả năng ra quyết định, NextPlay mang đến những hiểu biết và chiến lược vô giá cho game thủ ở mọi cấp độ.\",\"badge\":\"Manifest\",\"btn_text\":\"Khám phá ngay\",\"btn_url\":\"\\/products\\/index.html\"},\"stats\":{\"stat_1_value\":\"100+\",\"stat_1_label\":\"Game đa dạng\",\"stat_2_value\":\"50K+\",\"stat_2_label\":\"Người chơi hoạt động\",\"stat_3_value\":\"\",\"stat_3_label\":\"\",\"stat_4_value\":\"\",\"stat_4_label\":\"\"},\"services\":{\"title\":\"Dịch vụ\"}}', '2025-12-08 10:31:07');
 
 -- --------------------------------------------------------
 
@@ -532,7 +496,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`uid`, `uname`, `avatar`, `email`, `password`, `DOB`, `lname`, `fname`, `failed_attempts`, `lockout_time`, `password_changed_at`) VALUES
-(1, 'john_doe', 'avatar1.png', 'john@example.com', 'pass123', '1990-01-01', 'Doe', 'John', 0, NULL, '2025-12-05 00:26:33'),
+(1, 'john_doe', 'avatar1.png', 'john@example.com', 'pass123', '1990-01-01', 'Doe', 'John', 0, '2025-12-08 09:22:43', '2025-12-05 00:26:33'),
 (2, 'jane_smith', 'avatar2.png', 'jane@example.com', 'pass456', '1992-05-10', 'Smith', 'Jane', 0, NULL, '2025-12-05 00:26:33'),
 (3, 'admin1', NULL, 'admin1@example.com', 'adminpass', '1985-03-15', 'Admin', 'One', 0, NULL, '2025-12-05 00:26:33'),
 (4, 'publisher1', NULL, 'pub1@example.com', 'pubpass', '1980-07-20', 'Publisher', 'One', 0, NULL, '2025-12-05 00:26:33'),
@@ -548,10 +512,12 @@ INSERT INTO `user` (`uid`, `uname`, `avatar`, `email`, `password`, `DOB`, `lname
 (30, 'MinhTien Studio', NULL, 'mtienn@gmail.com', '$2y$10$Mt8geAaY0qHcciJftJikkO/8cqk6FLZWczA.vWtHQ2xxXNpoXOXFG', '2005-03-20', 'Huỳnh Minh', 'Tiến', 0, NULL, '2025-12-05 00:26:33'),
 (31, 'tien', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1764863096/p2amdbvwoazomtgidzfi.jpg', 'tien2005@gmail.com', '$2y$10$WMtFyXVGMod/qu6YLgk12uW8hcLZHEBmhKW3bEC.9xS3B4nAt3Tk.', '2005-03-20', 'Minh', 'Tien', 0, NULL, '2025-12-05 00:26:33'),
 (36, 'tien2032005', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1764863876/fkcvzvfkjhfnunx0uhcr.jpg', 'tien2032005@gmail.com', '$2y$10$WMtFyXVGMod/qu6YLgk12uW8hcLZHEBmhKW3bEC.9xS3B4nAt3Tk.', '2005-03-20', 'Minh', 'Tien', 0, NULL, '2025-12-05 00:26:33'),
-(37, 'MinhTien2032005', NULL, 'tien.huynhminhcse@hcmut.edu.vn', '$2y$10$td4ESCCLhfgViQLOmHfQQOypaQSidfhO75c3oEoS2S/.15ZiHNPvK', '2005-03-20', 'Huỳnh', 'Minh Tiến', 0, NULL, '2025-12-05 00:26:33'),
+(37, 'MinhTien2032005', 'https://res.cloudinary.com/dlmaw4de5/image/upload/v1765183326/cuwcv3h0lppzmmt5rglw.png', 'tien.huynhminhcse@hcmut.edu.vn', '$2y$10$CC1LvEnkgNiDYpBkECFtD.75rW9nFbpqWOIDuh./C.HAkFMfs5qS6', '2005-03-20', 'Huỳnh', 'Minh Tiến', 0, NULL, '2025-12-08 15:45:59'),
 (38, 'minhtien2003', NULL, 'rrr@gmail.com', '$2y$10$kiydZLU2f7f2afISytYZnujdB7O0Xm2ob./biT57EYgKoAumjnj7m', '2005-03-20', 'Minh', 'Tien', 7, '2025-12-04 21:51:16', '2025-12-05 00:37:48'),
 (39, 'mtienn', NULL, 'm@gmail.com', '$2y$10$OtEtM5G.MGzl08R3pT0CJOcaNnruj0xqoEh.iiC2Nvg.p5Gm94cKW', '2005-03-20', 'minh', 'tien', 6, '2025-12-05 17:32:24', '2025-12-05 22:35:40'),
-(40, 'tienmup', NULL, 'huynhminhtien@gmail.com', '$2y$10$F2kENHG8DoXHESUlh8O4Zuc6tRYMoRZbU2rSjewOc2bFCezs6qZLK', '2005-09-07', 'hUỲNH', 'mINH', 0, NULL, '2025-12-07 19:13:58');
+(40, 'tienmup', NULL, 'huynhminhtien@gmail.com', '$2y$10$F2kENHG8DoXHESUlh8O4Zuc6tRYMoRZbU2rSjewOc2bFCezs6qZLK', '2005-09-07', 'hUỲNH', 'mINH', 0, NULL, '2025-12-07 19:13:58'),
+(41, 'TienTienStudio', NULL, 'minhtien2032005@gmail.com', '$2y$10$BKnsEjRazChEAc5AhHrUz.i10FAB8fmdK2osqj.E1xujl/z8tgn7y', '2005-03-20', 'Huỳnh Minh', 'Tiến', 0, NULL, '2025-12-08 14:42:15'),
+(42, 't', NULL, 't@gmail.com', '$2y$10$77lIXvtCTAHFYpXTjjqWHu2VjcdO5DQ1zAo1RZN0LpUXUmpH8QeBi', '2005-03-20', 'hhh', 'ttt', 0, NULL, '2025-12-08 15:08:44');
 
 -- --------------------------------------------------------
 
@@ -577,7 +543,8 @@ INSERT INTO `wishlist` (`uid`, `wishname`) VALUES
 (37, 'Cart'),
 (38, 'Cart'),
 (39, 'Cart'),
-(40, 'Cart');
+(40, 'Cart'),
+(42, 'Cart');
 
 -- --------------------------------------------------------
 
@@ -682,20 +649,6 @@ ALTER TABLE `news`
   ADD KEY `author_id` (`author_id`);
 
 --
--- Indexes for table `pagecontent`
---
-ALTER TABLE `pagecontent`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_content` (`page_key`,`section_key`,`content_key`);
-
---
--- Indexes for table `pages`
---
-ALTER TABLE `pages`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `slug` (`slug`);
-
---
 -- Indexes for table `publisher`
 --
 ALTER TABLE `publisher`
@@ -716,6 +669,12 @@ ALTER TABLE `receives_feedback`
 ALTER TABLE `review`
   ADD PRIMARY KEY (`customerid`,`news_id`),
   ADD KEY `news_id` (`news_id`);
+
+--
+-- Indexes for table `system_settings`
+--
+ALTER TABLE `system_settings`
+  ADD PRIMARY KEY (`setting_key`);
 
 --
 -- Indexes for table `user`
@@ -757,19 +716,19 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `contactmessages`
 --
 ALTER TABLE `contactmessages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `faqs`
 --
 ALTER TABLE `faqs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `game`
@@ -784,28 +743,16 @@ ALTER TABLE `news`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT for table `pagecontent`
---
-ALTER TABLE `pagecontent`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
-
---
--- AUTO_INCREMENT for table `pages`
---
-ALTER TABLE `pages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
 -- AUTO_INCREMENT for table `publisher`
 --
 ALTER TABLE `publisher`
-  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- Constraints for dumped tables
