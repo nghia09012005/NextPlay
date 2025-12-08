@@ -63,6 +63,10 @@ $pageController = new PageController();
 $contactController = new ContactController($db);
 $pageContentController = new PageContentController($db);
 $faqController = new FaqController($db);
+require_once __DIR__ . '/controller/SystemSettingController.php';
+$systemSettingController = new SystemSettingController();
+
+
 
 $base_path = '/BTL_LTW/BTL_LTW_BE';
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -79,6 +83,14 @@ $request_uri = preg_replace('|^/index\.php|', '', $request_uri);
 error_log("After index.php strip: " . $request_uri);
 
 $uri = array_values(array_filter(explode('/', trim($request_uri, '/'))));
+
+// Handle system settings endpoints
+if (isset($uri[0]) && $uri[0] === 'settings') {
+    require_once __DIR__ . '/controller/SystemSettingController.php';
+    $systemSettingController = new SystemSettingController();
+    $systemSettingController->handleRequest($_SERVER['REQUEST_METHOD'], $uri);
+    exit();
+}
 
 // // Debug
 // echo "Request URI: " . $request_uri . "<br>";

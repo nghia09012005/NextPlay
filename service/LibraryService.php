@@ -206,7 +206,7 @@ class LibraryService {
             
             // Check if balance is sufficient
             if ($currentBalance < $totalCost) {
-                $neededAmount = number_format($totalCost - $currentBalance, 2);
+                $neededAmount = $totalCost - $currentBalance;
                 return [
                     'status' => 'error',
                     'message' => 'Insufficient balance',

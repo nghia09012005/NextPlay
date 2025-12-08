@@ -390,48 +390,6 @@ class UserController {
             echo json_encode(['status' => 'success', 'isAdmin' => $isAdmin]);
         } catch (Exception $e) {
             $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
-            if (empty($json)) {
-                throw new Exception('No input data received', 400);
-            }
-            
-            $data = json_decode($json, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception('Invalid JSON format', 400);
-            }
-
-            if (!isset($data['newPassword'])) {
-                throw new Exception('New password is required', 400);
-            }
-
-            // Verify admin permissions (assuming session check is done or needed here)
-             if (!isset($_SESSION['user_id'])) { // Basic check, better to check role
-                 throw new Exception('Unauthorized', 401);
-             }
-
-             // You might want to add a check here to ensure the requester is an admin
-             // $isAdmin = $this->service->isAdmin($_SESSION['user_id']);
-             // if (!$isAdmin) throw new Exception('Access denied', 403);
-
-            $uid = isset($data['uid']) ? $data['uid'] : null;
-             if (!$uid) {
-                // Try from URL if not in body, though typically for POST actions body is safer or URL param
-                 // Implementation depends on how router passes ID. Let's assume BODY usage for this action
-                 throw new Exception('Target user ID is required', 400);
-            }
-
-            $result = $this->service->adminResetPassword($uid, $data['newPassword']);
-
-            if ($result) {
-                echo json_encode([
-                    'status' => 'success',
-                    'message' => 'Password reset successfully'
-                ]);
-            } else {
-                throw new Exception('Failed to reset password', 500);
-            }
-
-        } catch (Exception $e) {
-            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
             http_response_code($statusCode);
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
@@ -487,7 +445,7 @@ class UserController {
         }
     }
 
-    public function adminResetPasswordEndpoint() {
+    public function deposit($uid) {
         header('Content-Type: application/json');
         
         // Start session if not already started
@@ -496,6 +454,16 @@ class UserController {
         }
 
         try {
+            // Check authorization: User can only deposit to their own account
+            if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $uid) {
+                 // Unless admin? For now strictly own account or just rely on router auth check which passed $uid
+                 // The router calls this method with $uri[1] which is $uid from URL.
+                 // We should ensure the logged in user matches the target $uid.
+                 if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $uid) {
+                     throw new Exception('Unauthorized action', 403);
+                 }
+            }
+
             $json = file_get_contents("php://input");
             if (empty($json)) {
                 throw new Exception('No input data received', 400);
@@ -518,6 +486,56 @@ class UserController {
                 ]);
             } else {
                 throw new Exception('Deposit failed', 500);
+            }
+
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            http_response_code($statusCode);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function adminResetPasswordEndpoint() {
+        header('Content-Type: application/json');
+        
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        try {
+            $json = file_get_contents("php://input");
+            if (empty($json)) {
+                throw new Exception('No input data received', 400);
+            }
+            
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON format', 400);
+            }
+
+            if (!isset($data['newPassword'])) {
+                throw new Exception('New password is required', 400);
+            }
+
+            // Authorization check
+             if (!isset($_SESSION['user_id']) || !$this->service->isAdmin($_SESSION['user_id'])) {
+                 throw new Exception('Unauthorized access', 403);
+             }
+
+            $uid = isset($data['uid']) ? $data['uid'] : null;
+             if (!$uid) {
+                 throw new Exception('Target user ID is required', 400);
+            }
+
+            $result = $this->service->adminResetPassword($uid, $data['newPassword']);
+
+            if ($result) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Password reset successfully'
+                ]);
+            } else {
+                throw new Exception('Failed to reset password', 500);
             }
 
         } catch (Exception $e) {
